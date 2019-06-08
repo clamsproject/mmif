@@ -4,3 +4,17 @@ MMIF can have two different meanings. First, in a narrow sense, MMIF is an annot
 
 The draft of MMIF components, their specifications, and their implementation ideas can be found on [the github repository](https://github.com/clamsproject/mmif/tree/master/specifications/draft). Contributions are welcome via [the github issue tracker](https://github.com/clamsproject/mmif/issues). 
 
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-141649660-2"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-141649660-2');
+</script>
+
+
