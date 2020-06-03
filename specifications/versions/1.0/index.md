@@ -213,12 +213,12 @@ Here is an other example of a view containing two bounding boxes created by the 
   "annotations": [
      { "@type": "http://miff.clams.ai/vocabulary/1.0/BoundingBox",
        "id": "bb0",
-       "coordinates": [(10,20), (60,20), (10,50), (60,50)],
+       "coordinates": [[10,20], [60,20], [10,50], [60,50]],
        "properties": {}
       },
      { "@type": "http://miff.clams.ai/vocabulary/1.0/BoundingBox",
        "id": "bb1",
-       "coordinates": [(90,40), (110,40), (90,80), (110,80)],
+       "coordinates": [[90,40], [110,40], [90,80], [110,80]],
        "properties": {}
       }
     ]
@@ -263,7 +263,7 @@ In MMIF, this could look like (leaving out some details):
           "@type": "BoundingBox",
           "id": "bb1",
           "properties": {
-            "coordinates": [(90,40), (110,40), (90,50), (110,50)] }
+            "coordinates": [[90,40], [110,40], [90,50], [110,50] }
         }  
       ]
     }
