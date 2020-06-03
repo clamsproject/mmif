@@ -4,7 +4,7 @@ MMIF is an annotation format for audiovisual media as well as associated text li
 
 MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
 
-The current JSON schema for MMIF are at http://mmif.clams.ai/schema/mmif-schema-1.0.json and determine part of the syntactic shape of MMIF. The specifications here often refer to elements from the CLAMS  Vocabulary at [http://mmif.clams.ai/vocabulary/1.0](http://mmif.clams.ai/vocabulary/1.0) as well as to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). See later in this document for an introduction and comparison of those vocabularies.
+The current JSON schema for MMIF are at http://mmif.clams.ai/schema/mmif-1.0.json and determine part of the syntactic shape of MMIF. The specifications here often refer to elements from the CLAMS  Vocabulary at [http://mmif.clams.ai/vocabulary/1.0](http://mmif.clams.ai/vocabulary/1.0) as well as to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). See later in this document for an introduction and comparison of those vocabularies.
 
 
 
@@ -15,7 +15,7 @@ The basic idea is that in essence a MMIF file needs to represent two things:
 1. Media like texts, videos, images and audio recordings.
 2. Annotations over those media representing information that was added by processing the media. 
 
-Annotations are always stored separately from the media. They can be directly linked to a slice in the media (a string in a text, a shape in an image, or a time frame in a  video or audio). Annotations can also refer to other annotations, for example to specify relations between text strings. More specifically, a MMIF file contains a context, metadata, a list of media and a list of annotation views, where each view contains a list of annotation types like Segment, BoundingBox, VideoObject and NamedEntity. The top-level structure of a MMIF file is as follows:
+Annotations are always stored separately from the media. They can be directly linked to a slice in the media (a string in a text, a shape in an image, or a time frame in a  video or audio). Annotations can also refer to other annotations, for example to specify relations between text strings. More specifically, a MMIF file contains a context, metadata, a list of media and a list of annotation views, where each view contains a list of annotation types like Segment, BoundingBox, VideoObject or NamedEntity. The top-level structure of a MMIF file is as follows:
 
 ```json
 {
@@ -26,15 +26,15 @@ Annotations are always stored separately from the media. They can be directly li
 }
 ```
 
-The following sub sections will describe the values of these four properties.
+The following sub sections describe the values of these four properties.
 
 
 
 ### 1.1. The *@context* property
 
-The value here is the fixed URL http://mmif.clams.ai/specifications/context/miff-1.0.json which leads to a JSON-LD context document that points to various parts of the CLAMS vocabulary and defines terms used in MMIF. One thing it does is to define the location of the current version of the [CLAMS vocabulary](http://mmif.clams.ai/vocabulary/1.0), which allows us to use shortcuts in the "@type" property of annotations (see below in section 1.3). For example, when we use "Segment" as the type value this will be automatically be expanded to http://mmif.clams.ai/vocabulary/1.0/Segment.
+The value here is the fixed URL http://mmif.clams.ai/specifications/context/miff-1.0.json which leads to a JSON-LD context document that points to various parts of the CLAMS vocabulary and defines terms used in MMIF. One thing it does is to define the location of the current version of the [CLAMS vocabulary](http://mmif.clams.ai/vocabulary/1.0), which allows us to use shortcuts in the *@type* property of annotations (see below in section 1.3). For example, when we use "Segment" as the type value this will be automatically be expanded to http://mmif.clams.ai/vocabulary/1.0/Segment.
 
-> This context property was not used properly in LAPPS (as in, not all terms were defined), should think this through a bit more for CLAMS.
+> This context property was not used properly in LAPPS (as in, not all terms were defined and we did not update it), should think this through a bit more for CLAMS.
 
 
 
@@ -57,6 +57,8 @@ Includes any metadata associated with the file including MMIF and schema version
 
 Note that the schema version and the MMIF version are the same in the example above, but that is not necessarily the case, in general, the MMIF version will update more often than the schema version. The *contains* property stores a dictionary of annotation types with the identifiers for the views that the annotation objects occur in. This dictionary is for quick access to file content and is generated automatically from the view metadata.
 
+> We may move towards only having one version nuimber for the entire MMIF usiverse, that is, specifications, context, vocabulary and schema all have the same version number. We first need to establish though whether there are case where we want to allow a version of the vocabulary to be used with another version of the specifications.
+
 
 
 ### 1.3. The *media* property
@@ -68,31 +70,34 @@ The value is a list of media specifications where each media element has an iden
   "media": [
     {
       "id": "m0",
-      "type": "video/mp4",
+      "type": "video",
+      "mime": "video/mp4",
       "location": "/var/archive/video-0012.mp4"
     },
     {
       "id": "m1",
-      "type": "text/plain",
+      "type": "text",
+      "mime": "text/plain",
       "location": "/var/archive/video-0012-transcript.txt"
     }
   ]
 }
 ```
 
-The type is a MIME type and the location is a URL or a local path to a file. Alternatively, and for text only, the media could be inline, in which case the element is represented as in the *text* property in LIF, which is a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* and a *@language* key:
+The type is one of *text*, *video*, *audio* and *image*, but in the future more types may be added. The other properties store the MIME type and the location of the media file, which is a URL or a local path to a file. Alternatively, and for text only, the media could be inline, in which case the element is represented as in the *text* property in LIF, which is a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* and a *@language* key:
 
 ``` json
 {
   "media": [
     {
       "id": "m0",
-      "type": "video/mp4",
+      "type": "video",
+      "mime": "video/mp4",
       "location": "/var/archive/video-0012.mp4"
     },
     {
       "id": "m1",
-      "type": "text/plain",
+      "type": "text",
       "text": {
         "@value": "Fido barks",
         "@language": "en" }
@@ -101,11 +106,9 @@ The type is a MIME type and the location is a URL or a local path to a file. Alt
 }
 ```
 
-The value associated with *@value* is a string and the value associated with *@language* follows the rules in [BCP47](http://www.w3.org/TR/json-ld/#bib-bcp47), which for our current purposes boils down to using the ISO 639 code.
+The value associated with *@value* is a string and the value associated with *@language* follows the rules in [BCP47](http://www.w3.org/TR/json-ld/#bib-bcp47), which for our current purposes boils down to using the ISO 639 code. With inline text there is no MIME type.
 
-With LAPPS and LIF, there was only one medium, namely the text source for all annotations and how that source came into being was not represented in any way. For MMIF the situation is different in that there are four kinds of media (text, sounds, image, video) and there can be many instances of each type in a MMIF document. And some of those media can actually be the result of processing other media, for example when we recognize a text box in an image and run OCR over that box. 
-
-This introduces a need to elaborate on the representation of media, but we will return to this case in section 1.5 after we have introduced annotations.
+With LAPPS and LIF, there was only one medium, namely the text source, and how that source came into being was not represented in any way. For MMIF the situation is different in that there are four kinds of media and for each one there can be many instances in a MMIF document. And some of those media can actually be the result of processing other media, for example when we recognize a text box in an image and run OCR over that box. This introduces a need to elaborate on the representation of media, but we will return to this in section 1.5 after we have introduced annotations.
 
 
 
@@ -139,11 +142,7 @@ Before describing the metadata and annotation we list a few general principles r
 
 #### 1.4.1. The *view's metadata* property
 
-This property contains information to describe the annotations in a view. Here is an example for view with segments added by the CLAMS bars-and-tones tool:
-
-
-
-a `producer` key and optionally a `rules` keys (not shown here, but it could define a particular rule set or maybe a model used by the service). Here is an example of the value of the metadata property of a view:
+This property contains information about the annotations in a view. Here is an example for view with segments added by the CLAMS bars-and-tones tool:
 
 ```json
 {
@@ -154,15 +153,19 @@ a `producer` key and optionally a `rules` keys (not shown here, but it could def
   },
   "medium": "m3",
   "timestamp": "2020-05-27T12:23:45",
-  "tool": "http://tools.clams.io/bars-and-tones",
-  "tool-version": "1.0.2",
-  "tool-wrapper-version": "1.0.5"
+  "tool": "http://tools.clams.ai/bars-and-tones/1.0.5"
 }
 ```
 
+> Let's not put *rules* as a metadata property in the vocabulary.
+
 The *contains* dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary or properties of those annotation objects (they can also refer to user-defined objects or properties) and they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has specifies that the view contains *Segment* annotations and the metadata property *unit* is set to "seconds". Section 2 will go into more details on how the vocabulary and the view metadata interact.
 
-The *medium* key gives the identfier of the medium that the annotations are over. The *tool* key contains a URI that specifies what service created the annotation data. The *timestamp* key reflects when the view was created by the tool. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views which is significant because by default arrays in JSON-LD are not ordered. Finally, the metadata includes versioning information of the tool and the wrapper of the tool. 
+The *medium* key gives the identfier of the medium that the annotations are over.
+
+The *tool* key contains a URL that specifies what service created the annotation data. That URL should contain all information relevant for the tool: description, tool metadata, configuration etcetera. It should also contain a link the the Git repository for the tool (that repository will actually maintain all the information in the URL.
+
+The *timestamp* key reflects when the view was created by the tool. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views which is significant because by default arrays in JSON-LD are not ordered. Finally, the metadata includes versioning information of the tool and the wrapper of the tool.
 
 See https://github.com/clamsproject/mmif/issues/9 for a discussion on view metadata.
 
@@ -186,7 +189,7 @@ The value of the annotations property on a view is a list of annotation objects.
 
 The two required keys are *@type* and *properties*. The value of *@type* is an element of the CLAMS or LAPPS vocabulary or a user-defined annotation category defined elsewhere, for example by the creator of a tool. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI. The *id* key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s0”) or the identifier with a view identifier prefix (for example “v3:s0”). If there is no prefix the current view is assumed.
 
-The *properties* dictionary typically contains the features defined for the annotation category as defined in the vocabularies at http://mmif.clams.ai/vocabulary/1.0 or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *Segment* annotation type the vocabulary includes the feature like *segmentType* as well as the inherited features *id*, *start* and *end*. The specifications allow arbitrary features in the features dictionary. Values should be as specified in the vocabulary. Typically these are strings, identifiers and integers, or lists of strings, identifiers and integers.
+The *properties* dictionary typically contains the features defined for the annotation category as defined in the vocabularies at http://mmif.clams.ai/vocabulary/1.0 or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *Segment* annotation type the vocabulary includes the feature *segmentType* as well as the inherited features *id*, *start* and *end*. The specifications allow arbitrary features in the features dictionary. Values should be as specified in the vocabulary. Typically these are strings, identifiers and integers, or lists of strings, identifiers and integers.
 
 > Rewrite prose in the paragraph below, clarifying interactions with the context
 
@@ -228,7 +231,7 @@ Here is an other example of a view containing two bounding boxes created by the 
 
 
 
-## 1.5. More on the *media* property
+### 1.5. More on the *media* property
 
 Media can be generated from other media and/or from information in views. Assume the Tesseract OCR tool that takes and image and the coordinates of a bounding box (or a new images created from the source image and coordinates) and generates a new texts for the bounding box. That text will be stored as a text medium in the MMIF document and that text can be the starting point of chains of text processing where views over the medium are created.
 
@@ -238,7 +241,7 @@ Let's use an example of an image of a barking dog where a region of the image ha
 
 <img src="pi78oGjdT-annotated.jpg" border="1" height="200"/>
 
-In MMIF, this could look like (leaving out some details):
+In MMIF, this looks like the following (leaving out some details):
 
 ```json
 {
@@ -263,7 +266,7 @@ In MMIF, this could look like (leaving out some details):
           "@type": "BoundingBox",
           "id": "bb1",
           "properties": {
-            "coordinates": [[90,40], [110,40], [90,50], [110,50] }
+            "coordinates": [[90,40], [110,40], [90,50], [110,50]] }
         }  
       ]
     }
@@ -288,9 +291,11 @@ When we add results of processing as new media then those media need to assume s
 }
 ```
 
+> Need some way for Tesseract to know what bounding boxes to take. Either introducing some kind of type or maybe a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for a tool.
+
 Note the use of *source*, which points to a bounding box annotation in view *v1*. Indirectly that would alo represent that the bounding box was from image *m1*. Other metadata like timestamps and version information can/should be added as well.
 
-Note that the image just had a bounding box for the part of the image with the word *yelp*, but there were three other boxes that could have been input to OCR as well. The representation above would be rather inefficient because it would repeat similar metadata over and over again. So we introduce a mechanism that in a way does the same as the annotations list in a view in that it allows metadata to be stored only once:
+Note that the image just had a bounding box for the part of the image with the word *yelp*, but there were three other image regions that could have been input to OCR as well. The representation above would be rather inefficient because it would repeat similar metadata over and over again. So we introduce a mechanism that in a way does the same as the annotations list in a view in that it allows metadata to be stored only once:
 
 ```json
 {
@@ -301,15 +306,17 @@ Note that the image just had a bounding box for the part of the image with the w
     "tool": "http://tools.clams.io/tesseract-ocr" 
   },
   "submedia": [
-    { "id": "sm2", "annotation": "bb1", "text": { "@value": "yelp" }},
+    { "id": "sm1", "annotation": "bb1", "text": { "@value": "yelp" }},
     { "id": "sm2", "annotation": "bb2", "text": { "@value": "Arf" }},
-    { "id": "sm2", "annotation": "bb3", "text": { "@value": "bark" }},
-    { "id": "sm2", "annotation": "bb4", "text": { "@value": "woof" }}
+    { "id": "sm3", "annotation": "bb3", "text": { "@value": "bark" }},
+    { "id": "sm4", "annotation": "bb4", "text": { "@value": "woof" }}
   ]
 }
 ```
 
 The media set as a whole can be referred to with "m2", and the submedia by concatenating the medium and submedium identifiers as in "m2:sm1". Note how indivudual media have *annotation* properties that pick out the bounding box in the view that the text media were created from.
+
+> This is all rather preliminary, needs experimentation.
 
 
 
@@ -318,6 +325,21 @@ The media set as a whole can be referred to with "m2", and the submedia by conca
 
 
 ## 3. Compatibility with LAPPS Tools
+
+A converter is required to run LIF tools with MMIF as input. Here's two possible scenarios that the converter must be able to handle.
+
+##### Running LAPPS tools on the primary text sources
+
+In this simple case, a dummy LIF payload should be generated by the converter with the contents of the primary text source file taken as `text`. LAPPS tools can run taking the dummy LIF and returns a LIF with a number of new views generated. Then the converter takes that regular LIF payload and inserts new views in the LIF to the original MMIF.
+
+##### Running LAPPS tools on existing text annotation objects
+
+**This scenario includes running LAPPS tools on text sources generated from the primary AV meterial.**
+
+* OCR from video -> an annotation per box?  -> then, should LAPPS tools handle each box as one "document"? or can we concatenate all text from all boxes linearly and pass to linguistics tools?
+  * THIS case needs a lot more thoughts.
+* ASR from audio -> an annotation for an entire audio stream? -> then it's easy, treat it as one document
+* forced-aligned text -> forced alignment assumes the existence of a external original primary text file -> it's easy, treat it as primary text source
 
 
 
