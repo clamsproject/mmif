@@ -1,1 +1,38 @@
-{"context": "mmif-prototype-0.0.1.jsonld", "metadata": {}, "media": [{"id": "0", "type": "audio-video", "location": "/Users/kelleylynch/data/wgbh/data/cpb-aacip-507-zw18k75v1r.mp4", "location_tested": "/Users/kelleylynch/data/wgbh/data/cpb-aacip-507-ns0ks6jw2f.mp4", "metadata": {}}], "contains": {"slate-detection": "v_0"}, "views": [{"id": "v_0", "contains": {"slate-detection": {"producer": "<class 'slatedetect.SlateDetection'>", "gen_time": ""}}, "annotations": [{"start": "90", "end": "2460", "feature": {}, "id": 0, "attype": "slate-detection"}]}]}
+{
+  "context": "mmif-prototype-0.0.1.jsonld",
+  "metadata": {
+
+  },
+  "media": [
+    {
+      "id": "0",
+      "type": "audio-video",
+      "location": "/Users/kelleylynch/data/wgbh/data/cpb-aacip-507-zw18k75v1r.mp4",
+      "location_tested": "/Users/kelleylynch/data/wgbh/data/cpb-aacip-507-ns0ks6jw2f.mp4",
+      "metadata": {}
+    }
+  ],
+  "contains": {
+    "slate-detection": "v_0"
+  },
+  "views": [
+    {
+      "id": "v_0",
+      "contains": {
+        "slate-detection": {
+          "producer": "<class 'slatedetect.SlateDetection'>",
+          "gen_time": ""
+        }
+      },
+      "annotations": [
+        {
+          "start": "90",
+          "end": "2460",
+            "feature": {},
+          "id": 0,
+          "attype": "slate-detection"
+        }
+      ]
+    }
+  ]
+}

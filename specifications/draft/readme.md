@@ -63,7 +63,6 @@ TimeFrame
    unit - String
 ```
 
-
 The integer could refer to a second, a millisecond or a frame number (Alternatively, we can use an indutrial standard to refer frame numbers in the video metadata (if it exists). See https://en.wikipedia.org/wiki/Timecode and [SMPTE](https://en.wikipedia.org/wiki/SMPTE_timecode). 
 ), the `unit` attribute would encode that unless we stipulate that we use one type only in which case we do not need `unit`. For example, with chaptering/segmentation we could have `Chapter` or `Segment` as a subtype of `TimeFrame` much in the same way as `Paragraph` and `Sentence` in LIF are subtypes of `Region` (this similarity is intentional).
 
