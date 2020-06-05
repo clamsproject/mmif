@@ -1,0 +1,32 @@
+{
+    "@context" : {
+
+	"@vocab" : "http://mmif.clams.ai/0.1.0/vocab/",
+
+	"medium": "Annotation#medium",
+
+	"unit": "Region#unit",
+
+	"start": "Interval#start",
+	"end": "Interval#end",
+	"targets": "Interval#targets",
+
+	"point": "TimePoint#point",
+
+	"segmentType": "Segment#segmentType",
+
+	"title": "Chapter#title",
+
+	"coordinates": "BoundingBox#coordinates",
+	"timePoint": "BoundingBox#timePoint",
+
+	"boundingBoxes": "VideoObject#boundingBoxes",
+
+	"source_type": "Alignment#source_type",
+	"target_type": "Alignment#target_type",
+	"source": "Alignment#source",
+	"target": "Alignment#target",
+
+    }
+
+}

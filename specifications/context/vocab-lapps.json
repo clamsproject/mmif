@@ -1,0 +1,29 @@
+{
+    "@context" : {
+
+	"@vocab" : "http://vocab.lappsgrid.org/",
+
+	"types" : "http://vocab.lappsgrid.org/types/",
+
+	"tokenization" : "types:tokenization/",
+	"tagset" : "types:posType/",
+	"ner" : "types:ner/",
+	"coref" : "types:coref/",
+	"chunk" : "types:chunk/",
+
+	"token" : "http://vocab.lappsgrid.org/Token#",
+	"common" : "http://vocab.lappsgrid.org/Annotation#",
+
+	"id":"common:id",
+	"start":"common:start",
+	"end":"common:end",
+	"label":"common:label",
+
+	"pos" : "token:pos",
+	"lemma": "token:lemma",
+	"kind": "token:kind",
+	"word": "token:word",
+	"length": "token:length",
+	"orth": "token:orth"
+    }
+}
