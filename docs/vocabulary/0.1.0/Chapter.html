@@ -2,7 +2,7 @@
   <head>
     <link href="css/lappsstyle.css" rel="stylesheet" type="text/css"/>
     <title>
-      Segment
+      Chapter
     </title>
   </head>
   <body>
@@ -10,10 +10,10 @@
       <div id="intro">
         <div id="pageHeader">
           <h1>
-            CLAMS Exchange Vocabulary
+            CLAMS Vocabulary
           </h1>
           <h2>
-            version 1.0
+            version 0.1.0
           </h2>
         </div>
       </div>
@@ -38,8 +38,20 @@
           <span>
             &gt;
           </span>
+          <a href="Interval.html">
+            Interval
+          </a>
           <span>
-            Segment
+            &gt;
+          </span>
+          <a href="TimeFrame.html">
+            TimeFrame
+          </a>
+          <span>
+            &gt;
+          </span>
+          <span>
+            Chapter
           </span>
         </p>
         <br/>
@@ -51,7 +63,7 @@
               </b>
             </td>
             <td>
-              A time segment in an audio or video stream. Has sometimes been called TimeFrame.
+              Example case for when we do not want to use Segment with a specific segmentType or if we want to introduce special properties.
             </td>
           </tr>
           <tr>
@@ -61,8 +73,8 @@
               </b>
             </td>
             <td>
-              <a href="http://mmif.clams.ai/vocabulary/1.0/Segment.html">
-                http://mmif.clams.ai/vocabulary/1.0/Segment.html
+              <a href="http://mmif.clams.ai/vocabulary/0.1.0/Chapter.html">
+                http://mmif.clams.ai/vocabulary/0.1.0/Chapter.html
               </a>
             </td>
           </tr>
@@ -93,7 +105,7 @@
               String
             </td>
             <td>
-              The unit used to determine boundaries. For text regions this is typically *offsets* to indicate character offsets, for images this is could be *coordinates*, and for audio or video streams *seconds*, *milliseconds*, *timestamps* or *frames*.
+              The unit used to determine boundaries. For text regions this is typically *offsets* to indicate character offsets, for images this is could be *pixels*, and for audio or video streams *seconds*, *milliseconds*, *timestamps* or *frames*.
             </td>
           </tr>
         </table>
@@ -126,32 +138,37 @@
               </span>
             </td>
           </tr>
-          <tr>
-            <td>
-              producer
-            </td>
-            <td>
-              List of URI
-            </td>
-            <td>
-              The software that produced the annotations.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              rules
-            </td>
-            <td>
-              List of URI
-            </td>
-            <td>
-              The documentation (if any) for the rules that were used to identify the annotations.
-            </td>
-          </tr>
         </table>
         <h1>
           Properties
         </h1>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              title
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              Title of the chapter
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Interval
+        </h2>
         <table class="definition-table">
           <tr>
             <th class="fixed">
@@ -172,10 +189,7 @@
               Integer
             </td>
             <td>
-              The starting offset in the stream.
-              <span class="required">
-                [Required]
-              </span>
+              The starting offset in the primary data. What unit is used is determined by the *unit* metadata property.
             </td>
           </tr>
           <tr>
@@ -186,18 +200,18 @@
               Integer
             </td>
             <td>
-              The ending offset in the stream. If not used the Segment is a timepoint.
+              The ending offset in the primary data. What unit is used is determined by the *unit* metadata property.
             </td>
           </tr>
           <tr>
             <td>
-              segmentType
+              targets
             </td>
             <td>
-              String
+              List of IDs
             </td>
             <td>
-              The type of Segment. Could be bars-and-tones, speech, noise, music, other.
+              IDs of a sequence of annotations covering the region of primary data referred to by this annotation. Used as an alternative to *start* and *end* to point to component annotations (for example a token sequence) rather than directly into primary data, or to link two or more annotations (for example in a coreference annotation).
             </td>
           </tr>
         </table>
@@ -235,7 +249,7 @@
       </div>
     </div>
     <div id="footer">
-      Page generated on 2020-05-27 at 10:55:19
+      Page generated on 2020-06-04 at 21:44:19
     </div>
   </body>
 </html>

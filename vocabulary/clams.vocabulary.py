@@ -15,7 +15,13 @@ When you use the default output directory and merge changes into the master
 branch then the site at http://miff.clams.ai/vocabulary will be automatically
 updated.
 
+
+TODO. We now use a VERSION argument. This should probably instead be driven from
+checking out the version we want and then use the number in the VERSION file in
+the repository root.
+
 """
+
 
 import os
 import sys
@@ -156,7 +162,7 @@ class Page(object):
         self.soup.head.append(tag('title', text=title))
 
     def _add_header(self):
-        title = 'CLAMS Exchange Vocabulary'
+        title = 'CLAMS Vocabulary'
         version = 'version %s' % self.version
         header = DIV({'id': 'pageHeader'},
                      dtrs=[H1(title),
@@ -201,7 +207,7 @@ class IndexPage(Page):
         self._add_footer()
 
     def _add_description(self):
-        span1_text = "The CLAMS Services Exchange Vocabulary defines an ontology" \
+        span1_text = "The CLAMS Vocabulary defines an ontology" \
                      + " of terms for a core of objects and features exchanged" \
                      + " amongst tools that process multi-media data. It is based" \
                      + " on the LAPPS Web Service Exchange Vocabulary at "
@@ -372,7 +378,7 @@ if __name__ == '__main__':
     else:
         outdir = os.path.join('..', 'docs', 'vocabulary', version)
     setup(outdir)
-    clams_types = read_yaml("clams.vocabulary-%s.yaml" % version)
+    clams_types = read_yaml("clams.vocabulary.yaml")
     tree = Tree(clams_types)
     write_hierarchy(tree, outdir, version)
     write_pages(tree, outdir, version)

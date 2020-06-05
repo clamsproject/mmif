@@ -10,17 +10,17 @@
       <div id="intro">
         <div id="pageHeader">
           <h1>
-            CLAMS Exchange Vocabulary
+            CLAMS Vocabulary
           </h1>
           <h2>
-            version 1.0
+            version 0.1.0
           </h2>
         </div>
       </div>
       <div id="mainContent">
         <p>
           <span>
-            The CLAMS Services Exchange Vocabulary defines an ontology of terms for a core of objects and features exchanged amongst tools that process multi-media data. It is based on the LAPPS Web Service Exchange Vocabulary at
+            The CLAMS Vocabulary defines an ontology of terms for a core of objects and features exchanged amongst tools that process multi-media data. It is based on the LAPPS Web Service Exchange Vocabulary at
           </span>
           <a href="http://vocab.lappsgrid.org">
             http://vocab.lappsgrid.org.
@@ -43,7 +43,7 @@
                 Annotation
               </a>
               <span>
-                : [medium, producer, rules]
+                : [medium]
               </span>
               <span>
                 : id
@@ -80,11 +80,11 @@
                     <table class="h">
                       <tr>
                         <td class="tc" colspan="4">
-                          <a href="Span.html">
-                            Span
+                          <a href="TimePoint.html">
+                            TimePoint
                           </a>
                           <span>
-                            : targets
+                            : point
                           </span>
                         </td>
                       </tr>
@@ -102,11 +102,11 @@
                     <table class="h">
                       <tr>
                         <td class="tc" colspan="4">
-                          <a href="Segment.html">
-                            Segment
+                          <a href="Interval.html">
+                            Interval
                           </a>
                           <span>
-                            : start, end, segmentType
+                            : start, end, targets
                           </span>
                         </td>
                       </tr>
@@ -118,6 +118,25 @@
                         <td class="space">
                         </td>
                         <td>
+                          <table class="h">
+                            <tr>
+                              <td class="tc" colspan="4">
+                                <a href="Span.html">
+                                  Span
+                                </a>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="space">
+                              </td>
+                              <td class="bar">
+                              </td>
+                              <td class="space">
+                              </td>
+                              <td>
+                              </td>
+                            </tr>
+                          </table>
                           <table class="h">
                             <tr>
                               <td class="tc" colspan="4">
@@ -134,28 +153,50 @@
                               <td class="space">
                               </td>
                               <td>
-                              </td>
-                            </tr>
-                          </table>
-                          <table class="h">
-                            <tr>
-                              <td class="tc" colspan="4">
-                                <a href="Chapter.html">
-                                  Chapter
-                                </a>
-                                <span>
-                                  : title
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td class="space">
-                              </td>
-                              <td class="bar">
-                              </td>
-                              <td class="space">
-                              </td>
-                              <td>
+                                <table class="h">
+                                  <tr>
+                                    <td class="tc" colspan="4">
+                                      <a href="Segment.html">
+                                        Segment
+                                      </a>
+                                      <span>
+                                        : segmentType
+                                      </span>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td class="space">
+                                    </td>
+                                    <td class="bar">
+                                    </td>
+                                    <td class="space">
+                                    </td>
+                                    <td>
+                                    </td>
+                                  </tr>
+                                </table>
+                                <table class="h">
+                                  <tr>
+                                    <td class="tc" colspan="4">
+                                      <a href="Chapter.html">
+                                        Chapter
+                                      </a>
+                                      <span>
+                                        : title
+                                      </span>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td class="space">
+                                    </td>
+                                    <td class="bar">
+                                    </td>
+                                    <td class="space">
+                                    </td>
+                                    <td>
+                                    </td>
+                                  </tr>
+                                </table>
                               </td>
                             </tr>
                           </table>
@@ -169,7 +210,7 @@
                             BoundingBox
                           </a>
                           <span>
-                            : coordinates, segment
+                            : coordinates, timePoint
                           </span>
                         </td>
                       </tr>
@@ -232,10 +273,10 @@
                             Alignment
                           </a>
                           <span>
-                            : [region1_type, region2_type]
+                            : [source_type, target_type]
                           </span>
                           <span>
-                            : region1, region2
+                            : source, target
                           </span>
                         </td>
                       </tr>
@@ -260,7 +301,7 @@
       </div>
     </div>
     <div id="footer">
-      Page generated on 2020-05-27 at 10:55:19
+      Page generated on 2020-06-04 at 21:44:18
     </div>
   </body>
 </html>
