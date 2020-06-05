@@ -1,0 +1,247 @@
+<html>
+  <head>
+    <link href="css/lappsstyle.css" rel="stylesheet" type="text/css"/>
+    <title>
+      Alignment
+    </title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="intro">
+        <div id="pageHeader">
+          <h1>
+            CLAMS Exchange Vocabulary
+          </h1>
+          <h2>
+            version 1.0
+          </h2>
+        </div>
+      </div>
+      <div id="mainContent">
+        <div id="sectionbar">
+          <p>
+            <a href="index.html">
+              Home
+            </a>
+          </p>
+        </div>
+        <p class="head">
+          <a href="Annotation.html">
+            Annotation
+          </a>
+          <span>
+            &gt;
+          </span>
+          <a href="Relation.html">
+            Relation
+          </a>
+          <span>
+            &gt;
+          </span>
+          <span>
+            Alignment
+          </span>
+        </p>
+        <br/>
+        <table>
+          <tr>
+            <td class="fixed">
+              <b>
+                Definition
+              </b>
+            </td>
+            <td>
+              An alignment relation between two Regions.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>
+                URI
+              </b>
+            </td>
+            <td>
+              <a href="http://mmif.clams.ai/vocabulary/1.0/Alignment.html">
+                http://mmif.clams.ai/vocabulary/1.0/Alignment.html
+              </a>
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Metadata
+        </h1>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              region1_type
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              The type of the first of the aligned Regions.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              region2_type
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              The type of the second of the aligned Regions.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Metadata from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              medium
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the medium that the annotation is over.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              producer
+            </td>
+            <td>
+              List of URI
+            </td>
+            <td>
+              The software that produced the annotations.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              rules
+            </td>
+            <td>
+              List of URI
+            </td>
+            <td>
+              The documentation (if any) for the rules that were used to identify the annotations.
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Properties
+        </h1>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              region1
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The first of the aligned Regions.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              region2
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The first of the aligned Regions.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              id
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              A unique identifier for the annotation. Uniqueness is relative to the view the annotation is in.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <br/>
+      </div>
+    </div>
+    <div id="footer">
+      Page generated on 2020-05-27 at 10:55:20
+    </div>
+  </body>
+</html>

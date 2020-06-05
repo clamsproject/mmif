@@ -1,0 +1,191 @@
+
+name: Annotation
+parent: null
+
+description: >-
+  Any kind of information added to primary data. Could be a region over the
+  primary data or a relation over regions.
+
+metadata:
+  medium:
+    type: ID
+    description: The identifier of the medium that the annotation is over.
+    required: true
+  producer:
+    type: List of URI
+    description: The software that produced the annotations.
+  rules:
+    type: List of URI
+    description: The documentation (if any) for the rules that were used to identify the annotations.
+  
+properties:
+  id:
+    type: ID
+    description: >-
+      A unique identifier for the annotation. Uniqueness is relative to the view
+      the annotation is in.
+    required: true
+
+---
+
+name: Region
+parent: Annotation
+
+description: >-
+  An annotation over a region in primary data where primary data can be a text,
+  an image, an audio stream or a video streem. Typically one of the sub types
+  of this will be used.
+
+metadata:
+
+  unit:
+    type: String
+    description: >-
+      The unit used to determine boundaries. For text regions this is typically
+      *offsets* to indicate character offsets, for images this is could be
+      *coordinates*, and for audio or video streams *seconds*, *milliseconds*,
+      *timestamps* or *frames*.
+
+---
+
+name: Span
+parent: Region
+
+similarTo: http://vocab.lappsgrid.org/Region
+
+description: >-
+  An annotation over a region in primary text data. A Span may be defined by
+  pointing directly into primary data (by using start and end offsets) or
+  by linking to one or more other Annotations with the targets property.
+
+properties:
+  targets:
+    type: List of IDs
+    description: >-
+      IDs of a sequence of annotations covering the region of primary data
+      referred to by this annotation. Used as an alternative to <em>start</em>
+      and <em>end</em> to point to component annotations (e.g., a token
+      sequence) rather than directly into primary data, or to link two or more
+      annotations (e.g., in a coreference annotation).
+    start:
+      type: Integer
+      description: The starting offset (0-based) in the primary data.
+    end:
+      type: Integer
+      description: The ending offset (0-based) in the primary data.
+
+---
+
+name: Segment
+parent: Region
+
+description: >-
+  A time segment in an audio or video stream. Has sometimes been called TimeFrame.
+
+properties:
+  start:
+    type: Integer
+    description: The starting offset in the stream.
+    required: true
+  end:
+    type: Integer
+    description: The ending offset in the stream. If not used the Segment is a timepoint.
+  segmentType:
+    type: String
+    description: The type of Segment. Could be bars-and-tones, speech, noise, music, other.
+
+---
+
+name: TimeFrame
+parent: Segment
+
+description: TimeFrame
+
+---
+
+name: Chapter
+parent: Segment
+description: >-
+  Example case for when we do not want to use segmentType or if we want to
+  introduce special properties.
+  
+properties:
+  title:
+    type: String
+    description: Title of the chapter
+
+---
+
+name: BoundingBox
+parent: Region
+
+description: >-
+  A polygon in an image or video. NOTE: maybe restrict this to images only (so
+  the segment property would disappear) and then always use VideoObject when we
+  introduce the third dimension.
+
+properties:
+  coordinates:
+    type: List of pairs
+    description: The coordinates of the polygon.
+    required: true
+  segment:
+    type: ID
+    description: If on a video, the Segment that the BoundingBox occurs in.
+
+---
+
+name: VideoObject
+parent: Region
+
+description: >-
+  A sequence of BoundingBoxes, each BoundingBox is assumed to be associated with
+  a Segment.
+  
+properties:
+  boundingBoxes:
+    type: List of IDs
+    description: The BoundingBoxes that make up the object.
+    required: true
+
+---
+
+name: Relation
+parent: Annotation
+
+description: >-
+  Any relationship between two or more annotation types. For texts could be a
+  grammatical relation such as subject-object, a semantic relation between
+  meanings or roles, or a temporal relation indicating the simultaneity or
+  ordering in time of events or states. For image regions and video objects this
+  could invloves spatial relations or part-whole relations.
+
+---
+
+name: Alignment
+parent: Relation
+
+description: An alignment relation between two Regions.
+
+metadata:
+  region1_type:
+    type: String
+    description: The type of the first of the aligned Regions.
+    required: true
+  region2_type:
+    type: String
+    description: The type of the second of the aligned Regions.
+    required: true
+
+properties:
+  region1:
+    type: ID
+    description: The first of the aligned Regions.
+    required: true
+  region2:
+    type: ID
+    description: The first of the aligned Regions.
+    required: true
+
+
+
