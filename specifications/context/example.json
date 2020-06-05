@@ -1,0 +1,42 @@
+{
+    "@context": "http://mmif.clams.ai/0.1.0/context/mmif.jsonld",
+
+    "metadata": {
+	"mmif": "http://mmif.clams.ai/0.1.0",
+	"contains": {
+	    "http://mmif.clams.ai/1.0/vocabulary/Segment": ["v1", "v2"],
+	    "http://vocab.lappsgrid.org/Token": ["v3"]
+	}
+    },
+
+    "media": [
+
+    ],
+
+    "views": [
+
+	{
+	    "id": "v1",
+	    "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.jsonld",
+	    "metadata": {
+		"contains": {
+		    "Segment": { "unit": "seconds" }}},
+	    "annotations": [
+		{ "@type": "Segment",
+		  "properties": {
+		      "id": "s1",
+		      "segmentType": "bars-and-tones"
+		  }
+		}
+	    ],
+	},
+
+	{
+	    "id": "v2",
+	    "@context": "http://mmif.clams.ai/0.1.0/context/vocab-lapps.jsonld",
+	    "metadata": {},
+	    "annotations": []
+	}
+
+    ]
+}

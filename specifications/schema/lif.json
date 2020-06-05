@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Multi-Media Interchange Format",
-    "description": "The JSON-LD objects exchanged by CLAMS web services.",
+    "title": "LAPPS Interchange Format",
+    "description": "The JSON-LD objects exchanged by LAPPS web services.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -39,12 +39,6 @@
         "metadata": {
             "$ref": "#/definitions/map"
         },
-        "media": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/media"
-            }
-        }
         "views": {
             "type": "array",
             "items": {

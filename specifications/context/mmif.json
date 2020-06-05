@@ -1,0 +1,28 @@
+{
+    "@context" : {
+
+	"@vocab" : "http://mmif.clams.ai/0.1.0/vocab/mmif",
+
+	"mmif" : "http://mmif.clams.ai/0.1.0/vocab/mmif",
+
+	"media": "mmif:media",
+	"submedia": "mmif:submedia",
+	"text": "mmif:text",
+
+	"metadata": "mmif:metadata",
+	"contains": "mmif:contains",
+	"timestamp": "mmif:timestamp",
+	"type": "mmif:type",
+	"mime": "mmif:mime",
+	"location": "mmif:location",
+	"source": "mmif:source",
+
+	"views": "mmif:views",
+
+	"annotation": "mmif:annotation",
+	"annotations": "mmif:annotations",
+
+	"NOTE": "PROBABLY_ALL_WE NEED_IS_THE_VOCAB_LINE"
+    }
+
+}

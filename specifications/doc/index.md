@@ -4,7 +4,9 @@ MMIF is an annotation format for audiovisual media as well as associated text li
 
 MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
 
-The current JSON schema for MMIF are at http://mmif.clams.ai/schema/mmif-1.0.json and determine part of the syntactic shape of MMIF. The specifications here often refer to elements from the CLAMS  Vocabulary at [http://mmif.clams.ai/vocabulary/1.0](http://mmif.clams.ai/vocabulary/1.0) as well as to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). See later in this document for an introduction and comparison of those vocabularies.
+> In the following we are still rather cavalier on where all the versioned files are. For now we use version 0.1.0 as an example, but note that files may not yet be available where they are supposed to be.
+
+The current JSON schema for MMIF are at http://mmif.clams.ai/0.1.0/schema/mmif.json and determine part of the syntactic shape of MMIF. The specifications here often refer to elements from the CLAMS  Vocabulary at http://mmif.clams.ai/o.1.0/vocabulary) as well as to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). See later in this document for an introduction and comparison of those vocabularies.
 
 
 
@@ -19,7 +21,7 @@ Annotations are always stored separately from the media. They can be directly li
 
 ```json
 {
-  "@context": "http://mmif.clams.ai/specifications/context/miff-1.0.json",
+  "@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
   "metadata": { },
   "media": [ ],
   "views": [ ]
@@ -32,21 +34,22 @@ The following sub sections describe the values of these four properties.
 
 ### 1.1. The *@context* property
 
-The value here is the fixed URL http://mmif.clams.ai/specifications/context/miff-1.0.json which leads to a JSON-LD context document that points to various parts of the CLAMS vocabulary and defines terms used in MMIF. One thing it does is to define the location of the current version of the [CLAMS vocabulary](http://mmif.clams.ai/vocabulary/1.0), which allows us to use shortcuts in the *@type* property of annotations (see below in section 1.3). For example, when we use "Segment" as the type value this will be automatically be expanded to http://mmif.clams.ai/vocabulary/1.0/Segment.
+The value here is the fixed URL http://mmif.clams.ai/0.1.0/context/miff.json which leads to a JSON-LD context document that points to various parts of the CLAMS vocabulary and defines terms used in MMIF. One thing it does is to define the location of the matching version of the [CLAMS vocabulary](http://mmif.clams.ai/vocabulary/1.0), which allows us to use shortcuts in the *@type* property of annotations (see below in section 1.3). For example, when we use "Segment" then this will be automatically be expanded to http://mmif.clams.ai/0.1.0/vocabulary/Segment.
 
 > This context property was not used properly in LAPPS (as in, not all terms were defined and we did not update it), should think this through a bit more for CLAMS.
+
+> This is outdated now that we have split the context into a more syntactic MMIF part and a semantic vocabulary part. To be updated.
 
 
 
 ### 1.2. The *metadata* property
 
-Includes any metadata associated with the file including MMIF and schema versioning and an index of contents of views.
+Includes any metadata associated with the file including MMIF version and an index of contents of views.
 
 ```json
 {
   "metadata": {
-    "schema": "http://miff.clams.ai/specifications/schema/mmif-1.0.json",
-    "mmif": "http://miff.clams.ai/specifications/1.0",
+    "mmif": "http://miff.clams.ai/0.1.0",
     "contains": {
       "http://mmif.clams.ai/vocabulary/1.0/Segment": ["v1", "v2"],
       "http://vocab.lappsgrid.org/Token": ["v3"]
@@ -55,9 +58,9 @@ Includes any metadata associated with the file including MMIF and schema version
 }
 ```
 
-Note that the schema version and the MMIF version are the same in the example above, but that is not necessarily the case, in general, the MMIF version will update more often than the schema version. The *contains* property stores a dictionary of annotation types with the identifiers for the views that the annotation objects occur in. This dictionary is for quick access to file content and is generated automatically from the view metadata.
+The *mmif* property points at the MMIF version that is used in the document. The *contains* property stores a dictionary of annotation types with the identifiers for the views that the annotation objects occur in. This dictionary is for quick access to file content and is generated automatically from the view metadata.
 
-> We may move towards only having one version nuimber for the entire MMIF usiverse, that is, specifications, context, vocabulary and schema all have the same version number. We first need to establish though whether there are case where we want to allow a version of the vocabulary to be used with another version of the specifications.
+> MMIF has many parts to it: specifications, schema, context files, vocabulary and SDK. For now we assume that these are all included under the one version number. We are considering whether there is a need for keeping separate versioning for those components (but would liek to avoid that).
 
 
 
@@ -121,7 +124,7 @@ This is where all the annotations and associated metadata live. Views contain st
   "views": [
     {
       "id": "v0",
-      "@context": "http://mmif.clams.ai/specifications/context/lif-1.0.json",
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": { },
       "annotations": [ ]
     }
@@ -129,7 +132,7 @@ This is where all the annotations and associated metadata live. Views contain st
 }
 ```
 
-Each view has a unique identifier. Annotation elements in the view have identifiers unique to the view and these elements can be uniquely referred to from outside the view by using the view identifier and the annotation element identifier. For example, if the view above had an annotation with identfier "a8" then it could be referred to from outside the view by "v0:a8". The optional *@context* property is useful for views with results from LAPPS tools. Recall that the context introduced in the top level is a context that defines all kinds of terms from the CLAMS vocabulary. The problem is that there could be terms in the CLAMS and LAPPS vocabularies with the same name but with different meanings. There is no way to deal with that ambiguity in one context file so we allow a view to have a more specific LAPPS-oriented context  that overrules the CLAMS context.
+Each view has a unique identifier. Annotation elements in the view have identifiers unique to the view and these elements can be uniquely referred to from outside the view by using the view identifier and the annotation element identifier. For example, if the view above had an annotation with identfier "a8" then it could be referred to from outside the view by "v0:a8". The *@context* property defines the vocabulary vocabulary contex for the annotations in the view. Here we have the CLAMS vocabulary, but for views with results from LAPPS services we can use the LAPPS vocabulary context.
 
 Before describing the metadata and annotation we list a few general principles relevant to views:
 
@@ -137,6 +140,7 @@ Before describing the metadata and annotation we list a few general principles r
 2. Services may create as many new views as they want.
 3. Services may not add information to existing views, that is, views are read only, which has many advantages at the cost of some redundancy. Since views are read-only, services may not overwrite or delete information in existing views. This holds for the view’s metadata as well as the annotations.
 4. Annotations in views have identifiers that are unique to the view. Views have identifiers that uniquely define them relative to other views.
+5. Views should not mix annotations from CLAMS and LAPPS services.
 
 
 
@@ -147,7 +151,7 @@ This property contains information about the annotations in a view. Here is an e
 ```json
 {
   "contains": {
-    "http://mmif.clams.ai/vocabulary/1.0/Segment": {
+    "http://mmif.clams.ai/0.1.0/vocabulary/Segment": {
       "unit": "seconds"
     }
   },
@@ -189,7 +193,7 @@ The value of the annotations property on a view is a list of annotation objects.
 
 The two required keys are *@type* and *properties*. The value of *@type* is an element of the CLAMS or LAPPS vocabulary or a user-defined annotation category defined elsewhere, for example by the creator of a tool. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI. The *id* key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s0”) or the identifier with a view identifier prefix (for example “v3:s0”). If there is no prefix the current view is assumed.
 
-The *properties* dictionary typically contains the features defined for the annotation category as defined in the vocabularies at http://mmif.clams.ai/vocabulary/1.0 or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *Segment* annotation type the vocabulary includes the feature *segmentType* as well as the inherited features *id*, *start* and *end*. The specifications allow arbitrary features in the features dictionary. Values should be as specified in the vocabulary. Typically these are strings, identifiers and integers, or lists of strings, identifiers and integers.
+The *properties* dictionary typically contains the features defined for the annotation category as defined in the vocabularies at http://mmif.clams.ai/0.1.0/vocabulary or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *Segment* annotation type the vocabulary includes the feature *segmentType* as well as the inherited features *id*, *start* and *end*. The specifications allow arbitrary features in the features dictionary. Values should be as specified in the vocabulary. Typically these are strings, identifiers and integers, or lists of strings, identifiers and integers.
 
 > Rewrite prose in the paragraph below, clarifying interactions with the context
 
@@ -204,7 +208,7 @@ Here is an other example of a view containing two bounding boxes created by the 
   "id": "v1",
   "metadata": {
     "contains": {
-      "http://miff.clams.ai/vocabulary/1.0/BoundingBox": {
+      "http://miff.clams.ai/0.1.0/vocabulary/BoundingBox": {
         "unit": "pixels" }
     },
     "medium": "image3",
@@ -214,12 +218,12 @@ Here is an other example of a view containing two bounding boxes created by the 
     "tool-wrapper-version": "1.0.4"
   },
   "annotations": [
-     { "@type": "http://miff.clams.ai/vocabulary/1.0/BoundingBox",
+     { "@type": "http://miff.clams.ai/0.1.0/vocabulary/BoundingBox",
        "id": "bb0",
        "coordinates": [[10,20], [60,20], [10,50], [60,50]],
        "properties": {}
       },
-     { "@type": "http://miff.clams.ai/vocabulary/1.0/BoundingBox",
+     { "@type": "http://miff.clams.ai/0.1.0/vocabulary/BoundingBox",
        "id": "bb1",
        "coordinates": [[90,40], [110,40], [90,80], [110,80]],
        "properties": {}
