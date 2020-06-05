@@ -2,7 +2,7 @@
   <head>
     <link href="css/lappsstyle.css" rel="stylesheet" type="text/css"/>
     <title>
-      Chapter
+      BoundingBox
     </title>
   </head>
   <body>
@@ -10,10 +10,10 @@
       <div id="intro">
         <div id="pageHeader">
           <h1>
-            CLAMS Exchange Vocabulary
+            CLAMS Vocabulary
           </h1>
           <h2>
-            version 1.0
+            version 0.1.0
           </h2>
         </div>
       </div>
@@ -38,14 +38,8 @@
           <span>
             &gt;
           </span>
-          <a href="Segment.html">
-            Segment
-          </a>
           <span>
-            &gt;
-          </span>
-          <span>
-            Chapter
+            BoundingBox
           </span>
         </p>
         <br/>
@@ -57,7 +51,7 @@
               </b>
             </td>
             <td>
-              Example case for when we do not want to use segmentType or if we want to introduce special properties.
+              A polygon in an image or video. This is a two-dimensional object so if this occurs in a video it will be anchored to a particular frame or time point in the video.
             </td>
           </tr>
           <tr>
@@ -67,8 +61,8 @@
               </b>
             </td>
             <td>
-              <a href="http://mmif.clams.ai/vocabulary/1.0/Chapter.html">
-                http://mmif.clams.ai/vocabulary/1.0/Chapter.html
+              <a href="http://mmif.clams.ai/vocabulary/0.1.0/BoundingBox.html">
+                http://mmif.clams.ai/vocabulary/0.1.0/BoundingBox.html
               </a>
             </td>
           </tr>
@@ -99,7 +93,7 @@
               String
             </td>
             <td>
-              The unit used to determine boundaries. For text regions this is typically *offsets* to indicate character offsets, for images this is could be *coordinates*, and for audio or video streams *seconds*, *milliseconds*, *timestamps* or *frames*.
+              The unit used to determine boundaries. For text regions this is typically *offsets* to indicate character offsets, for images this is could be *pixels*, and for audio or video streams *seconds*, *milliseconds*, *timestamps* or *frames*.
             </td>
           </tr>
         </table>
@@ -132,28 +126,6 @@
               </span>
             </td>
           </tr>
-          <tr>
-            <td>
-              producer
-            </td>
-            <td>
-              List of URI
-            </td>
-            <td>
-              The software that produced the annotations.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              rules
-            </td>
-            <td>
-              List of URI
-            </td>
-            <td>
-              The documentation (if any) for the rules that were used to identify the annotations.
-            </td>
-          </tr>
         </table>
         <h1>
           Properties
@@ -172,40 +144,13 @@
           </tr>
           <tr>
             <td>
-              title
+              coordinates
             </td>
             <td>
-              String
+              List of pairs
             </td>
             <td>
-              Title of the chapter
-            </td>
-          </tr>
-        </table>
-        <h2>
-          Properties from Segment
-        </h2>
-        <table class="definition-table">
-          <tr>
-            <th class="fixed">
-              Property
-            </th>
-            <th class="fixed">
-              Type
-            </th>
-            <th>
-              Description
-            </th>
-          </tr>
-          <tr>
-            <td>
-              start
-            </td>
-            <td>
-              Integer
-            </td>
-            <td>
-              The starting offset in the stream.
+              The coordinates of the polygon.
               <span class="required">
                 [Required]
               </span>
@@ -213,24 +158,13 @@
           </tr>
           <tr>
             <td>
-              end
+              timePoint
             </td>
             <td>
-              Integer
+              ID
             </td>
             <td>
-              The ending offset in the stream. If not used the Segment is a timepoint.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              segmentType
-            </td>
-            <td>
-              String
-            </td>
-            <td>
-              The type of Segment. Could be bars-and-tones, speech, noise, music, other.
+              If on a video stream, the TimePoint that the BoundingBox occurs in.
             </td>
           </tr>
         </table>
@@ -268,7 +202,7 @@
       </div>
     </div>
     <div id="footer">
-      Page generated on 2020-05-27 at 10:55:20
+      Page generated on 2020-06-04 at 21:44:19
     </div>
   </body>
 </html>
