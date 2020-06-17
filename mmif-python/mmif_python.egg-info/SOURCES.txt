@@ -1,0 +1,9 @@
+README.md
+setup.py
+mmif/__init__.py
+mmif/serialize/__init__.py
+mmif/vocab/__init__.py
+mmif_python.egg-info/PKG-INFO
+mmif_python.egg-info/SOURCES.txt
+mmif_python.egg-info/dependency_links.txt
+mmif_python.egg-info/top_level.txt
