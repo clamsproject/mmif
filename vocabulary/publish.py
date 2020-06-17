@@ -1,24 +1,22 @@
-"""clams.vocabulary.py
+"""publish.py
 
 Script to create webpages from a YAML file with the vocabulary.
 
 Usage:
 
-$ python clams.vocabulary.py VERSION OUTDIR?
+$ python publish.py
+$ python publish.py --test
 
-The input is clams.vocabulary-VERSION.yaml and the webpages are written to
-OUTDIR. If there is no OUTDIR parameter then the webpages are written to
-../docs/vocabulary/VERSION. If the output directory exists then files in it
-will be overwritten.
+This takes the vocabulary specifications in clams.vocabulary.yaml and write
+webpages to ../docs/VERSION/vocabulary. The actual version is taken from the
+VERSION file in the top-level directory of this repository. If the output
+directory exists then files in it will be overwritten.
+
+With the --test option files will be written to www in this directory.
 
 When you use the default output directory and merge changes into the master
 branch then the site at http://miff.clams.ai/vocabulary will be automatically
 updated.
-
-
-TODO. We now use a VERSION argument. This should probably instead be driven from
-checking out the version we want and then use the number in the VERSION file in
-the repository root.
 
 """
 
@@ -32,7 +30,8 @@ import yaml
 from bs4 import BeautifulSoup
 
 
-VOCABULARY_URL = 'http://mmif.clams.ai/vocabulary'
+VERSION = open('../VERSION').read().strip()
+VOCABULARY_URL = 'http://mmif.clams.ai/%s/vocabulary' % VERSION
 
 
 def read_yaml(fname):
@@ -216,14 +215,12 @@ class IndexPage(Page):
         span3_text = "In the hierarchy below annotation types are printed with the" \
                      " properties defined for them, metadata properties are printed" \
                      " between square brackets."
-        link = HREF('http://vocab.lappsgrid.org', 'http://vocab.lappsgrid.org.')
-        p1 = tag('p',
-                dtrs=[SPAN(text=span1_text),
-                      link,
-                      SPAN(text=span2_text),
-                      SPAN(text=span3_text)])
-        p2 = tag('p', text=span3_text)
-        self.main_content.extend([p1, p2])
+        url = 'http://vocab.lappsgrid.org'
+        p1 = tag('p', dtrs=[SPAN(text=span1_text),
+                            HREF(url, url + '.'),
+                            SPAN(text=span2_text),
+                            SPAN(text=span3_text)])
+        self.main_content.append(p1)
         self._add_space()
 
     def _add_tree(self, clams_type, soup_node):
@@ -297,7 +294,7 @@ class TypePage(Page):
         self._add_space()
 
     def _add_definition(self):
-        url = '%s/%s/%s.html' % (VOCABULARY_URL, self.version, self.name)
+        url = '%s/%s.html' % (VOCABULARY_URL, self.name)
         table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
                                            dtrs=[tag('b', text='Definition')]),
                                        tag('td', text=self.description)]),
@@ -370,15 +367,15 @@ def setup(outdir):
     shutil.copy('lappsstyle.css', css_dir)
 
 
+
 if __name__ == '__main__':
 
-    version = sys.argv[1]
-    if len(sys.argv) > 2:
-        outdir = sys.argv[2]
-    else:
-        outdir = os.path.join('..', 'docs', 'vocabulary', version)
+    outdir =  os.path.join('..', 'docs', VERSION, 'vocabulary')
+    if len(sys.argv) > 1 and sys.argv[1] == '--test':
+        outdir = 'www'
     setup(outdir)
+    print("Creating webpages in '%s'" % outdir)
     clams_types = read_yaml("clams.vocabulary.yaml")
     tree = Tree(clams_types)
-    write_hierarchy(tree, outdir, version)
-    write_pages(tree, outdir, version)
+    write_hierarchy(tree, outdir, VERSION)
+    write_pages(tree, outdir, VERSION)
