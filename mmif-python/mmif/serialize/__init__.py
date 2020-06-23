@@ -66,7 +66,7 @@ class Mmif(MmifObject):
 
     def validate(self, json_str):
         json_dict: dict = json.loads(json_str)
-        assert len(json_dict) == 4
+        assert len(json_dict) == 5
         assert set(json_dict.keys()) == {'@context', 'metadata', 'media', 'views'}
         assert isinstance(json_dict['@context'], str)
         assert isinstance(json_dict['metadata'], dict)
