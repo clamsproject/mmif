@@ -1,11 +1,15 @@
 import datetime
 import json
+import os
+from typing import Any
+
+from jsonschema import validate, ValidationError
 
 
 class MmifObject(object):
     def __init__(self, mmif_json=None):
         if mmif_json is not None:
-            self.validate(mmif_json)
+            # self.validate(mmif_json)
             self.deserialize(mmif_json)
 
     def serialize(self):
@@ -20,8 +24,8 @@ class MmifObject(object):
     def pretty(self):
         return json.dumps(self, indent=2, cls=MmifObjectEncoder)
 
-    def validate(self, json_str):
-        raise NotImplementedError()
+    # def validate(self, json_str):
+    #     raise NotImplementedError()
 
 
 class MmifObjectEncoder(json.JSONEncoder):
@@ -47,6 +51,7 @@ class Mmif(MmifObject):
         self.media = []
         self.contains = {}
         self.views = []
+        self.validate(mmif_json)
         super().__init__(mmif_json)
 
     def serialize(self):
@@ -64,14 +69,20 @@ class Mmif(MmifObject):
         self.media = in_json["media"]
         self.views = in_json["views"]
 
-    def validate(self, json_str):
-        json_dict: dict = json.loads(json_str)
-        assert len(json_dict) == 5
-        assert set(json_dict.keys()) == {'@context', 'metadata', 'media', 'views', 'contains'}
-        assert isinstance(json_dict['@context'], str)
-        assert isinstance(json_dict['metadata'], dict)
-        assert isinstance(json_dict['media'], list)
-        assert isinstance(json_dict['views'], list)
+    # def validate(self, json_str):
+    #     json_dict: dict = json.loads(json_str)
+    #     assert len(json_dict) == 5
+    #     assert set(json_dict.keys()) == {'@context', 'metadata', 'media', 'views', 'contains'}
+    #     assert isinstance(json_dict['@context'], str)
+    #     assert isinstance(json_dict['metadata'], dict)
+    #     assert isinstance(json_dict['media'], list)
+    #     assert isinstance(json_dict['views'], list)
+
+    @staticmethod
+    def validate(json_str) -> str:
+        with open(os.path.join("..", "..", "schema", "mmif.json"), "r") as schema_json:
+            schema = json.load(schema_json)
+        validate(json.loads(json_str), schema)
 
     def new_view_id(self):
         return 'v_' + str(len(self.views))
@@ -119,27 +130,27 @@ class Medium(MmifObject):
     def deserialize(self, mmif):
         pass
 
-    def validate(self, json_str):
-        json_list: list = json.loads(json_str)
-        for medium in json_list:
-            assert isinstance(medium, dict)
-            assert set.issubset(set(medium.keys()), {'id', 'type', 'mime', 'text', 'metadata', 'submedia'})
-            assert 'id' in medium
-            assert isinstance(medium['id'], str)
-            assert 'type' in medium
-            assert isinstance(medium['type'], str)
-            if 'location' in medium:
-                assert isinstance(medium['location'], str)
-                assert 'mime' in medium
-                assert 'text' not in medium
-                assert isinstance(medium['mime'], str)
-            else:
-                assert 'text' in medium and 'mime' not in medium
-                assert isinstance(medium['text'], dict)
-            if 'submedia' in medium:
-                assert isinstance(medium['submedia'], list)
-            if 'metadata' in medium:
-                assert isinstance(medium['metadata'], dict)
+    # def validate(self, json_str):
+    #     json_list: list = json.loads(json_str)
+    #     for medium in json_list:
+    #         assert isinstance(medium, dict)
+    #         assert set.issubset(set(medium.keys()), {'id', 'type', 'mime', 'text', 'metadata', 'submedia'})
+    #         assert 'id' in medium
+    #         assert isinstance(medium['id'], str)
+    #         assert 'type' in medium
+    #         assert isinstance(medium['type'], str)
+    #         if 'location' in medium:
+    #             assert isinstance(medium['location'], str)
+    #             assert 'mime' in medium
+    #             assert 'text' not in medium
+    #             assert isinstance(medium['mime'], str)
+    #         else:
+    #             assert 'text' in medium and 'mime' not in medium
+    #             assert isinstance(medium['text'], dict)
+    #         if 'submedia' in medium:
+    #             assert isinstance(medium['submedia'], list)
+    #         if 'metadata' in medium:
+    #             assert isinstance(medium['metadata'], dict)
 
     def add_metadata(self, name, value):
         self.metadata[name] = value
@@ -164,14 +175,14 @@ class Annotation(MmifObject):
     def deserialize(self, mmif):
         pass
 
-    def validate(self, json_str):
-        json_dict = json.loads(json_str)
-        assert set(json_dict.keys()) == {'@type', 'properties'}
-        assert isinstance(json_dict['@type'], str)
-        assert isinstance(json_dict['properties'], dict)
-        properties = json_dict['properties']
-        assert 'id' in properties
-        assert isinstance(properties['id'], str)
+    # def validate(self, json_str):
+    #     json_dict = json.loads(json_str)
+    #     assert set(json_dict.keys()) == {'@type', 'properties'}
+    #     assert isinstance(json_dict['@type'], str)
+    #     assert isinstance(json_dict['properties'], dict)
+    #     properties = json_dict['properties']
+    #     assert 'id' in properties
+    #     assert isinstance(properties['id'], str)
 
     def add_feature(self, name, value):
         self.feature[name] = value
@@ -191,13 +202,13 @@ class View(MmifObject):
     def deserialize(self, view):
         pass
 
-    def validate(self, json_str):
-        json_dict = json.loads(json_str)
-        assert set(json_dict.keys) == {'id', '@context', 'metadata', 'annotations'}
-        assert isinstance(json_dict['id'], str)
-        assert isinstance(json_dict['@context'], str)
-        assert isinstance(json_dict['metadata'], dict)
-        assert isinstance(json_dict['annotations'], list)
+    # def validate(self, json_str):
+    #     json_dict = json.loads(json_str)
+    #     assert set(json_dict.keys) == {'id', '@context', 'metadata', 'annotations'}
+    #     assert isinstance(json_dict['id'], str)
+    #     assert isinstance(json_dict['@context'], str)
+    #     assert isinstance(json_dict['metadata'], dict)
+    #     assert isinstance(json_dict['annotations'], list)
 
     def new_contain(self, at_type, producer=""):
         new_contain = Contain()
