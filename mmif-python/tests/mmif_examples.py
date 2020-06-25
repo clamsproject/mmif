@@ -1,7 +1,11 @@
 example1 = """{
-  "@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
-  "metadata": { },
-  "contains": "???",
+  "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/0.1.0",
+    "contains": {
+      "http://mmif.clams.ai/vocabulary/0.1.0/BoundingBox": ["v1"]
+    }
+  },
   "media": [
     {
       "id": "m1",
@@ -35,8 +39,8 @@ example1 = """{
       "annotations": [
         {
           "@type": "BoundingBox",
-          "id": "bb1",
           "properties": {
+            "id": "bb1",
             "coordinates": [[90,40], [110,40], [90,50], [110,50]] }
         }
       ]
