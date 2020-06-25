@@ -1,6 +1,8 @@
 import unittest
 import json
 from jsonschema import ValidationError
+# FIXME (angus-lherrou @ 6/25/2020): the following imports probably only
+#  work with my interpreter paths.
 import mmif
 from tests.mmif_examples import *
 
@@ -11,7 +13,6 @@ class TestMmif(unittest.TestCase):
         self.mmif_json: dict = json.loads(example1)
 
     def test_mmif_deserialize(self):
-        self.mmif_json.pop("contains")
         json_str = json.dumps(self.mmif_json)
         try:
             mmif_obj = mmif.serialize.Mmif(json_str)
@@ -25,7 +26,7 @@ class TestMmif(unittest.TestCase):
         try:
             mmif_obj = mmif.serialize.Mmif(json_str)
             self.fail()
-        except AssertionError:
+        except ValidationError:
             pass
 
     def test_bad_mmif_deserialize_no_metadata(self):
@@ -34,7 +35,7 @@ class TestMmif(unittest.TestCase):
         try:
             mmif_obj = mmif.serialize.Mmif(json_str)
             self.fail()
-        except AssertionError:
+        except ValidationError:
             pass
 
     def test_bad_mmif_deserialize_no_media(self):
@@ -43,7 +44,7 @@ class TestMmif(unittest.TestCase):
         try:
             mmif_obj = mmif.serialize.Mmif(json_str)
             self.fail()
-        except AssertionError:
+        except ValidationError:
             pass
 
     def test_bad_mmif_deserialize_no_views(self):
@@ -52,16 +53,7 @@ class TestMmif(unittest.TestCase):
         try:
             mmif_obj = mmif.serialize.Mmif(json_str)
             self.fail()
-        except AssertionError:
-            pass
-
-    def test_bad_mmif_deserialize_no_contains(self):
-        self.mmif_json.pop('contains')
-        json_str = json.dumps(self.mmif_json)
-        try:
-            mmif_obj = mmif.serialize.Mmif(json_str)
-            self.fail()
-        except AssertionError:
+        except ValidationError:
             pass
 
 
