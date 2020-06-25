@@ -1,9 +1,8 @@
 import datetime
 import json
 import os
-from typing import Any
 
-from jsonschema import validate, ValidationError
+from jsonschema import validate
 
 
 class MmifObject(object):
@@ -49,7 +48,6 @@ class Mmif(MmifObject):
         self.context = ''
         self.metadata = {}
         self.media = []
-        self.contains = {}
         self.views = []
         self.validate(mmif_json)
         super().__init__(mmif_json)
@@ -64,22 +62,15 @@ class Mmif(MmifObject):
 
         # TODO (krim @ 10/3/2018): more robust json parsing
         self.context = in_json["@context"]
-        self.contains = in_json["contains"]
         self.metadata = in_json["metadata"]
         self.media = in_json["media"]
         self.views = in_json["views"]
 
-    # def validate(self, json_str):
-    #     json_dict: dict = json.loads(json_str)
-    #     assert len(json_dict) == 5
-    #     assert set(json_dict.keys()) == {'@context', 'metadata', 'media', 'views', 'contains'}
-    #     assert isinstance(json_dict['@context'], str)
-    #     assert isinstance(json_dict['metadata'], dict)
-    #     assert isinstance(json_dict['media'], list)
-    #     assert isinstance(json_dict['views'], list)
-
     @staticmethod
-    def validate(json_str) -> str:
+    def validate(json_str):
+        # FIXME (angus-lherrou @ 6/25/2020): find a better way of accessing the schema file.
+        #  This currently only works when running from the test suite.
+
         with open(os.path.join("..", "..", "schema", "mmif.json"), "r") as schema_json:
             schema = json.load(schema_json)
         validate(json.loads(json_str), schema)
@@ -130,28 +121,6 @@ class Medium(MmifObject):
     def deserialize(self, mmif):
         pass
 
-    # def validate(self, json_str):
-    #     json_list: list = json.loads(json_str)
-    #     for medium in json_list:
-    #         assert isinstance(medium, dict)
-    #         assert set.issubset(set(medium.keys()), {'id', 'type', 'mime', 'text', 'metadata', 'submedia'})
-    #         assert 'id' in medium
-    #         assert isinstance(medium['id'], str)
-    #         assert 'type' in medium
-    #         assert isinstance(medium['type'], str)
-    #         if 'location' in medium:
-    #             assert isinstance(medium['location'], str)
-    #             assert 'mime' in medium
-    #             assert 'text' not in medium
-    #             assert isinstance(medium['mime'], str)
-    #         else:
-    #             assert 'text' in medium and 'mime' not in medium
-    #             assert isinstance(medium['text'], dict)
-    #         if 'submedia' in medium:
-    #             assert isinstance(medium['submedia'], list)
-    #         if 'metadata' in medium:
-    #             assert isinstance(medium['metadata'], dict)
-
     def add_metadata(self, name, value):
         self.metadata[name] = value
 
@@ -175,15 +144,6 @@ class Annotation(MmifObject):
     def deserialize(self, mmif):
         pass
 
-    # def validate(self, json_str):
-    #     json_dict = json.loads(json_str)
-    #     assert set(json_dict.keys()) == {'@type', 'properties'}
-    #     assert isinstance(json_dict['@type'], str)
-    #     assert isinstance(json_dict['properties'], dict)
-    #     properties = json_dict['properties']
-    #     assert 'id' in properties
-    #     assert isinstance(properties['id'], str)
-
     def add_feature(self, name, value):
         self.feature[name] = value
 
@@ -201,14 +161,6 @@ class View(MmifObject):
 
     def deserialize(self, view):
         pass
-
-    # def validate(self, json_str):
-    #     json_dict = json.loads(json_str)
-    #     assert set(json_dict.keys) == {'id', '@context', 'metadata', 'annotations'}
-    #     assert isinstance(json_dict['id'], str)
-    #     assert isinstance(json_dict['@context'], str)
-    #     assert isinstance(json_dict['metadata'], dict)
-    #     assert isinstance(json_dict['annotations'], list)
 
     def new_contain(self, at_type, producer=""):
         new_contain = Contain()
@@ -233,4 +185,3 @@ class Contain(MmifObject):
 
     def deserialize(self, mmif):
         pass
-
