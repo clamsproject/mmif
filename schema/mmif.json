@@ -25,6 +25,12 @@
             }
         }
     },
+    "required": [
+        "@context",
+        "metadata",
+        "media",
+        "views"
+    ],
     "definitions": {
         "map": {
             "type": "object",
