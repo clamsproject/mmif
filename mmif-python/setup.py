@@ -3,6 +3,9 @@ import setuptools
 with open('README.md') as readme:
     long_desc = readme.read()
 
+with open('requirements.txt') as requirements:
+    requires = requirements.readlines()
+
 setuptools.setup(
     name="mmif-python", 
     version="0.0.1",
@@ -13,6 +16,15 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/clamsproject/mmif-python",
     packages=setuptools.find_packages() ,
+    install_requires=requires,
+    extras_require={
+        'dev': [
+            'pytest',
+            'pytest-pep8',
+            'pytest-cov', 
+            'gitpython'
+        ]
+    },
     python_requires='>=3.6',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
