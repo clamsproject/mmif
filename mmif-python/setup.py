@@ -1,4 +1,5 @@
 import setuptools
+import os
 
 with open('README.md') as readme:
     long_desc = readme.read()
@@ -6,9 +7,15 @@ with open('README.md') as readme:
 with open('requirements.txt') as requirements:
     requires = requirements.readlines()
 
+# TODO (krim @ 6/30/20): this string value should be read from existing source (e.g. `VERSION` file)
+# however, as SDK version is only partially bound to the MMIF "VERSION", need to come up with a separate source
+version = '0.1.0'
+with open(os.path.join('mmif', 'version', '__init__.py'), 'w') as version_file:
+    version_file.write(f'__version__ = "{version}"')
+
 setuptools.setup(
     name="mmif-python", 
-    version="0.0.1",
+    version=version,
     author="Brandeis Lab for Linguistics and Computation", 
     author_email="admin@clams.ai",
     description="Python implementation of MultiMedia Interchange Format specification. (https://mmif.clams.ai)",

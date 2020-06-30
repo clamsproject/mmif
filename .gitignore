@@ -70,3 +70,6 @@ gdrive_shared*/
 # ctag generated file
 tags
 .tags
+
+# auto-generated files
+**/version/__init__.py
