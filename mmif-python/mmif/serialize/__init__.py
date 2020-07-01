@@ -1,6 +1,6 @@
 import datetime
 import json
-import os
+import mmif
 
 from jsonschema import validate
 
@@ -8,7 +8,6 @@ from jsonschema import validate
 class MmifObject(object):
     def __init__(self, mmif_json=None):
         if mmif_json is not None:
-            # self.validate(mmif_json)
             self.deserialize(mmif_json)
 
     def serialize(self):
@@ -22,9 +21,6 @@ class MmifObject(object):
 
     def pretty(self):
         return json.dumps(self, indent=2, cls=MmifObjectEncoder)
-
-    # def validate(self, json_str):
-    #     raise NotImplementedError()
 
 
 class MmifObjectEncoder(json.JSONEncoder):
@@ -44,12 +40,13 @@ class Mmif(MmifObject):
     contains: dict
     views: list
 
-    def __init__(self, mmif_json=None):
+    def __init__(self, mmif_json=None, validate=True):
         self.context = ''
         self.metadata = {}
         self.media = []
         self.views = []
-        self.validate(mmif_json)
+        if validate:
+            self.validate(mmif_json)
         super().__init__(mmif_json)
 
     def serialize(self):
@@ -68,11 +65,11 @@ class Mmif(MmifObject):
 
     @staticmethod
     def validate(json_str):
-        # FIXME (angus-lherrou @ 6/25/2020): find a better way of accessing the schema file.
-        #  This currently only works when running from the test suite.
+        # NOTE that schema file first needs to be copied to resources directory
+        # this is automatically done via setup.py, so for users this shouldn't be a matter
 
-        with open(os.path.join("..", "..", "schema", "mmif.json"), "r") as schema_json:
-            schema = json.load(schema_json)
+        from pkg_resources import resource_stream
+        schema = json.load(resource_stream(f'{mmif.__name__}.{mmif._res_pkg}', mmif._schema_res_name))
         validate(json.loads(json_str), schema)
 
     def new_view_id(self):

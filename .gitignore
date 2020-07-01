@@ -72,4 +72,5 @@ tags
 .tags
 
 # auto-generated files
-**/version/__init__.py
+mmif-python/**/ver
+mmif-python/**/res
