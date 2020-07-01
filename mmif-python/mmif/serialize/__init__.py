@@ -1,5 +1,8 @@
 import datetime
 import json
+import mmif
+
+from jsonschema import validate
 
 
 class MmifObject(object):
@@ -37,12 +40,13 @@ class Mmif(MmifObject):
     contains: dict
     views: list
 
-    def __init__(self, mmif_json=None):
+    def __init__(self, mmif_json=None, validate=True):
         self.context = ''
         self.metadata = {}
         self.media = []
-        self.contains = {}
         self.views = []
+        if validate:
+            self.validate(mmif_json)
         super().__init__(mmif_json)
 
     def serialize(self):
@@ -55,10 +59,18 @@ class Mmif(MmifObject):
 
         # TODO (krim @ 10/3/2018): more robust json parsing
         self.context = in_json["@context"]
-        self.contains = in_json["contains"]
         self.metadata = in_json["metadata"]
         self.media = in_json["media"]
         self.views = in_json["views"]
+
+    @staticmethod
+    def validate(json_str):
+        # NOTE that schema file first needs to be copied to resources directory
+        # this is automatically done via setup.py, so for users this shouldn't be a matter
+
+        from pkg_resources import resource_stream
+        schema = json.load(resource_stream(f'{mmif.__name__}.{mmif._res_pkg}', mmif._schema_res_name))
+        validate(json.loads(json_str), schema)
 
     def new_view_id(self):
         return 'v_' + str(len(self.views))
@@ -170,4 +182,3 @@ class Contain(MmifObject):
 
     def deserialize(self, mmif):
         pass
-

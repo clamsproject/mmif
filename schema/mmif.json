@@ -4,148 +4,224 @@
     "description": "The JSON-LD objects exchanged by CLAMS services.",
     "type": "object",
     "additionalProperties": false,
-
     "properties": {
-
-        "@context": { "type": "string", "format": "uri" },
-
-	"metadata": { "$ref": "#/definitions/doc_metadata" },
-
-	"media": {
+        "@context": {
+            "type": "string",
+            "format": "uri"
+        },
+        "metadata": {
+            "$ref": "#/definitions/doc_metadata"
+        },
+        "media": {
             "type": "array",
-            "items": { "$ref": "#/definitions/media" }
-        }
-
-	"views": {
+            "items": {
+                "$ref": "#/definitions/media"
+            }
+        },
+        "views": {
             "type": "array",
-            "items": { "$ref": "#/definitions/view" }
+            "items": {
+                "$ref": "#/definitions/view"
+            }
         }
     },
-
+    "required": [
+        "@context",
+        "metadata",
+        "media",
+        "views"
+    ],
     "definitions": {
-
         "map": {
             "type": "object",
             "additionalProperties": true
         },
-
-	"doc_metadata": {
+        "doc_metadata": {
             "type": "object",
             "properties": {
-                "mmif": { "type": "string", "format": "uri" },
+                "mmif": {
+                    "type": "string",
+                    "format": "uri"
+                },
                 "contains": {
                     "$ref": "#/definitions/map"
                 }
             },
             "additionalProperties": true,
-            "required": [ "mmif" ]
+            "required": [
+                "mmif"
+            ]
         },
-
-	"view_metadata": {
+        "view_metadata": {
             "type": "object",
             "properties": {
-		"medium":  { "type": "string" },
-		"timestamp":  { "type": "string" },
-		"tool": { "type": "string", "format": "uri" },
+                "medium": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "tool": {
+                    "type": "string",
+                    "format": "uri"
+                },
                 "contains": {
                     "$ref": "#/definitions/map"
                 }
             },
             "additionalProperties": true,
-            "required": [ "medium", "tool", "contains" ]
+            "required": [
+                "medium",
+                "tool",
+                "contains"
+            ]
         },
-
-	"media_metadata": {
+        "media_metadata": {
             "type": "object",
             "properties": {
-		"source":  { "type": "string" },
-		"tool": { "type": "string", "format": "uri" }
-            }
+                "source": {
+                    "type": "string"
+                },
+                "tool": {
+                    "type": "string",
+                    "format": "uri"
+                }
+            },
             "additionalProperties": true,
-            "required": [ "source", "tool" ]
+            "required": [
+                "source",
+                "tool"
+            ]
         },
-
-	"media": {
+        "media": {
             "type": "object",
             "properties": {
-                "id": { "type": "string" },
-                "type": { "type": "string" },
-                "mime": { "type": "string" },
-                "location": { "type": "string" },
-		"text": {
-		    "$ref": "#/definitions/text" },
-                "metadata": {
-                    "$ref": "#/definitions/media_metadata" }
-		"submedia": {
-		    "type": "array",
-		    "items": { "$ref": "#/definitions/submedia" } }
-	    },
-            "additionalProperties": false,
-            "required": [ "id", "type" ]
-        },
-
-	"submedia": {
-	    "type": "object",
-	    "properties": {
-	        "id": { "type": "string" },
-                "annotation": { "type": "string" },
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "mime": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
                 "text": {
-                    "$ref": "#/definitions/text" },
-            },
-	    "additionalProperties": true,
-            "required": [ "id", "annotation", "text" ]
-	},
-
-	"text": {
-            "type": "object",
-            "properties": {
-		"@value":  { "type": "string" },
-		"@language": { "type": "string" }
-            }
-            "additionalProperties": false,
-            "required": [ "@value" ]
-        },
-
-	"view": {
-            "type": "object",
-            "properties": {
-                "id": { "type": "string" },
+                    "$ref": "#/definitions/text"
+                },
                 "metadata": {
-                    "$ref": "#/definitions/map" },
-                "annotations": {
-                    "$ref": "#/definitions/annotations" }
+                    "$ref": "#/definitions/media_metadata"
+                },
+                "submedia": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/submedia"
+                    }
+                }
             },
             "additionalProperties": false,
-            "required": [ "id", "metadata", "annotations" ]
+            "required": [
+                "id",
+                "type"
+            ]
         },
-
-	"annotations": {
+        "submedia": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "annotation": {
+                    "type": "string"
+                },
+                "text": {
+                    "$ref": "#/definitions/text"
+                }
+            },
+            "additionalProperties": true,
+            "required": [
+                "id",
+                "annotation",
+                "text"
+            ]
+        },
+        "text": {
+            "type": "object",
+            "properties": {
+                "@value": {
+                    "type": "string"
+                },
+                "@language": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "@value"
+            ]
+        },
+        "view": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/map"
+                },
+                "annotations": {
+                    "$ref": "#/definitions/annotations"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "metadata",
+                "annotations"
+            ]
+        },
+        "annotations": {
             "type": "array",
             "items": {
                 "$ref": "#/definitions/annotation"
             }
         },
-
-	"annotation": {
+        "annotation": {
             "type": "object",
             "properties": {
-                "@type": { "type": "string" },
+                "@type": {
+                    "type": "string"
+                },
                 "properties": {
                     "$ref": "#/definitions/properties"
                 }
-	    },
-	    "required": [ "@type", "properties" ],
+            },
+            "required": [
+                "@type",
+                "properties"
+            ],
             "additionalProperties": false
-        }
-
-	"properties": {
+        },
+        "properties": {
             "type": "object",
             "properties": {
-                "id": { "type": "string" },
-		"start": { "type": "integer", "minimum": -1 },
-		"end": { "type": "integer", "minimum": -1 }
-	    },
-	    "required": [ "id" ],
+                "id": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "integer",
+                    "minimum": -1
+                },
+                "end": {
+                    "type": "integer",
+                    "minimum": -1
+                }
+            },
+            "required": [
+                "id"
+            ],
             "additionalProperties": true
         }
     }
