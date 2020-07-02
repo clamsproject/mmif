@@ -1,10 +1,9 @@
+import subprocess
 from typing import Union
 
 import setuptools
 import os
 from os.path import join as pjoin
-# TODO (krim @ 7/2/20): how can we install this (pip install gitpython) for devs before running setup.py
-import git
 import shutil
 import mmif  # this imports `mmif` directory as a sibling, not `mmif` site-package
 
@@ -26,15 +25,17 @@ def generate_subpack(pack_name, mod_name, init_contents=""):
     return mod_dir
 
 
-def get_matching_gittag(repo: git.Repo, version: str):
+def get_matching_gittag(version: str):
     vmaj, vmin, vpat = version.split('.')
-    return sorted([tag for tag in repo.tags if f'{vmaj}.{vmin}.' in tag.name], key=lambda x: int(x.name.split('.')[-1]))[-1]
+    tags = subprocess.check_output(['git', 'tag']).decode().split('\n')
+    # sort and return highest version
+    return \
+        sorted([tag for tag in tags if f'{vmaj}.{vmin}.' in tag],
+               key=lambda x: int(x.split('.')[-1]))[-1]
 
 
-def get_file_contents_at_tag(repo: git.Repo, tag: git.Tag, filepath: str) -> bytes:
-    blob = tag.commit.tree[filepath]
-    blobcontents = blob.data_stream
-    return blobcontents.read()
+def get_file_contents_at_tag(tag, filepath: str) -> bytes:
+    return subprocess.check_output(['git', 'show', tag, '--', filepath])
 
 
 def write_res_file(res_dir: str, res_name: str, res_data: Union[bytes, str]):
@@ -52,16 +53,11 @@ generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"')
 res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
 
 # assuming build only happens inside the `mmif` git repository
-# read git repository
-cwds = os.getcwd().split(os.sep)
-while not os.path.exists('/'+pjoin(*cwds, '.git')):
-    cwds.pop()
-gitrepo = git.Repo('/'+pjoin(*cwds))
-gittag = get_matching_gittag(gitrepo, version)
+gittag = get_matching_gittag(version)
 
 # and write resource files
-write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gitrepo, gittag, mmif._schema_res_oriname))
-write_res_file(res_dir, mmif._schema_vocab_name, get_file_contents_at_tag(gitrepo, gittag, mmif._schema_vocab_oriname))
+write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
+write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
 
 with open('README.md') as readme:
     long_desc = readme.read()
@@ -69,11 +65,10 @@ with open('README.md') as readme:
 with open('requirements.txt') as requirements:
     requires = requirements.readlines()
 
-
 setuptools.setup(
-    name="mmif-python", 
+    name="mmif-python",
     version=version,
-    author="Brandeis Lab for Linguistics and Computation", 
+    author="Brandeis Lab for Linguistics and Computation",
     author_email="admin@clams.ai",
     description="Python implementation of MultiMedia Interchange Format specification. (https://mmif.clams.ai)",
     long_description=long_desc,
@@ -85,8 +80,7 @@ setuptools.setup(
         'dev': [
             'pytest',
             'pytest-pep8',
-            'pytest-cov', 
-            'gitpython'
+            'pytest-cov'
         ]
     },
     python_requires='>=3.6',
@@ -95,5 +89,5 @@ setuptools.setup(
         'Intended Audience :: Developers ',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3 :: Only',
-        ],
+    ],
 )
