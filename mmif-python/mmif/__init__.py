@@ -1,10 +1,8 @@
-from mmif.serialize import *
-from mmif.vocab import *
-
 _res_pkg = 'res'
 _ver_pkg = 'ver'
 __version__ = 'UNK'
 _schema_res_name = 'mmif.json'
+_vocab_res_name = 'clams.vocabulary.yaml'
 
 try:
     import importlib
@@ -13,3 +11,6 @@ try:
 except ImportError:
     # don't set version
     pass
+
+from mmif.serialize import *
+from mmif.vocab import *
