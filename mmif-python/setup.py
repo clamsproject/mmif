@@ -31,6 +31,8 @@ res_dir = generate_module(mmif.__name__, mmif._res_pkg)
 # TODO (krim @ 7/1/20): must be a better way to grasp these outside files...
 schema_filename = pjoin(os.path.dirname(os.path.abspath(__file__)), '..', 'schema', 'mmif.json')
 shutil.copy(schema_filename, pjoin(res_dir, mmif._schema_res_name))
+yaml_filename = pjoin(os.path.dirname(os.path.abspath(__file__)), '..', 'vocabulary', 'clams.vocabulary.yaml')
+shutil.copy(yaml_filename, pjoin(res_dir, mmif._vocab_res_name))
 
 with open('README.md') as readme:
     long_desc = readme.read()

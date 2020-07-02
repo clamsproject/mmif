@@ -30,7 +30,7 @@ import yaml
 from bs4 import BeautifulSoup
 
 
-VERSION = open('../VERSION').read().strip()
+VERSION = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'VERSION')).read().strip()
 VOCABULARY_URL = 'http://mmif.clams.ai/%s/vocabulary' % VERSION
 
 
