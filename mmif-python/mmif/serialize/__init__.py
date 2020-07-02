@@ -175,7 +175,7 @@ class View(MmifObject):
         return new_contain
 
     def new_annotation(self, aid, at_type='Annotation'):
-        new_annotation = Annotation('{ "@type" = "%s", "properties": { "id": "%s" }}' % (at_type, aid))
+        new_annotation = Annotation('{ "@type": "%s", "properties": { "id": "%s" }}' % (at_type, aid))
         self.annotations.append(new_annotation)
         self.anno_ids.add(aid)
         return new_annotation
