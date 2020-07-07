@@ -9,7 +9,7 @@ _vocab_res_name = 'clams.vocabulary.yaml'
 try:
     import importlib
     i = importlib.import_module(f'{__name__}.{_ver_pkg}')
-    __version__ = i.__version__
+    __version__ = i.__version__  # pytype: disable=attribute-error
 except ImportError:
     # don't set version
     pass

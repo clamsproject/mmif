@@ -80,7 +80,8 @@ setuptools.setup(
         'dev': [
             'pytest',
             'pytest-pep8',
-            'pytest-cov'
+            'pytest-cov',
+            'pytype',
         ]
     },
     python_requires='>=3.6',
