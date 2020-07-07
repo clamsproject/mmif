@@ -12,6 +12,9 @@ import setuptools.command.develop
 
 import mmif  # this imports `mmif` directory as a sibling, not `mmif` site-package
 
+# this is only necessary when not using setuptools/distribute
+from sphinx.setup_command import BuildDoc
+cmdclass = {'build_sphinx': BuildDoc}
 
 def do_not_edit_warning(dirname):
     with open(pjoin(dirname, 'do-not-edit.txt'), 'w') as warning:
@@ -112,7 +115,7 @@ with open('requirements.txt') as requirements:
     requires = requirements.readlines()
 
 setuptools.setup(
-    name="mmif-python",
+    name=name,
     version=mmif.__version__,
     author="Brandeis Lab for Linguistics and Computation",
     author_email="admin@clams.ai",
@@ -138,6 +141,7 @@ setuptools.setup(
             'pytest-pep8',
             'pytest-cov',
             'pytype',
+            'sphinx'
         ]
     },
     python_requires='>=3.6',
@@ -147,4 +151,15 @@ setuptools.setup(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3 :: Only',
     ],
+    cmdclass=cmdclass,
+    command_options={
+        'build_sphinx': {
+            #  'source_dir': ('setup.py', 'doc'), 
+            'project': ('setup.py', name),
+            'version': ('setup.py', version),
+            #  'release': ('setup.py', release),
+            'build_dir': ('setup.py', '_build'),
+            'builder': ('setup.py', 'html'),
+            }
+        }
 )
