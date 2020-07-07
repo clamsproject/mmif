@@ -18,7 +18,7 @@ class TestMmif(unittest.TestCase):
             mmif_obj = mmif.serialize.Mmif(json_str)
         except ValidationError as ve:
             self.fail(ve.message)
-        self.assertEqual(self.mmif_json, mmif_obj.serialize())
+        self.assertEqual(mmif_obj, mmif.serialize.Mmif(mmif_obj.serialize()))
 
     def test_bad_mmif_deserialize_no_context(self):
         self.mmif_json.pop('@context')

@@ -23,6 +23,9 @@ class MmifObject(object):
     def pretty(self):
         return json.dumps(self, indent=2, cls=MmifObjectEncoder)
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 
 class MmifObjectEncoder(json.JSONEncoder):
     def default(self, obj):
