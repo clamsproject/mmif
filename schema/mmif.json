@@ -10,12 +10,12 @@
             "format": "uri"
         },
         "metadata": {
-            "$ref": "#/definitions/doc_metadata"
+            "$ref": "#/definitions/mmif_metadata"
         },
         "media": {
             "type": "array",
             "items": {
-                "$ref": "#/definitions/media"
+                "$ref": "#/definitions/medium"
             }
         },
         "views": {
@@ -32,11 +32,7 @@
         "views"
     ],
     "definitions": {
-        "map": {
-            "type": "object",
-            "additionalProperties": true
-        },
-        "doc_metadata": {
+        "mmif_metadata": {
             "type": "object",
             "properties": {
                 "mmif": {
@@ -44,10 +40,9 @@
                     "format": "uri"
                 },
                 "contains": {
-                    "$ref": "#/definitions/map"
-                }
+              "type": "object"
+                  }
             },
-            "additionalProperties": true,
             "required": [
                 "mmif"
             ]
@@ -66,17 +61,16 @@
                     "format": "uri"
                 },
                 "contains": {
-                    "$ref": "#/definitions/map"
+            "type": "object"
                 }
             },
-            "additionalProperties": true,
             "required": [
                 "medium",
                 "tool",
                 "contains"
             ]
         },
-        "media_metadata": {
+        "medium_metadata": {
             "type": "object",
             "properties": {
                 "source": {
@@ -87,13 +81,12 @@
                     "format": "uri"
                 }
             },
-            "additionalProperties": true,
             "required": [
                 "source",
                 "tool"
             ]
         },
-        "media": {
+        "medium": {
             "type": "object",
             "properties": {
                 "id": {
@@ -112,7 +105,7 @@
                     "$ref": "#/definitions/text"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/media_metadata"
+                    "$ref": "#/definitions/medium_metadata"
                 },
                 "submedia": {
                     "type": "array",
@@ -140,7 +133,6 @@
                     "$ref": "#/definitions/text"
                 }
             },
-            "additionalProperties": true,
             "required": [
                 "id",
                 "annotation",
@@ -169,10 +161,13 @@
                     "type": "string"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/map"
+            "type": "object"
                 },
                 "annotations": {
-                    "$ref": "#/definitions/annotations"
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/annotation"
+            }
                 }
             },
             "additionalProperties": false,
@@ -181,12 +176,6 @@
                 "metadata",
                 "annotations"
             ]
-        },
-        "annotations": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/annotation"
-            }
         },
         "annotation": {
             "type": "object",
@@ -221,8 +210,7 @@
             },
             "required": [
                 "id"
-            ],
-            "additionalProperties": true
+            ]
         }
     }
 }
