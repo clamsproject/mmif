@@ -12,7 +12,7 @@ from .model import MmifObject
 
 class Mmif(MmifObject):
     # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
-    context: str
+    _context: str
     metadata: Dict[str, str]
     media: List[Medium]
     # this contains is different from contains field in view, in that this is only for sniffing purpose
@@ -23,29 +23,13 @@ class Mmif(MmifObject):
     views: List['View']
 
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
-        self.context = ''
+        self._context = ''
         self.metadata = {}
         self.media = []
         self.views = []
         if validate:
             self.validate(mmif_obj)
         super().__init__(mmif_obj)
-
-    def serialize(self, pretty: bool =False) -> str:
-        """
-        Overrides the default `serialize` to add `@` sign to context field.
-        """
-        d = self.__dict__.copy()
-        d['@context'] = d.pop('context')
-        return self._serialize(d, pretty)
-
-    def _deserialize(self, mmif_dict: dict):
-
-        # TODO (krim @ 10/3/2018): more robust json parsing
-        self.context = mmif_dict["@context"]
-        self.metadata = mmif_dict["metadata"]
-        self.media = mmif_dict["media"]
-        self.views = mmif_dict["views"]
 
     @staticmethod
     def validate(json_str: Union[str, dict]):

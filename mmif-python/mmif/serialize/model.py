@@ -1,5 +1,5 @@
 import json
-from typing import Union
+from typing import Union, Any, Dict
 
 
 class MmifObject(object):
@@ -33,7 +33,31 @@ class MmifObject(object):
 
     @staticmethod
     def _serialize(kv_obj: dict, pretty: bool = False) -> str:
+        for k in list(kv_obj.keys()):
+            if k.startswith('_'):
+                kv_obj[f'@{k[1:]}'] = kv_obj.pop(k)
         return json.dumps(kv_obj, indent=2 if pretty else None, cls=MmifObjectEncoder)
+
+    @staticmethod
+    def _load_str(json_str: str):
+        """
+        Turns JSON-format string into python dict. In doing so, it replaces "@"
+        signs in JSON-LD field names with "_" to be python-compliant.
+
+        >>> "_type" in MmifObject._load_str('{ "@type": "some_type", "@value": "some_value"}').keys()
+        True
+        >>> "_value" in MmifObject._load_str('{ "@type": "some_type", "@value": "some_value"}').keys()
+        True
+
+        :param json_str:
+        :return:
+        """
+        def to_atsign(d: Dict[str, Any]):
+            for k in d:
+                if k.startswith('@'):
+                    d[f'_{k[1:]}'] = d.pop(k)
+            return d
+        return json.loads(json_str, object_hook=to_atsign)
 
     def deserialize(self, mmif_json: Union[str, dict]) -> None:
         """
@@ -45,7 +69,7 @@ class MmifObject(object):
          that represents a MMIF object
         """
         if type(mmif_json) == str:
-            mmif_json = json.loads(mmif_json)
+            mmif_json = self._load_str(mmif_json)
         self._deserialize(mmif_json)
 
     def _deserialize(self, input_dict: dict) -> None:
