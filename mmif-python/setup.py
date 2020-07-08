@@ -35,7 +35,7 @@ def get_matching_gittag(version: str):
 
 
 def get_file_contents_at_tag(tag, filepath: str) -> bytes:
-    return subprocess.check_output(['git', 'show', tag, '--', filepath])
+    return subprocess.check_output(['git', 'show', f'{tag}:{filepath}'])
 
 
 def write_res_file(res_dir: str, res_name: str, res_data: Union[bytes, str]):
@@ -47,7 +47,7 @@ def write_res_file(res_dir: str, res_name: str, res_data: Union[bytes, str]):
 
 # TODO (krim @ 6/30/20): this string value should be read from existing source (e.g. `VERSION` file)
 # however, as SDK version is only partially bound to the MMIF "VERSION", need to come up with a separate source
-version = '0.1.0'
+version = '0.1.1'
 generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"')
 # making resources into a python package so than `pkg_resources` can access resource files
 res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
@@ -80,7 +80,8 @@ setuptools.setup(
         'dev': [
             'pytest',
             'pytest-pep8',
-            'pytest-cov'
+            'pytest-cov',
+            'pytype',
         ]
     },
     python_requires='>=3.6',
