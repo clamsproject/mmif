@@ -15,7 +15,7 @@ directory exists then files in it will be overwritten.
 With the --test option files will be written to www in this directory.
 
 When you use the default output directory and merge changes into the master
-branch then the site at http://miff.clams.ai/vocabulary will be automatically
+branch then the site at http://mmif.clams.ai/vocabulary will be automatically
 updated.
 
 """
@@ -28,6 +28,7 @@ import time
 import yaml
 
 from bs4 import BeautifulSoup
+# make sure to pip install lxml
 
 
 VERSION = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'VERSION')).read().strip()
@@ -139,7 +140,6 @@ def write_hierarchy(tree, outdir, version):
 def write_pages(tree, outdir, version):
     for clams_type in tree.types:
         TypePage(clams_type, outdir, version).write()
-
 
 
 class Page(object):
@@ -367,10 +367,8 @@ def setup(outdir):
     shutil.copy('lappsstyle.css', css_dir)
 
 
-
 if __name__ == '__main__':
-
-    outdir =  os.path.join('..', 'docs', VERSION, 'vocabulary')
+    outdir = os.path.join('..', 'docs', VERSION, 'vocabulary')
     if len(sys.argv) > 1 and sys.argv[1] == '--test':
         outdir = 'www'
     setup(outdir)
