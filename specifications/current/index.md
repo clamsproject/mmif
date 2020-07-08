@@ -375,14 +375,16 @@ Annotations in a MMIF file can also refer to the LAPPS Vocabulary at [http://voc
 The first example is at [../samples/example-1.json](../samples/example-1.json). It contains two media (a video and a transcript). For the first medium there are two views, one with bars-and-tone annotations and one with slate annotations. For the second medium there is one view with the results of a tokenizer. This example file has all thingies required by MMIF. A few things to note:
 
 - The metadata specify the MMIF version and a top-level specification of what annotation types are in the views. Both are technically not needed because they can be derived from the context and the views, but are there for convenience.
-- Each view has a context that is there to define the terms in the annotations list.
+- Each view has a context that is there to define the expanded forms of the terms in the annotations list. For example, the first view as an annotation obejct with *@type* equals *TimeFrame*. The context will expand this to http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame. Something similar happens to all propertuy names in the *properties* dictionary. 
 - Each view has some metadata spelling out several kinds of things:
-  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains filed has a property http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame with a dictionary as the value and that dictioray contains the metadata, in this case specifying that the unit used for annotation offsets is seconds).
+  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains field has a property http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame with a dictionary as the value and that dictionary contains the metadata, in this case specifying that the unit used for annotation offsets is seconds).
   - The medium that the annotations are over.
   - A timestamp of when the view was created.
   - The tool that created the view.
 
 Note that only one annotation is shown for each view, this is to keep the file as small as possible. Of course, often the bars-and-tones and slate views often have only one annotation so it is only the tokens view where annotations were left out.
+
+As we move along with integrating new tools, other examples will be added with other kinds of annotation types like *BoundingBox* and *Alignment*. Addition to the specifications will like accompany this. One thing we will know will change is the simple usniverse we show in the first example, where there are two simple medium instances and no submedia and annotations on submedia. For now we can get away with using *start* and *end* as properties that anchor an annotaiton, but we will probably replace those with something called *anchor* which provides several ways of anchoring annotations to the source: start and end offsets, start and end offsets qualified by submedia identifiers, coordinates, etcetera.
 
 
 
