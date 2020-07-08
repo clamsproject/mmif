@@ -6,7 +6,7 @@ MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
 
 > In the following we are still rather cavalier on where all the versioned files are. For now we use version 0.1.0 as an example, but note that files may not yet be available where they are supposed to be.
 
-The current JSON schema for MMIF are at http://mmif.clams.ai/0.1.0/schema/mmif.json and determine part of the syntactic shape of MMIF. The specifications here often refer to elements from the CLAMS  Vocabulary at http://mmif.clams.ai/o.1.0/vocabulary as well as to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). See section 2 in this document for an introduction and comparison of those vocabularies.
+The current JSON schema for MMIF are at http://mmif.clams.ai/0.1.0/schema/mmif.json and determine part of the syntactic shape of MMIF. The specifications here often refer to elements from the CLAMS  Vocabulary at http://mmif.clams.ai/0.1.0/vocabulary as well as to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). See section 2 in this document for an introduction and comparison of those vocabularies.
 
 
 
@@ -244,7 +244,9 @@ Here is an other example of a view containing two bounding boxes created by the 
 
 ### 1.5. More on the *media* property
 
-Media can be generated from other media and/or from information in views. Assume the Tesseract OCR tool that takes an image and the coordinates of a bounding box (or a new images created from the source image and coordinates) and generates a new text for the bounding box. That text will be stored as a text medium in the MMIF document and that text can be the starting point for chains of text processing where views over the medium are created.
+>  NOTE: the contents here are all rather preliminary and further experimentation is needed.
+
+Media can be generated from other media and/or from information in views. Assume the Tesseract OCR tool that takes an image and the coordinates of a bounding box and generates a new text for the bounding box. That text will be stored as a text medium in the MMIF document and that text can be the starting point for chains of text processing where views over the medium are created.
 
 > The alternative is to store the results in a view, but this introduces complextities when we want to run an NLP tool over the text since the text will then need to be extracted from the view first. In addition, it seemed conceptually clearer to represent text media as media, even though they may be derived.
 
@@ -285,7 +287,7 @@ In MMIF, this looks like the following (leaving out some details, coordinates so
 }
 ```
 
-When we add results of processing as new media then those media need to assume some of the characteristics of views and we may want to store metadata information just as we did with views:
+When we add results of processing as new media then those media need to assume some of the characteristics of views and we want to store metadata information just as we did with views:
 
 ```json
 {
@@ -304,7 +306,7 @@ When we add results of processing as new media then those media need to assume s
 
 Note the use of *source*, which points to a bounding box annotation in view *v1*. Indirectly that alo represents that the bounding box was from image *m1*. Other metadata like timestamps and version information can/should be added as well.
 
-> This glances over the problem that we need some way for Tesseract to know what bounding boxes to take. Either introducing some kind of type or maybe a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for a tool.
+> This glances over the problem that we need some way for Tesseract to know what bounding boxes to take. Either introducing some kind of type or use the tool property in the metadata or maybe introduce a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for a tool.
 
 Note that the image just had a bounding box for the part of the image with the word *yelp*, but there were three other image regions that could have been input to OCR as well. The representation above would be rather inefficient because it would repeat similar metadata over and over again. So we introduce a mechanism that in a way does the same as the annotations list in a view in that it allows metadata to be stored only once:
 
@@ -327,15 +329,64 @@ Note that the image just had a bounding box for the part of the image with the w
 
 The media set as a whole can be referred to with "m2", and the submedia by concatenating the medium and submedium identifiers as in "m2:sm1". Note how indivudual media have *annotation* properties that pick out the bounding box in the view that the text media were created from.
 
-> Note that this is all rather preliminary and that experimentation is needed.
-
 
 
 ## 2. MIFF and the CLAMS Vocabulary
 
+The structure of MMIF files is defined in the schema at  http://mmif.clams.ai/0.1.0/schema/mmif.json and described in this document. But the semantics of what is expressed in the views are determined by the CLAMS Vocabulary at http://mmif.clams.ai/0.1.0/vocabulary.
+
+Each annotation has two fields: *@type* and *properties*. The value of the first one is typically an annotation type from the vocabulary. Here is a BoundingBox annotation as an example:
+
+```json
+{
+  "@type": "http://mmif.clams.ai/0.1.0/vocabulary/BoundingBox",
+  "properties": {
+    "id": "bb1",
+    "coordinates": [[0,0], [10,0], [0,10], [10,10]]
+  }
+}
+```
+
+The value of *@type* refers to the URL http://mmif.clams.ai/0.1.0/vocabulary/BoundingBox which is a page in the published vocabulary. That page will spell out the definition of BoundingBox as well as list all properties defined for BoundingBox, whether inherited or not. On the page we can see that *id* is a required property inherited from Annotation and that *coordinates* is a required property of BoundingBox. Both are expressed in the properties dictionary above. The page also says that there is an optional property *timePoint* but it is not used above.
+
+The vocabulary also defines metadata properties. For example, the optional property *unit* can be used for a BoundingBox to specify what unit is used for the coordinates in instances of BoundingBox. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the *contains* section:
+
+```json
+{
+  "metadata": {
+		"contains": {
+		    "http://mmif.clams.ai/0.1.0/vocabulary/BoundingBox": {
+          "unit": "pixels"
+        }
+		},
+		"medium": "m12",
+		"timestamp": "2020-05-27T12:23:45",
+		"tool": "http://tools.clams.ai/some_bb_tool/1.0.3"
+  }
+}
+```
+
+Annotations in a MMIF file can also refer to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). In that case, the annotation type in *@type* will refer to a URL just as with CLAMS annotation types, the only difference is that the URL will b ein the LAPPS Vocabulary. Properties and metadata properties of LAPPS annotation types are defined and used the same way as described above for CLAMS types.
 
 
-## 3. User-defined extensions
+
+## 3. MIFF Examples
+
+The first example is at [../samples/example-1.json](../samples/example-1.json). It contains two media (a video and a transcript). For the first medium there are two views, one with bars-and-tone annotations and one with slate annotations. For the second medium there is one view with the results of a tokenizer. This example file has all thingies required by MMIF. A few things to note:
+
+- The metadata specify the MMIF version and a top-level specification of what annotation types are in the views. Both are technically not needed because they can be derived from the context and the views, but are there for convenience.
+- Each view has a context that is there to define the terms in the annotations list.
+- Each view has some metadata spelling out several kinds of things:
+  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains filed has a property http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame with a dictionary as the value and that dictioray contains the metadata, in this case specifying that the unit used for annotation offsets is seconds).
+  - The medium that the annotations are over.
+  - A timestamp of when the view was created.
+  - The tool that created the view.
+
+Note that only one annotation is shown for each view, this is to keep the file as small as possible. Of course, often the bars-and-tones and slate views often have only one annotation so it is only the tokens view where annotations were left out.
+
+
+
+## 4. User-defined extensions
 
 The value of *@type* in an annotation is typically an element of the CLAMS or LAPPS vocabulary, but you can also enter a user-defined annotation category defined elsewhere, for example by the creator of a tool. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI.
 
@@ -343,7 +394,9 @@ The value of *@type* in an annotation is typically an element of the CLAMS or LA
 
 
 
-## 4. Compatibility with LAPPS Tools
+## 5. Compatibility with LAPPS Tools
+
+> These are highly preliminary notes
 
 A converter is required to run LIF tools with MMIF as input. Here's two possible scenarios that the converter must be able to handle.
 
@@ -368,6 +421,8 @@ In this simple case, a dummy LIF payload should be generated by the converter wi
 
 ## 6. Related Work
 
+> Highly preliminary notes again
+
 An exchange format for multimodal annotations.
 Schmidt et al. 2008. An exchange format for multimodal annotations. In *International LREC Workshop on Multimodal Corpora*.
 
@@ -379,8 +434,5 @@ https://www.clarin.eu/content/component-metadata
 Broeder et all. 2012. CMDI: a component meta- data infrastructure. In *Describing LRs with metadata: towards flexibility and interoperability in the documen- tation of LR workshop programme*. 
 
 Image and video annotation tools.
-
-
-
 
 
