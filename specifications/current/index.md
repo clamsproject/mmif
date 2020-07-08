@@ -342,7 +342,7 @@ Each annotation has two fields: *@type* and *properties*. The value of the first
   "@type": "http://mmif.clams.ai/0.1.0/vocabulary/BoundingBox",
   "properties": {
     "id": "bb1",
-    "coordinates": [(0,0), (10,0), (0,10), 10,10]
+    "coordinates": [[0,0], [10,0], [0,10], [10,10]]
   }
 }
 ```
