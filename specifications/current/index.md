@@ -4,10 +4,24 @@ MMIF is an annotation format for audiovisual media as well as associated text li
 
 MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
 
+## 0. Status of this document and MMIF specification. 
+
+As a specification, MMIF consist of three formal components in addition to this verbally documented specification. They are 
+1. JSON schema; that defines syntactic elements in MMIF
+1. Linked Data (JSON-LD) context; that defines shortcuts for URIs of the MMIF namespace
+1. Vocabularies (type hierarchy); that defines concepts and their ontological relations
+
 > In the following we are still rather cavalier on where all the versioned files are. For now we use version 0.1.0 as an example, but note that files may not yet be available where they are supposed to be.
 
 The current JSON schema for MMIF are at http://mmif.clams.ai/0.1.0/schema/mmif.json and determine part of the syntactic shape of MMIF. The specifications here often refer to elements from the CLAMS  Vocabulary at http://mmif.clams.ai/0.1.0/vocabulary as well as to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). See section 2 in this document for an introduction and comparison of those vocabularies.
 
+Along with formal specifications and documentation, our goal is to also provide a preference implementation of MMIF. Currently it is being developed in Python programming language and will be distributed via github (as source code) as well as via [Python Package Index](https://pypi.org/) (as Python library). The package will function as a software development kit, that helps users (mostly developers) to easily use various features of MMIF.
+
+### Versioning 
+
+The MMIF specification and its reference implementation (SDK) are now in pre-alpha, and during the current development phase, we will use `0.1.x` versions. All present and future versions follows the [semantic versioning](https://semver.org/) specification, and use `major.minor.patch` version scheme. All formal components (this document, JSON schema, JSON-LD context, and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers of the specification version. That is, 
+1. A change in a single component of the specification will increase version numbers of other components as well, and thus some components can be identical to their immediate previous version. 
+1. A specific version of the SDK is tied to certain versions of the specification, and thus the applications based on different versions of SDK may not be compatible to each other, and can't be used together in a single pipeline. 
 
 
 ## 1. The structure of MMIF files
@@ -55,9 +69,6 @@ Includes any metadata associated with the file including MMIF version and an ind
 ```
 
 The *mmif* property points at the MMIF version that is used in the document. The *contains* property stores a dictionary of annotation types with the identifiers for the views that the annotation objects occur in. This dictionary is for quick access to file content and is generated automatically from the view metadata.
-
-> MMIF has many parts to it: specifications, schema, context files, vocabulary and SDK. For now we assume that these are all included under the one version number. We are considering whether there is a need for keeping separate versioning for those components (but would liek to avoid that).
-
 
 
 ### 1.3. The *media* property
@@ -366,7 +377,7 @@ The vocabulary also defines metadata properties. For example, the optional prope
 }
 ```
 
-Annotations in a MMIF file can also refer to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). In that case, the annotation type in *@type* will refer to a URL just as with CLAMS annotation types, the only difference is that the URL will b ein the LAPPS Vocabulary. Properties and metadata properties of LAPPS annotation types are defined and used the same way as described above for CLAMS types.
+Annotations in a MMIF file can also refer to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). In that case, the annotation type in *@type* will refer to a URL just as with CLAMS annotation types, the only difference is that the URL will be in the LAPPS Vocabulary. Properties and metadata properties of LAPPS annotation types are defined and used the same way as described above for CLAMS types.
 
 
 
@@ -375,16 +386,14 @@ Annotations in a MMIF file can also refer to the LAPPS Vocabulary at [http://voc
 The first example is at [../samples/example-1.json](../samples/example-1.json). It contains two media (a video and a transcript). For the first medium there are two views, one with bars-and-tone annotations and one with slate annotations. For the second medium there is one view with the results of a tokenizer. This example file has all thingies required by MMIF. A few things to note:
 
 - The metadata specify the MMIF version and a top-level specification of what annotation types are in the views. Both are technically not needed because they can be derived from the context and the views, but are there for convenience.
-- Each view has a context that is there to define the expanded forms of the terms in the annotations list. For example, the first view as an annotation obejct with *@type* equals *TimeFrame*. The context will expand this to http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame. Something similar happens to all propertuy names in the *properties* dictionary. 
+- Each view has a context that is there to define the terms in the annotations list.
 - Each view has some metadata spelling out several kinds of things:
-  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains field has a property http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame with a dictionary as the value and that dictionary contains the metadata, in this case specifying that the unit used for annotation offsets is seconds).
+  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains filed has a property http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame with a dictionary as the value and that dictionary contains the metadata, in this case specifying that the unit used for annotation offsets is seconds).
   - The medium that the annotations are over.
   - A timestamp of when the view was created.
   - The tool that created the view.
 
 Note that only one annotation is shown for each view, this is to keep the file as small as possible. Of course, often the bars-and-tones and slate views often have only one annotation so it is only the tokens view where annotations were left out.
-
-As we move along with integrating new tools, other examples will be added with other kinds of annotation types like *BoundingBox* and *Alignment*. Addition to the specifications will like accompany this. One thing we will know will change is the simple usniverse we show in the first example, where there are two simple medium instances and no submedia and annotations on submedia. For now we can get away with using *start* and *end* as properties that anchor an annotaiton, but we will probably replace those with something called *anchor* which provides several ways of anchoring annotations to the source: start and end offsets, start and end offsets qualified by submedia identifiers, coordinates, etcetera.
 
 
 
