@@ -1,5 +1,8 @@
+import os
+from sys import argv
+
 import yaml
-from vocabulary.publish import VERSION
+from publish import VERSION  # PyCharm doesn't like this but it works as long as you don't use python -m
 
 
 def kv_to_vdsl(key, value):
@@ -49,5 +52,9 @@ version='{VERSION}'
 
 
 if __name__ == '__main__':
-    with open('clams.vocabulary', 'w') as vdsl:
-        vdsl.write(yaml_to_vdsl())
+    if len(argv) == 1:
+        print("Usage: yaml_to_vdsl dirname")
+    else:
+        dirname = argv[1]
+        with open(os.path.join(dirname, 'clams.vocabulary'), 'w') as vdsl:
+            vdsl.write(yaml_to_vdsl())

@@ -74,4 +74,7 @@ tags
 # auto-generated files
 mmif-python/**/ver
 mmif-python/**/res
-/vocabulary/clams.vocabulary
+/vocabulary/rdf/clams.vocabulary
+
+# re-includes
+!vocabulary/rdf/bin/*.jar
