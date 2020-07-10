@@ -38,9 +38,6 @@
         "mmif": {
           "type": "string",
           "format": "uri"
-        },
-        "contains": {
-          "type": "object"
         }
       },
       "required": [
