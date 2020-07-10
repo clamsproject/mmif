@@ -15,11 +15,6 @@ class Mmif(MmifObject):
     _context: str
     metadata: Dict[str, str]
     media: List[Medium]
-    # this contains is different from contains field in view, in that this is only for sniffing purpose
-    # and has view ids only
-    # TODO (krim @ 7/7/20): should these lists be sorted? default behavior of `get_view_contains` would be
-    # returning the latest view, so the list should sorted by generation timestamp, I guess.
-    contains: Dict[str, List[str]]
     views: List['View']
 
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
@@ -71,5 +66,12 @@ class Mmif(MmifObject):
                 return view
         raise Exception("{} view not found".format(id))
 
+    def get_all_views_contain(self, at_type: str):
+        return [view for view in self.views if at_type in view.contains]
+
     def get_view_contains(self, at_type: str):
-        return self.get_view_by_id(self.contains[at_type][-1])
+        # will return the *latest* view
+        for view in reversed(self.views):
+            if at_type in view.contains:
+                return view
+        return None
