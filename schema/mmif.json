@@ -10,7 +10,7 @@
             "format": "uri"
         },
         "metadata": {
-            "$ref": "#/definitions/mmif_metadata"
+            "$ref": "#/definitions/mmifMetadata"
         },
         "media": {
             "type": "array",
@@ -32,7 +32,7 @@
         "views"
     ],
     "definitions": {
-        "mmif_metadata": {
+        "mmifMetadata": {
             "type": "object",
             "properties": {
                 "mmif": {
@@ -47,14 +47,15 @@
                 "mmif"
             ]
         },
-        "view_metadata": {
+        "viewMetadata": {
             "type": "object",
             "properties": {
                 "medium": {
                     "type": "string"
                 },
                 "timestamp": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time"
                 },
                 "tool": {
                     "type": "string",
@@ -70,7 +71,7 @@
                 "contains"
             ]
         },
-        "medium_metadata": {
+        "mediumMetadata": {
             "type": "object",
             "properties": {
                 "source": {
@@ -105,7 +106,7 @@
                     "$ref": "#/definitions/text"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/medium_metadata"
+                    "$ref": "#/definitions/mediumMetadata"
                 },
                 "submedia": {
                     "type": "array",
@@ -184,7 +185,7 @@
                     "type": "string"
                 },
                 "properties": {
-                    "$ref": "#/definitions/properties"
+                    "$ref": "#/definitions/annotationProperties"
                 }
             },
             "required": [
@@ -193,7 +194,7 @@
             ],
             "additionalProperties": false
         },
-        "properties": {
+        "annotationProperties": {
             "type": "object",
             "properties": {
                 "id": {
