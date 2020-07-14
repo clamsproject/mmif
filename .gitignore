@@ -55,6 +55,8 @@ hs_err_pid* # virtual machine crash logs, see http://www.java.com/en/download/he
 # python 
 **/*.pyc
 **/__pycache__
+**/dist
+**/*.egg-info
 
 # shared folders
 dropbox_shared*/
@@ -68,3 +70,7 @@ gdrive_shared*/
 # ctag generated file
 tags
 .tags
+
+# auto-generated files
+mmif-python/**/ver
+mmif-python/**/res
