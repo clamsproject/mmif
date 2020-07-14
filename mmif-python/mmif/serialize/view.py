@@ -1,5 +1,5 @@
-import datetime
-from typing import Dict, List, Union
+from datetime import datetime
+from typing import Dict, List, Union, Optional, Any
 
 from .contain import Contain
 from .model import MmifObject
@@ -28,7 +28,6 @@ class View(MmifObject):
     def new_contain(self, at_type: str, producer: str):
         new_contain = Contain()
         new_contain.producer = producer
-        new_contain.gen_time = datetime.datetime.utcnow().isoformat()
         self.contains[at_type] = new_contain
         return new_contain
 
@@ -42,3 +41,11 @@ class View(MmifObject):
         self.annotations.append(annotation)
         self.anno_ids.add(annotation.id)
         return annotation
+
+
+class ViewMetadata(MmifObject):
+    medium: str
+    timestamp: Optional[datetime] = None
+    tool: str
+    contains: Dict[str, Any]
+

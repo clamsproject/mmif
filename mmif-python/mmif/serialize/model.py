@@ -73,7 +73,14 @@ class MmifObject(object):
         self._deserialize(mmif_json)
 
     def _deserialize(self, input_dict: dict) -> None:
-        raise NotImplementedError()
+        """
+        Maps a plain python dict object to a MMIF object.
+        If a subclass needs special treatment during the mapping, it needs to
+        override this method.
+        :param input_dict:
+        :return:
+        """
+        self.__dict__ = input_dict
 
     def __str__(self):
         return self.serialize(False)

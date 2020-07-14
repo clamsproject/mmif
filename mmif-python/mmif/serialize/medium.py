@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 
 from .model import MmifObject
 
@@ -22,3 +22,13 @@ class Medium(MmifObject):
 
     def add_metadata(self, name: str, value: str):
         self.metadata[name] = value
+
+
+class Text(MmifObject):
+    _value: str
+    _language: Optional[str]
+
+
+class MediumMetadata(MmifObject):
+    source: str
+    tool: str
