@@ -28,4 +28,4 @@ if [ "$1" = "-default" ] ; then
     exit
 fi
 
-/Library/Java/JavaVirtualMachines/jdk-13.0.1.jdk/Contents/Home/bin/java -jar $DIR/$JAR $@
+java -jar $DIR/$JAR $@
