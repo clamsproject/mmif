@@ -1,4 +1,4 @@
-VERSION=$(shell cat VERSION)
+VERSION=$(shell cat ../../VERSION)
 
 VOCABULARY=clams.vocabulary
 
@@ -18,8 +18,7 @@ rdf:
 	./bin/vocab -V $(VERSION) --output target --rdf rdf $(VOCABULARY) 
 	./bin/vocab -V $(VERSION) --output target --rdf owl $(VOCABULARY) 
 	./bin/vocab -V $(VERSION) --output target --rdf ttl $(VOCABULARY) 
-	./bin/vocab -V $(VERSION) --output target --rdf jsonld $(VOCABULARY) 
-	./bin/vocab -V $(VERSION) --output target --xsd $(VOCABULARY)
+	./bin/vocab -V $(VERSION) --output target --rdf jsonld $(VOCABULARY)
 	
 all: clean rdf
 
