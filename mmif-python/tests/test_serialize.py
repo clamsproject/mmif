@@ -1,5 +1,7 @@
 import unittest
 import json
+
+import pytest
 from jsonschema import ValidationError
 from mmif.serialize import Mmif
 from tests.mmif_examples import *
@@ -53,6 +55,15 @@ class TestMmif(unittest.TestCase):
             self.fail()
         except ValidationError:
             pass
+
+    def test_medium_cannot_have_text_and_location(self):
+        mmif = Mmif(json.dumps(self.mmif_json))
+        m1 = mmif.get_medium_by_id('m1')
+        m2 = mmif.get_medium_by_id('m2')
+        m1.text = m2.text
+        with pytest.raises(ValidationError) as ve:
+            Mmif(mmif.serialize())
+            assert "validating 'oneOf'" in ve.value
 
 
 if __name__ == '__main__':
