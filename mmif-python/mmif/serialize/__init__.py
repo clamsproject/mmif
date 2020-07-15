@@ -1,7 +1,6 @@
-from .annotation import Annotation
-from .mmif import Mmif
-from .view import View
-from .medium import Medium
-from .contain import Contain
+from .annotation import *
+from .mmif import *
+from .view import *
+from .medium import *
 
 

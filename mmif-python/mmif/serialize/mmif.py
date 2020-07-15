@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Union, Optional, Any
+from typing import Dict, List, Union
 
 from jsonschema import validate
 from pkg_resources import resource_stream
@@ -14,7 +14,7 @@ class Mmif(MmifObject):
     # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
     _context: str
     metadata: Dict[str, str]
-    media: List[Medium]
+    media: List['Medium']
     views: List['View']
 
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
@@ -25,6 +25,12 @@ class Mmif(MmifObject):
         if validate:
             self.validate(mmif_obj)
         super().__init__(mmif_obj)
+
+    def _deserialize(self, input_dict: dict) -> None:
+        self._context = input_dict['_context']
+        self.metadata = input_dict['metadata']
+        self.media = [Medium(m) for m in input_dict['media']]
+        self.views = [View(v) for v in input_dict['views']]
 
     @staticmethod
     def validate(json_str: Union[str, dict]):
@@ -54,24 +60,30 @@ class Mmif(MmifObject):
         except Exception:
             self.media.append(medium)
 
-    def get_medium_location(self, md_type: str):
+    def get_medium_location(self, md_type: str) -> str:
         for medium in self.media:
             if medium["type"] == md_type:
                 return medium["location"]
         raise Exception("{} type media not found".format(md_type))
 
-    def get_view_by_id(self, id: str):
+    def get_medium_by_id(self, id: str) -> 'Medium':
+        for medium in self.media:
+            if medium.id == id:
+                return medium
+        raise Exception("{} medium not found".format(id))
+
+    def get_view_by_id(self, id: str) -> 'View':
         for view in self.views:
             if view.id == id:
                 return view
         raise Exception("{} view not found".format(id))
 
     def get_all_views_contain(self, at_type: str):
-        return [view for view in self.views if at_type in view.contains]
+        return [view for view in self.views if at_type in view.metadata.contains]
 
     def get_view_contains(self, at_type: str):
         # will return the *latest* view
         for view in reversed(self.views):
-            if at_type in view.contains:
+            if at_type in view.metadata.contains:
                 return view
         return None

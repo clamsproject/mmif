@@ -1,35 +1,30 @@
 from datetime import datetime
-from typing import Dict, List, Union, Optional, Any
+from typing import Dict, List, Union, Optional
 
-from .contain import Contain
-from .model import MmifObject
 from .annotation import Annotation
+from .model import MmifObject
 
 
 class View(MmifObject):
     id: str
-    contains: Dict[str, Contain]
-    annotations: List[Annotation]
+    metadata: 'ViewMetadata'
+    annotations: List['Annotation']
     anno_ids = set()
 
     def __init__(self, view_obj: Union[str, dict] = None):
         self.id = ''
-        self.contains = {}
+        self.metadata = ViewMetadata()
         self.annotations = []
         super().__init__(view_obj)
 
     def _deserialize(self, view_dict: dict):
         self.id = view_dict['id']
-        for at_type, contain in view_dict['metadata']['contains'].items():
-            self.new_contain(at_type, contain['producer'])
+        self.metadata = ViewMetadata(view_dict['metadata'])
         for anno_dict in view_dict['annotations']:
             self.add_annotation(Annotation(anno_dict))
 
-    def new_contain(self, at_type: str, producer: str):
-        new_contain = Contain()
-        new_contain.producer = producer
-        self.contains[at_type] = new_contain
-        return new_contain
+    def new_contain(self, at_type: str, contain_dict: dict):
+        return self.metadata.new_contain(at_type, contain_dict)
 
     def new_annotation(self, aid: str, at_type: str):
         new_annotation = Annotation()
@@ -37,7 +32,7 @@ class View(MmifObject):
         new_annotation.id = aid
         return self.add_annotation(new_annotation)
 
-    def add_annotation(self, annotation: Annotation) -> Annotation:
+    def add_annotation(self, annotation: 'Annotation') -> 'Annotation':
         self.annotations.append(annotation)
         self.anno_ids.add(annotation.id)
         return annotation
@@ -47,5 +42,31 @@ class ViewMetadata(MmifObject):
     medium: str
     timestamp: Optional[datetime] = None
     tool: str
-    contains: Dict[str, Any]
+    contains: Dict[str, 'Contain']
+
+    def __init__(self, viewmetadata_obj: Union[str, dict] = None):
+        self.medium = ''
+        self.timestamp = datetime.now()
+        self.tool = ''
+        self.contains = {}
+        super().__init__(viewmetadata_obj)
+
+    def _deserialize(self, input_dict: dict) -> None:
+        self.__dict__ = input_dict
+        self.contains = dict([(at_type, Contain(contain_obj)) for at_type, contain_obj in input_dict.get('contains').items()])
+
+    def new_contain(self, at_type: str, contain_dict: dict):
+        new_contain = Contain(contain_dict)
+        self.contains[at_type] = new_contain
+        return new_contain
+
+
+class Contain(MmifObject):
+    producer: str
+    gen_time: datetime
+
+    def __init__(self, contain_obj: Union[str, dict] = None):
+        self.producer = ''
+        self.gen_time = datetime.now()     # datetime.datetime
+        super().__init__(contain_obj)
 
