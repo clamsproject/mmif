@@ -203,6 +203,7 @@ class IndexPage(Page):
         self._add_description()
         self._add_tree(self.tree.root, self.main_content)
         self._add_space()
+        self._add_ontologies()
         self._add_footer()
 
     def _add_description(self):
@@ -246,6 +247,26 @@ class IndexPage(Page):
         soup_node.append(table)
         for subtype in clams_type['childNodes']:
             self._add_tree(subtype, sub_cell)
+
+    def _add_ontologies(self):
+        onto_soup = BeautifulSoup("""
+      <p>The vocabulary is available in the following formats: </p>
+      <ul>
+        <li>
+          <a href='ontologies/clams.vocabulary.rdf'>RDF</a>
+        </li>
+        <li>
+          <a href='ontologies/clams.vocabulary.owl'>OWL</a>
+        </li>
+        <li>
+          <a href='ontologies/clams.vocabulary.jsonld'>JSONLD</a>
+        </li>
+        <li>
+          <a href='ontologies/clams.vocabulary.ttl'>TTL</a>
+        </li>
+      </ul>""", features="lxml")
+        for element in onto_soup.body:
+            self.main_content.append(element)
 
 
 class TypePage(Page):

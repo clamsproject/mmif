@@ -1,0 +1,163 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Alignment>
+        a                owl:Class ;
+        rdfs:comment     "An alignment relation between two Regions where typically one of the Regions is a text span and the other a video or audio segment. While there is no enforced directionality we tend to consider the text region as the target of the alignment." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Relation> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Alignment#source>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "The first of the aligned Regions." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Alignment> ;
+        rdfs:range    xsd:ID .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/BoundingBox#timePoint>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "If on a video stream, the TimePoint that the BoundingBox occurs in." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/BoundingBox> ;
+        rdfs:range    xsd:ID .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Chapter#title>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "Title of the chapter" ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Chapter> ;
+        rdfs:range    xsd:string .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Segment>
+        a                owl:Class ;
+        rdfs:comment     "A concrete TimeFrame of a certain type." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/TimeFrame> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/metadata#medium>
+        a             owl:AnnotationProperty ;
+        rdfs:comment  "The identifier of the medium that the annotation is over." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Annotation> ;
+        rdfs:range    xsd:ID .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/metadata#target_type>
+        a             owl:AnnotationProperty ;
+        rdfs:comment  "The type of the second of the aligned Regions." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Alignment> ;
+        rdfs:range    xsd:string .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Relation>
+        a                owl:Class ;
+        rdfs:comment     "Any relationship between two or more annotation types. For texts could be a grammatical relation such as subject-object, a semantic relation between meanings or roles, or a temporal relation indicating the simultaneity or ordering in time of events or states. For image regions and video objects this could involve spatial relations or part-whole relations." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Annotation> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Segment#segmentType>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "The type of Segment. Could be bars-and-tones, speech, noise, music, other." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Segment> ;
+        rdfs:range    xsd:string .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Span>
+        a                owl:Class ;
+        rdfs:comment     "An annotation over a region in primary text data. A Span may be defined by pointing directly into primary data (by using start and end offsets) or by linking to one or more other Annotations with the targets property." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Interval> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Annotation#id>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "A unique identifier for the annotation. Uniqueness is relative to the view the annotation is in." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Annotation> ;
+        rdfs:range    xsd:ID .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/BoundingBox>
+        a                owl:Class ;
+        rdfs:comment     "A polygon in an image or video. This is a two-dimensional object so if this occurs in a video it will be anchored to a particular frame or time point in the video." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Region> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/TimeFrame>
+        a                owl:Class ;
+        rdfs:comment     "A temporal interval in an audio or video stream." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Interval> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/TimePoint>
+        a                owl:Class ;
+        rdfs:comment     "A time point in an audio or video stream." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Region> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Interval#start>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "The starting offset in the primary data. What unit is used is determined by the *unit* metadata property." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Interval> ;
+        rdfs:range    xsd:long .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/TimePoint#point>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "The starting offset in the stream." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/TimePoint> ;
+        rdfs:range    xsd:long .
+
+<https://mmif.clams.ai/0.1.0/vocabulary>
+        a                owl:Ontology ;
+        owl:versionInfo  "0.1.0" .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/metadata#source_type>
+        a             owl:AnnotationProperty ;
+        rdfs:comment  "The type of the first of the aligned Regions." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Alignment> ;
+        rdfs:range    xsd:string .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Annotation>
+        a             owl:Class ;
+        rdfs:comment  "Any kind of information added to primary data. Could be a region over the primary data or a relation over regions." .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/BoundingBox#coordinates>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "The coordinates of the polygon." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/BoundingBox> ;
+        rdfs:range    <https://mmif.clams.ai/vocabulary/Datatype#pair_list> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Chapter>
+        a                owl:Class ;
+        rdfs:comment     "Example case for when we do not want to use Segment with a specific segmentType or if we want to introduce special properties." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/TimeFrame> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Region>
+        a                owl:Class ;
+        rdfs:comment     "An annotation over a region in primary data where primary data can be a text, an image, an audio stream or a video streem. Typically one of the sub types of this will be used." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Annotation> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Alignment#target>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "The first of the aligned Regions." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Alignment> ;
+        rdfs:range    xsd:ID .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/VideoObject#boundingBoxes>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "The BoundingBoxes that make up the object." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/VideoObject> ;
+        rdfs:range    xsd:IDREFS .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Interval>
+        a                owl:Class ;
+        rdfs:comment     "An annotation over an interval of two-dimensional primary data, either a text or a video or audio stream. An Interval may be defined by pointing directly into primary data (by using start and end offsets) or by linking to one or more other Annotations with the targets property. This annotation type is intended to be an abstract type and typically one of the sub types will be used." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Region> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/VideoObject>
+        a                owl:Class ;
+        rdfs:comment     "A sequence of BoundingBoxes, where each BoundingBox is associated with a TimePoint." ;
+        rdfs:subClassOf  <https://mmif.clams.ai/0.1.0/vocabulary/Region> .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Interval#end>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "The ending offset in the primary data. What unit is used is determined by the *unit* metadata property." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Interval> ;
+        rdfs:range    xsd:long .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/Interval#targets>
+        a             owl:DatatypeProperty ;
+        rdfs:comment  "IDs of a sequence of annotations covering the region of primary data referred to by this annotation. Used as an alternative to *start* and *end* to point to component annotations (for example a token sequence) rather than directly into primary data, or to link two or more annotations (for example in a coreference annotation)." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Interval> ;
+        rdfs:range    xsd:IDREFS .
+
+<https://mmif.clams.ai/0.1.0/vocabulary/metadata#unit>
+        a             owl:AnnotationProperty ;
+        rdfs:comment  "The unit used to determine boundaries. For text regions this is typically *offsets* to indicate character offsets, for images this is could be *pixels*, and for audio or video streams *seconds*, *milliseconds*, *timestamps* or *frames*." ;
+        rdfs:domain   <https://mmif.clams.ai/0.1.0/vocabulary/Region> ;
+        rdfs:range    xsd:string .

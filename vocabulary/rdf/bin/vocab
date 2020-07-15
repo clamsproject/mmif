@@ -16,7 +16,7 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 MEMSIZE=4G
-JAR=vocab-1.5.0-SNAPSHOT.jar
+JAR=vocab-L1.0-SNAPSHOT.jar
 
 if [ "$1" = "-default" ] ; then
     if [ "$2" = "" ] ; then
@@ -28,4 +28,4 @@ if [ "$1" = "-default" ] ; then
     exit
 fi
 
-java -jar $DIR/$JAR $@
+/Library/Java/JavaVirtualMachines/jdk-13.0.1.jdk/Contents/Home/bin/java -jar $DIR/$JAR $@
