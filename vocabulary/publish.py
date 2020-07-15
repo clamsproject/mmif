@@ -152,10 +152,10 @@ class Page(object):
         self.container = None
         self.intro = None
         self.main_content = None
-        self._add_stylesheet('css/lappsstyle.css')
+        self._add_stylesheet()
 
-    def _add_stylesheet(self, stylesheet):
-        add_stylesheet(self.soup, stylesheet)
+    def _add_stylesheet(self):
+        add_stylesheet(self.soup, self.stylesheet)
 
     def _add_title(self, title):
         self.soup.head.append(tag('title', text=title))
@@ -187,6 +187,8 @@ class Page(object):
         self.main_content.append(tag('br'))
 
     def write(self):
+        if not os.path.exists(self.fpath):
+            os.mkdir(self.fpath)
         with open(self.fname, 'w') as fh:
             fh.write(increase_leading_space(self.soup.prettify()))
 
@@ -194,7 +196,9 @@ class Page(object):
 class IndexPage(Page):
 
     def __init__(self, tree, outdir, version):
+        self.stylesheet = 'css/lappsstyle.css'
         super().__init__(outdir, version)
+        self.fpath = outdir
         self.fname = os.path.join(outdir, 'index.html')
         self.tree = tree
         self._add_title('CLAMS Vocabulary')
@@ -225,7 +229,7 @@ class IndexPage(Page):
 
     def _add_tree(self, clams_type, soup_node):
         type_name = clams_type['name']
-        fname = '%s.html' % type_name
+        fname = '%s' % type_name
         link = HREF(fname, type_name)
         name_cell = tag('td', {'class': 'tc', 'colspan': 4})
         name_cell.append(link)
@@ -251,13 +255,15 @@ class IndexPage(Page):
 class TypePage(Page):
 
     def __init__(self, clams_type, outdir, version):
+        self.stylesheet = '../css/lappsstyle.css'
         super().__init__(outdir, version)
         self.clams_type = clams_type
         self.name = clams_type['name']
         self.description = clams_type['description']
         self.metadata = clams_type.get('metadata', [])
         self.properties = clams_type.get('properties', [])
-        self.fname = os.path.join(outdir, '%s.html' % self.name)
+        self.fpath = os.path.join(outdir, self.name)
+        self.fname = os.path.join(outdir, self.name, 'index.html')
         self._add_title(self.name)
         self._add_main_structure()
         self._add_header()
@@ -280,13 +286,13 @@ class TypePage(Page):
     def _add_home_button(self):
         self.main_content.append(
             DIV({'id': 'sectionbar'},
-                dtrs=[tag('p', dtrs=[HREF('index.html', 'Home')])]))
+                dtrs=[tag('p', dtrs=[HREF('../index.html', 'Home')])]))
 
     def _add_head(self):
         chain = reversed(self._chain_to_top())
         dtrs = []
         for n in chain:
-            dtrs.append(HREF("%s.html" % n['name'], n['name']))
+            dtrs.append(HREF("../%s" % n['name'], n['name']))
             dtrs.append(SPAN('>'))
         dtrs.append(SPAN(self.name))
         p = tag('p', {'class': 'head'}, dtrs=dtrs)
@@ -294,7 +300,7 @@ class TypePage(Page):
         self._add_space()
 
     def _add_definition(self):
-        url = '%s/%s.html' % (VOCABULARY_URL, self.name)
+        url = '%s/%s' % (VOCABULARY_URL, self.name)
         table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
                                            dtrs=[tag('b', text='Definition')]),
                                        tag('td', text=self.description)]),
