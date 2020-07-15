@@ -23,8 +23,8 @@ class Mmif(MmifObject):
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
         self._context = ''
         self.metadata = {}
-        self.media = []
-        self.views = []
+        self.media: Dict[str, Medium] = {}
+        self.views: Dict[str, View] = {}
         if validate:
             self.validate(mmif_obj)
         super().__init__(mmif_obj)
@@ -53,7 +53,7 @@ class Mmif(MmifObject):
     def new_view(self):
         new_view = View()
         new_view.id = self.new_view_id()
-        self.views.append(new_view)
+        self.views[new_view.id] = new_view
         return new_view
 
     def add_media(self, medium: Medium):
@@ -61,32 +61,39 @@ class Mmif(MmifObject):
             self.get_medium_location(medium.type)
         # TODO (krim @ 10/7/2018): if get_m_location returns, raise "already exists" error
         except Exception:
-            self.media.append(medium)
+            self.media[medium.id] = medium
 
-    def get_medium_location(self, md_type: str) -> str:
-        for medium in self.media:
-            if medium["type"] == md_type:
-                return medium["location"]
+    def get_medium_location(self, md_type: str):
+        for medium in self.media.values():
+            if medium.type == md_type:
+                return medium.location
         raise Exception("{} type media not found".format(md_type))
 
-    def get_medium_by_id(self, id: str) -> 'Medium':
-        for medium in self.media:
-            if medium.id == id:
-                return medium
-        raise Exception("{} medium not found".format(id))
-
-    def get_view_by_id(self, id: str) -> 'View':
-        for view in self.views:
-            if view.id == id:
+    def get_view_by_id(self, req_view_id: str):
+        for view_id, view in self.views.items():
+            if view_id == req_view_id:
                 return view
-        raise Exception("{} view not found".format(id))
+        raise Exception("{} view not found".format(req_view_id))
 
     def get_all_views_contain(self, at_type: str):
-        return [view for view in self.views if at_type in view.metadata.contains]
+        return [view for view in self.views.values() if at_type in view.contains]
 
     def get_view_contains(self, at_type: str):
         # will return the *latest* view
-        for view in reversed(self.views):
-            if at_type in view.metadata.contains:
+        # works as of python 3.6+ because dicts are deterministically ordered by insertion order
+        from sys import version_info
+        if version_info < (3, 6):
+            print("Warning: get_view_contains requires Python 3.6+")
+        for view_id, view in reversed(self.views.items()):
+            if at_type in view.contains:
                 return view
         return None
+
+    def __getitem__(self, item):
+        view_result = self.views.get(item)
+        medium_result = self.media.get(item)
+        if view_result and medium_result:
+            raise KeyError("Ambiguous ID search result")
+        if not (view_result or medium_result):
+            raise KeyError("ID not found")
+        return view_result or medium_result
