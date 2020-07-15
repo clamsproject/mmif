@@ -1,0 +1,225 @@
+<html>
+  <head>
+    <link href="../css/lappsstyle.css" rel="stylesheet" type="text/css"/>
+    <title>
+      Span
+    </title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="intro">
+        <div id="pageHeader">
+          <h1>
+            CLAMS Vocabulary
+          </h1>
+          <h2>
+            version 0.1.0
+          </h2>
+        </div>
+      </div>
+      <div id="mainContent">
+        <div id="sectionbar">
+          <p>
+            <a href="../index.html">
+              Home
+            </a>
+          </p>
+        </div>
+        <p class="head">
+          <a href="../Annotation">
+            Annotation
+          </a>
+          <span>
+            &gt;
+          </span>
+          <a href="../Region">
+            Region
+          </a>
+          <span>
+            &gt;
+          </span>
+          <a href="../Interval">
+            Interval
+          </a>
+          <span>
+            &gt;
+          </span>
+          <span>
+            Span
+          </span>
+        </p>
+        <br/>
+        <table>
+          <tr>
+            <td class="fixed">
+              <b>
+                Definition
+              </b>
+            </td>
+            <td>
+              An annotation over a region in primary text data. A Span may be defined by pointing directly into primary data (by using start and end offsets) or by linking to one or more other Annotations with the targets property.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>
+                URI
+              </b>
+            </td>
+            <td>
+              <a href="http://mmif.clams.ai/0.1.0/vocabulary/Span">
+                http://mmif.clams.ai/0.1.0/vocabulary/Span
+              </a>
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Metadata
+        </h1>
+        <h2>
+          Metadata from Region
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              unit
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              The unit used to determine boundaries. For text regions this is typically *offsets* to indicate character offsets, for images this is could be *pixels*, and for audio or video streams *seconds*, *milliseconds*, *timestamps* or *frames*.
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Metadata from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              medium
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the medium that the annotation is over.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Properties
+        </h1>
+        <h2>
+          Properties from Interval
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              start
+            </td>
+            <td>
+              Integer
+            </td>
+            <td>
+              The starting offset in the primary data. What unit is used is determined by the *unit* metadata property.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              end
+            </td>
+            <td>
+              Integer
+            </td>
+            <td>
+              The ending offset in the primary data. What unit is used is determined by the *unit* metadata property.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              targets
+            </td>
+            <td>
+              List of IDs
+            </td>
+            <td>
+              IDs of a sequence of annotations covering the region of primary data referred to by this annotation. Used as an alternative to *start* and *end* to point to component annotations (for example a token sequence) rather than directly into primary data, or to link two or more annotations (for example in a coreference annotation).
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              id
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              A unique identifier for the annotation. Uniqueness is relative to the view the annotation is in.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <br/>
+      </div>
+    </div>
+    <div id="footer">
+      Page generated on 2020-07-15 at 17:11:36
+    </div>
+  </body>
+</html>

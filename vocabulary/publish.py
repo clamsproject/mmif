@@ -352,7 +352,7 @@ class TypePage(Page):
 
 
 def increase_leading_space(text):
-    """Hack to double the indentation since didn't like the single character
+    """Hack to double the indentation since I didn't like the single character
     indent in bs4 and there is apparently no way to change that."""
     # TODO: there are other minor problems with the bs4 pretty print
     # TODO: find another way to take that string and pretty print it
@@ -366,22 +366,37 @@ def increase_leading_space(text):
     return '\n'.join(new_lines)
 
 
-def setup(outdir):
-    css_dir = os.path.join(outdir, 'css')
+def setup(out_dir, vocab_dir, schema_dir, context_dir):
+    css_dir = os.path.join(vocab_dir, 'css')
     if not os.path.exists(css_dir):
         os.makedirs(css_dir)
     shutil.copy('lappsstyle.css', css_dir)
+    shutil.copy('../specifications/current/index.md', out_dir)
+    shutil.copy('../specifications/current/pi78oGjdT-annotated.jpg', out_dir)
+    if not os.path.exists(schema_dir):
+        os.makedirs(schema_dir)
+    shutil.copy('../schema/lif.json', schema_dir)
+    shutil.copy('../schema/mmif.json', schema_dir)
+    if not os.path.exists(context_dir):
+        os.makedirs(context_dir)
+    shutil.copy('../context/mmif.json', context_dir)
+    shutil.copy('../context/vocab-clams.json', context_dir)
+    shutil.copy('../context/vocab-lapps.json', context_dir)
+    shutil.copy('../context/index.md', context_dir)
 
 
 
 if __name__ == '__main__':
 
-    outdir =  os.path.join('..', 'docs', VERSION, 'vocabulary')
+    out_dir =  os.path.join('..', 'docs', VERSION)
     if len(sys.argv) > 1 and sys.argv[1] == '--test':
-        outdir = 'www'
-    setup(outdir)
-    print("Creating webpages in '%s'" % outdir)
+        out_dir = 'www'
+    vocab_dir = os.path.join(out_dir, 'vocabulary')
+    schema_dir = os.path.join(out_dir, 'schema')
+    context_dir = os.path.join(out_dir, 'context')
+    setup(out_dir, vocab_dir, schema_dir, context_dir)
+    print(">>> Creating specifications in '%s'\n" % out_dir)
     clams_types = read_yaml("clams.vocabulary.yaml")
     tree = Tree(clams_types)
-    write_hierarchy(tree, outdir, VERSION)
-    write_pages(tree, outdir, VERSION)
+    write_hierarchy(tree, vocab_dir, VERSION)
+    write_pages(tree, vocab_dir, VERSION)
