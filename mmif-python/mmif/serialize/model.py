@@ -17,8 +17,6 @@ class MmifObject(object):
          If not given, an empty object will be initialized, sometimes with
          an ID value automatically generated, based on its parent object.
         """
-        if type(mmif_obj) == str:
-            mmif_obj = json.loads(mmif_obj)
         if mmif_obj is not None:
             self.deserialize(mmif_obj)
 
@@ -29,14 +27,16 @@ class MmifObject(object):
         :param pretty: If True, returns string representation with indentation.
         :return: JSON-LD string of the object.
         """
-        return self._serialize(self.__dict__, pretty)
+        return json.dumps(self._serialize(), indent=2 if pretty else None, cls=MmifObjectEncoder)
 
-    @staticmethod
-    def _serialize(kv_obj: dict, pretty: bool = False) -> str:
-        for k in list(kv_obj.keys()):
+    def _serialize(self) -> dict:
+        d = {}
+        for k, v in list(self.__dict__.items()):
             if k.startswith('_'):
-                kv_obj[f'@{k[1:]}'] = kv_obj.pop(k)
-        return json.dumps(kv_obj, indent=2 if pretty else None, cls=MmifObjectEncoder)
+                d[f'@{k[1:]}'] = v
+            else:
+                d[k] = v
+        return d
 
     @staticmethod
     def _load_str(json_str: str):
@@ -53,7 +53,7 @@ class MmifObject(object):
         :return:
         """
         def to_atsign(d: Dict[str, Any]):
-            for k in d:
+            for k in list(d.keys()):
                 if k.startswith('@'):
                     d[f'_{k[1:]}'] = d.pop(k)
             return d
@@ -61,9 +61,11 @@ class MmifObject(object):
 
     def deserialize(self, mmif_json: Union[str, dict]) -> None:
         """
-        Takes a JSON-formatted string or a simple `dict` json-loaded from
+        Takes a JSON-formatted string or a simple `dict` that's json-loaded from
         such a string as an input and populates object's fields with the values
         specified in the input.
+        NB: this assumes when input is dict type, the keys are properly renamed
+        (@xxx -> _xxx)
 
         :param mmif_json: JSON-formatted string or dict from such a string
          that represents a MMIF object
@@ -100,13 +102,11 @@ class MmifObjectEncoder(json.JSONEncoder):
     Encoder class to define behaviors of de-/serialization
     """
 
-    def default(self, obj: MmifObject):
+    def default(self, obj: 'MmifObject'):
         """
         Overrides default encoding behavior to prioritize :func: MmifObject.serilize() .
         """
-        if hasattr(obj, 'serialize'):
-            return obj.serialize()
-        elif hasattr(obj, '__str__'):
-            return str(obj)
-        else:
+        try:
+            return obj._serialize()
+        except:
             return json.JSONEncoder.default(self, obj)
