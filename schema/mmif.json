@@ -116,6 +116,10 @@
       "required": [
         "id",
         "type"
+      ],
+      "oneOf": [
+        {"required": ["text"]},
+        {"required": ["location"]}
       ]
     },
     "submedia": {

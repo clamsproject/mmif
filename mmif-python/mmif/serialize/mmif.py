@@ -12,13 +12,13 @@ from .model import MmifObject
 
 class Mmif(MmifObject):
     # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
-    context: str
+    _context: str
     metadata: Dict[str, str]
-    media: List[Medium]
+    media: List['Medium']
     views: List['View']
 
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
-        self.context = ''
+        self._context = ''
         self.metadata = {}
         self.media = []
         self.views = []
@@ -26,21 +26,11 @@ class Mmif(MmifObject):
             self.validate(mmif_obj)
         super().__init__(mmif_obj)
 
-    def serialize(self, pretty: bool =False) -> str:
-        """
-        Overrides the default `serialize` to add `@` sign to context field.
-        """
-        d = self.__dict__.copy()
-        d['@context'] = d.pop('context')
-        return self._serialize(d, pretty)
-
-    def _deserialize(self, mmif_dict: dict):
-
-        # TODO (krim @ 10/3/2018): more robust json parsing
-        self.context = mmif_dict["@context"]
-        self.metadata = mmif_dict["metadata"]
-        self.media = mmif_dict["media"]
-        self.views = mmif_dict["views"]
+    def _deserialize(self, input_dict: dict) -> None:
+        self._context = input_dict['_context']
+        self.metadata = input_dict['metadata']
+        self.media = [Medium(m) for m in input_dict['media']]
+        self.views = [View(v) for v in input_dict['views']]
 
     @staticmethod
     def validate(json_str: Union[str, dict]):
@@ -70,24 +60,30 @@ class Mmif(MmifObject):
         except Exception:
             self.media.append(medium)
 
-    def get_medium_location(self, md_type: str):
+    def get_medium_location(self, md_type: str) -> str:
         for medium in self.media:
             if medium["type"] == md_type:
                 return medium["location"]
         raise Exception("{} type media not found".format(md_type))
 
-    def get_view_by_id(self, id: str):
+    def get_medium_by_id(self, id: str) -> 'Medium':
+        for medium in self.media:
+            if medium.id == id:
+                return medium
+        raise Exception("{} medium not found".format(id))
+
+    def get_view_by_id(self, id: str) -> 'View':
         for view in self.views:
             if view.id == id:
                 return view
         raise Exception("{} view not found".format(id))
 
     def get_all_views_contain(self, at_type: str):
-        return [view for view in self.views if at_type in view.contains]
+        return [view for view in self.views if at_type in view.metadata.contains]
 
     def get_view_contains(self, at_type: str):
         # will return the *latest* view
         for view in reversed(self.views):
-            if at_type in view.contains:
+            if at_type in view.metadata.contains:
                 return view
         return None
