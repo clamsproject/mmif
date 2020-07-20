@@ -1,0 +1,42 @@
+{
+    "@context" : {
+
+	"@vocab" : "http://mmif.clams.ai/0.1.0/vocab/",
+
+	"mmif": "http://mmif.clams.ai/0.1.0/vocab/mmif/",
+
+	"id": "mmif:id",
+	"metadata": "mmif:metadata",
+	"medium": "mmif:medium",
+	"timestamp": "mmif:timestamp",
+	"tool": "mmif:tool",
+	"contains": "mmif:contains",
+	"annotations": "mmif:annotations",
+	"properties": "mmif:properties",
+
+	"medium": "Annotation#medium",
+
+	"unit": "Region#unit",
+
+	"start": "Interval#start",
+	"end": "Interval#end",
+	"targets": "Interval#targets",
+
+	"point": "TimePoint#point",
+
+	"frameType": "TimeFrame#frameType",
+
+	"title": "Chapter#title",
+
+	"coordinates": "Polygon#coordinates",
+	"timePoint": "Polygon#timePoint",
+
+	"boundingBoxes": "VideoObject#boundingBoxes",
+
+	"source_type": "Alignment#source_type",
+	"target_type": "Alignment#target_type",
+	"source": "Alignment#source",
+	"target": "Alignment#target"
+
+    }
+}

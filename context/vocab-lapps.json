@@ -1,0 +1,39 @@
+{
+    "@context" : {
+
+	"@vocab" : "http://vocab.lappsgrid.org/",
+
+	"mmif": "http://mmif.clams.ai/0.1.0/vocab/mmif/",
+
+	"id": "mmif:id",
+	"metadata": "mmif:metadata",
+	"medium": "mmif:medium",
+	"timestamp": "mmif:timestamp",
+	"tool": "mmif:tool",
+	"contains": "mmif:contains",
+	"annotations": "mmif:annotations",
+	"properties": "mmif:properties",
+
+	"types" : "http://vocab.lappsgrid.org/types/",
+
+	"tokenization" : "types:tokenization/",
+	"tagset" : "types:posType/",
+	"ner" : "types:ner/",
+	"coref" : "types:coref/",
+	"chunk" : "types:chunk/",
+
+	"token" : "http://vocab.lappsgrid.org/Token#",
+	"common" : "http://vocab.lappsgrid.org/Annotation#",
+
+	"start":"common:start",
+	"end":"common:end",
+	"label":"common:label",
+
+	"pos" : "token:pos",
+	"lemma": "token:lemma",
+	"kind": "token:kind",
+	"word": "token:word",
+	"length": "token:length",
+	"orth": "token:orth"
+    }
+}

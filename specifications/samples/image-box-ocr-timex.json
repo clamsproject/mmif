@@ -1,0 +1,263 @@
+{
+  "context": "mmif-prototype-0.0.1.jsonld",
+  "metadata": {},
+  "media": [
+    {
+      "id": "0",
+      "type": "audio-video",
+      "location": "/var/archive/cpb-aacip-507-fj2988397d.png",
+      "metadata": {
+        "resolutionX": 640,
+        "resolutionY": 480
+      }
+    }
+  ],
+  "contains": {
+    "object-box": "v_0",
+    "ocr": "v_1",
+    "timex-extraction": "v_2"
+  },
+  "views": [
+    {
+      "id": "v_0",
+      "contains": {
+        "obejct-box": {
+          "producer": "EAST-wrapper",
+          "gen_time": "2018-10-08T04:05:59.343212"
+        }
+      },
+      "annotations": [
+        {
+          "topleft": [124,28],
+          "bottomright": [200,70],
+          "id": 0,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [207,32],
+          "bottomright": [292,64],
+          "id": 1,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [298,26],
+          "bottomright": [289,70],
+          "id": 2,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [76,108],
+          "bottomright": [206,150],
+          "id": 3,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [53,148],
+          "bottomright": [401,190],
+          "id": 4,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [58,194],
+          "bottomright": [191,237],
+          "id": 5,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [57,242],
+          "bottomright": [207,280],
+          "id": 6,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [208,238],
+          "bottomright": [337,283],
+          "id": 7,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [310,245],
+          "bottomright": [396,280],
+          "id": 8,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [61,292],
+          "bottomright": [243,330],
+          "id": 9,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [232,289],
+          "bottomright": [383,330],
+          "id": 10,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [60,336],
+          "bottomright": [246,372],
+          "id": 11,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [248,330],
+          "bottomright": [458,372],
+          "id": 12,
+          "attype": "object-box",
+          "feaure": {}
+        }
+      ]
+    },
+    {
+      "id": "v_1",
+      "contains": {
+        "obejct-box": {
+          "producer": "tesseract-wrapper",
+          "gen_time": "2018-10-08T04:39:12.125128"
+        }
+      },
+      "annotations": [
+        {
+          "target": "v_0:0",
+          "id": 0,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "ON"
+          }
+        },
+        {
+          "target": "v_0:1",
+          "id": 1,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "THE"
+          }
+        },
+        {
+          "target": "v_0:2",
+          "id": 2,
+          "attype": "ocr",
+          "feaure": {
+            "characters": " RECORD"
+          }
+        },
+        {
+          "target": "v_0:3",
+          "id": 3,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "P OOO"
+          }
+        },
+        {
+          "target": "v_0:4",
+          "id": 4,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "Record: 11/13/92"
+          }
+        },
+        {
+          "target": "v_0:5",
+          "id": 5,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "Air i 1k"
+          }
+        },
+        {
+          "target": "v_0:6",
+          "id": 6,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "Reoeat:"
+          }
+        },
+        {
+          "target": "v_0:7",
+          "id": 7,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "11/16"
+          }
+        },
+        {
+          "target": "v_0:8",
+          "id": 8,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "i/92"
+          }
+        },
+        {
+          "target": "v_0:9",
+          "id": 9,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "Director: "
+          }
+        },
+        {
+          "target": "v_0:10",
+          "id": 10,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "UNGER"
+          }
+        },
+        {
+          "target": "v_0:11",
+          "id": 11,
+          "attype": "ocr",
+          "feaure": {
+            "characters": "Producer:"
+          }
+        },
+        {
+          "target": "v_0:12",
+          "id": 12,
+          "attype": "ocr",
+          "feaure": {
+            "characters": " DOUGLAS"
+          }
+        }
+      ]
+    },
+    {
+      "id": "v_2",
+      "contains": {
+        "timex-extraction": {
+          "producer": "CLAMS-heideltime-wrapper",
+          "gen_time": "2018-10-08T06:34:29.511315",
+          "items": 1
+        }
+      },
+      "annotations": [
+        {
+          "id": "timex_0",
+          "target": "v_1:4",
+          "start": 8,
+          "end": 15,
+          "attype": "timex-extraction",
+          "feature": {
+            "text": "11/13/92",
+            "value": "1992-11-13",
+            "type": "TIME"
+          }
+        }
+      ]
+    }
+  ]
+}
