@@ -24,7 +24,7 @@ description: Multi-Media Interchange Format
 # List of links in the navigation bar
 navbar-links:
   HOME: ""
-  CLAMS: "clams"
+  CLAMS: "https://www.clams.ai"
   # Documentation:
     # - Quick Start: "appliance"
     # - CLAMS Book: "https://book.clams.ai/"

@@ -27,7 +27,7 @@
 
   {% if layout.common-css %}
     {% for css in layout.common-css %}
-      <link rel="stylesheet" href="{{ css | prepend: site.baseurl | replace: '//', '/' }}" />
+      <link rel="stylesheet" href="{{ css }}" />
     {% endfor %}
   {% endif %}
 
@@ -45,7 +45,12 @@
 
   {% if page.css %}
     {% for css in page.css %}
-      <link rel="stylesheet" href="{{ css | prepend: site.baseurl | replace: '//', '/' }}" />
+      {% unless css contains 'http' %}
+      {% capture u %}{{ css | prepend: site.baseurl | replace: '//', '/' }}{% endcapture %}
+      {% else %}
+      {% assign u = css %}
+      {% endunless %}
+      <link rel="stylesheet" href="{{ u }}" />
     {% endfor %}
   {% endif %}
 

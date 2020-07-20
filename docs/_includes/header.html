@@ -7,12 +7,18 @@
     {% for bigimg in page.bigimg %}
 	  {% assign imgnum = forloop.index %}
 	  {% for imginfo in bigimg %}
-	    {% if imginfo[0] %}
-		  data-img-src-{{ imgnum }}="{{ imginfo[0] | prepend: site.baseurl | replace: '//', '/' }}"
-		  data-img-desc-{{ imgnum }}="{{ imginfo[1] }}"
-		{% else %}
-		  data-img-src-{{ imgnum }}="{{ imginfo | prepend: site.baseurl | replace: '//', '/' }}"
-		{% endif %}
+      {% if imginfo[0] %}
+        data-img-desc-{{ imgnum }}="{{ imginfo[1] }}"
+        {% assign iinfo = imginfo[0] %}
+      {% else %}
+        {% assign iinfo = imginfo %}
+      {% endif %}
+      {% unless iinfo contains 'http' %}
+      {% capture u %}{{ iinfo | prepend: site.baseurl | replace: '//', '/' }}{% endcapture %}
+      {% else %}
+      {% assign u = iinfo %}
+      {% endunless %}
+      data-img-src-{{ imgnum }}="{{ u }}"
 	  {% endfor %}
     {% endfor %}
   ></div>

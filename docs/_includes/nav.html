@@ -40,11 +40,16 @@
       </ul>
     </div>
 
+  {% unless site.avatar contains 'http' %}
+  {% capture u %}{{ site.avatar | prepend: site.baseurl | replace: '//', '/' }}{% endcapture %}
+  {% else %}
+  {% assign u = site.avatar %}
+  {% endunless %}
 	{% if page.image and (layout.show-avatar or page.show-avatar) %}
 	<div class="avatar-container">
 	  <div class="avatar-img-border">
 	    <a href="{{ site.url }}">
-	      <img class="avatar-img" src="{{ page.image | prepend: site.baseurl | replace: '//', '/' }}" />
+	      <img class="avatar-img" src="{{ u }}" />
 		</a>
 	  </div>
 	</div>
@@ -52,12 +57,7 @@
 	<div class="avatar-container">
 	  <div class="avatar-img-border">
 	    <a href="{{ site.url }}">
-
-        {% if site.avatar contains 'http' %}
-	      <img class="avatar-img" src="{{ site.avatar }}" />
-        {% else %}
-	      <img class="avatar-img" src="{{ site.avatar | prepend: site.baseurl | replace: '//', '/' }}" />
-        {% endif %}
+	      <img class="avatar-img" src="{{ u }}" />
 		</a>
 	  </div>
 	</div>
