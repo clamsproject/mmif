@@ -387,7 +387,7 @@ Annotations in a MMIF file can also refer to the LAPPS Vocabulary at [http://voc
 
 ## 3. MIFF Examples
 
-The first example is at [../samples/example-1.json](../samples/example-1.json). It contains two media, one pointing at a video and the other at a transcript. For the first medium there are two views, one with bars-and-tone annotations and one with slate annotations. For the second medium there is one view with the results of a tokenizer. This example file, while minimal, has everything required by MMIF. A few things to note:
+The first example is at [samples/example-1.json](samples/example-1.json). It contains two media, one pointing at a video and the other at a transcript. For the first medium there are two views, one with bars-and-tone annotations and one with slate annotations. For the second medium there is one view with the results of a tokenizer. This example file, while minimal, has everything required by MMIF. A few things to note:
 
 - The metadata specify the MMIF version and a top-level specification of what annotation types are in the views. Both are technically not needed because they can be derived from the context and the views, but are there for convenience.
 - Each view has a context that is there to define the expanded forms of the terms in the annotations list. For example, the first view as an annotation object with *@type* equals *TimeFrame*. The context will expand this to http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame. Something similar happens to all property names in the *properties* dictionary. 

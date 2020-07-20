@@ -365,14 +365,25 @@ def increase_leading_space(text):
                 break
     return '\n'.join(new_lines)
 
+def compile_index_md(source_md, target_dir):
+    from string import Template
+    source_md_f = open(source_md, 'r')
+    #  print(source_md_f.read())
+    tmpl_to_compile = Template(source_md_f.read())
+    compiled = tmpl_to_compile.substitute(VERSION=VERSION)
+    source_md_f.close()
+    compiled_md_f = open(os.path.join(target_dir, 'index.md'), 'w') 
+    compiled_md_f.write(compiled)
+    compiled_md_f.close()
 
 def setup(out_dir, vocab_dir, schema_dir, context_dir):
     css_dir = os.path.join(vocab_dir, 'css')
     if not os.path.exists(css_dir):
         os.makedirs(css_dir)
     shutil.copy('lappsstyle.css', css_dir)
-    shutil.copy('../specifications/current/index.md', out_dir)
-    shutil.copy('../specifications/current/pi78oGjdT-annotated.jpg', out_dir)
+    compile_index_md('../specifications/index.md', out_dir)
+    shutil.copy('../specifications/pi78oGjdT-annotated.jpg', out_dir)
+    shutil.copytree('../specifications/samples', os.path.join(out_dir, 'samples'))
     if not os.path.exists(schema_dir):
         os.makedirs(schema_dir)
     shutil.copy('../schema/lif.json', schema_dir)
@@ -382,7 +393,7 @@ def setup(out_dir, vocab_dir, schema_dir, context_dir):
     shutil.copy('../context/mmif.json', context_dir)
     shutil.copy('../context/vocab-clams.json', context_dir)
     shutil.copy('../context/vocab-lapps.json', context_dir)
-    shutil.copy('../context/index.md', context_dir)
+    compile_index_md('../context/index.md', context_dir)
 
 
 
@@ -391,6 +402,8 @@ if __name__ == '__main__':
     out_dir =  os.path.join('..', 'docs', VERSION)
     if len(sys.argv) > 1 and sys.argv[1] == '--test':
         out_dir = 'www'
+    shutil.rmtree(out_dir, ignore_errors=True)
+    os.mkdir(out_dir)
     vocab_dir = os.path.join(out_dir, 'vocabulary')
     schema_dir = os.path.join(out_dir, 'schema')
     context_dir = os.path.join(out_dir, 'context')

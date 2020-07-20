@@ -1,7 +1,7 @@
 ---
 layout: page
 title: MMIF Context Files
-subtitle: version 0.1.0
+subtitle: version $VERSION
 ---
 
 JSON-LD context definitions can be used to help expand terms in the MMIF document to full URIs. Rather than using inline context definitions we use context files.
