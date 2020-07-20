@@ -1,17 +1,21 @@
-# MMIF - Multi-Media Interchange Format
+---
+layout: page
+title: Specification 0.1.0
+subtitle: Multi-Media Interchange Format
+---
 
 MMIF is an annotation format for audiovisual media as well as associated text like transcripts, closed captions and other OCR. MMIF is a JSON-LD format used to transport data between CLAMS services and is inspired by and partially based on LIF, the [LAPPS Interchange Format](https://wiki.lappsgrid.org/interchange/). MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
 
 MMIF consist of three formal components in addition to this more informal specification, they are:
 1. The JSON schema:
-  - https://mmif.clams.ai/0.1.0/schema/mmif.json
+  - [https://mmif.clams.ai/0.1.0/schema/mmif.json](schema/mmif.json)
 1. The Linked Data (JSON-LD) context:
-  - http://mmif.clams.ai/0.1.0/context/mmif.json
-  - http://mmif.clams.ai/0.1.0/context/vocab-clams.json
-  - http://mmif.clams.ai/0.1.0/context/vocab-lapps.json
+  - [http://mmif.clams.ai/0.1.0/context/mmif.json](context/mmif.json)
+  - [http://mmif.clams.ai/0.1.0/context/vocab-clams.json](context/vocab-clams.json)
+  - [http://mmif.clams.ai/0.1.0/context/vocab-lapps.json](context/vocab-lapps.json)
 1. The Vocabularies (type hierarchies):
-  - https://mmif.clams.ai/0.1.0/vocabulary
-  - http://vocab.lappsgrid.org
+  - [https://mmif.clams.ai/0.1.0/vocabulary](vocabulary)
+  - [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org)
 
 The  JSON schema for MMIF defines the syntactic elements of MMIF and the contexts define shortcuts for URIs of the MMIF namespace. Both will be explained at length in this document in section 1. These specifications often refer to elements from the CLAMS  and LAPPS Vocabularies which define concepts and their ontological relations, see section 2 for some more notes on those vocabularies.
 
