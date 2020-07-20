@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Specification 0.1.0
-subtitle: Multi-Media Interchange Format
+title: MMIF Specification
+subtitle: version 0.1.0
 ---
 
 MMIF is an annotation format for audiovisual media as well as associated text like transcripts, closed captions and other OCR. MMIF is a JSON-LD format used to transport data between CLAMS services and is inspired by and partially based on LIF, the [LAPPS Interchange Format](https://wiki.lappsgrid.org/interchange/). MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
