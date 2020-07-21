@@ -33,7 +33,9 @@ class Medium(MmifObject):
             self.text = Text(medium_dict['text'])
 
     def add_metadata(self, name: str, value: str):
-        self.metadata[name] = value
+        name = name.replace('@', '_')
+        assert name.isidentifier(), "Annotation property name must be a valid Python identifier"
+        setattr(self.metadata, name, value)
 
 
 class Text(MmifObject):

@@ -11,14 +11,18 @@ __all__ = ['View', 'ViewMetadata', 'Contain']
 class View(MmifObject):
     id: str
     metadata: 'ViewMetadata'
-    annotations: List['Annotation']
-    anno_ids = set()
+    annotations: Dict[str, 'Annotation']
 
     def __init__(self, view_obj: Union[str, dict] = None):
         self.id = ''
         self.metadata = ViewMetadata()
-        self.annotations = []
+        self.annotations = {}
         super().__init__(view_obj)
+
+    def _serialize(self) -> dict:
+        intermediate = super()._serialize()
+        intermediate.update(annotations=list(self.annotations.values()))
+        return intermediate
 
     def _deserialize(self, view_dict: dict):
         self.id = view_dict['id']
@@ -36,10 +40,15 @@ class View(MmifObject):
         return self.add_annotation(new_annotation)
 
     def add_annotation(self, annotation: 'Annotation') -> 'Annotation':
-        self.annotations.append(annotation)
-        self.anno_ids.add(annotation.id)
+        self.annotations[annotation.id] = annotation
         self.new_contain(annotation.at_type)
         return annotation
+
+    def __getitem__(self, item):
+        anno_result = self.annotations.get(item)
+        if not anno_result:
+            raise KeyError("Annotation ID not found: %s" % item)
+        return anno_result
 
 
 class ViewMetadata(MmifObject):
@@ -77,4 +86,3 @@ class Contain(MmifObject):
         self.producer = ''
         self.gen_time = datetime.now()     # datetime.datetime
         super().__init__(contain_obj)
-

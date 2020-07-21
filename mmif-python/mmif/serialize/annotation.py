@@ -9,6 +9,11 @@ class Annotation(MmifObject):
     properties: 'AnnotationProperties'
     _type: str
 
+    def __init__(self, anno_obj: Union[str, dict] = None):
+        self._type = ''
+        self.properties = AnnotationProperties()
+        super().__init__(anno_obj)
+
     @property
     def at_type(self):
         return self._type
@@ -28,14 +33,16 @@ class Annotation(MmifObject):
     def _deserialize(self, input_dict: dict) -> None:
         self._type = input_dict['_type']
         self.properties = AnnotationProperties(input_dict['properties'])
-
-    def __init__(self, anno_obj: Union[str, dict] = None):
-        self._type = ''
-        self.properties = AnnotationProperties()
-        super().__init__(anno_obj)
+        
+    def _serialize(self) -> dict:
+        intermediate = super()._serialize()
+        intermediate.update(properties=self.properties._serialize())
+        return intermediate
 
     def add_property(self, name: str, value: str):
-        self.properties[name] = value
+        name = name.replace('@', '_')
+        assert name.isidentifier(), "Annotation property name must be a valid Python identifier"
+        setattr(self.properties, name, value)
 
 
 class AnnotationProperties(MmifObject):
