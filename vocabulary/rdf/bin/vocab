@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Startup script for the LAPPS Vocabulary processor.
+
+# Jump through hoops to find the directory where this command is installed. The
+# hoops are required incase we are called through a symlink.
+# See http://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+MEMSIZE=4G
+JAR=vocab-L1.0-SNAPSHOT.jar
+
+if [ "$1" = "-default" ] ; then
+    if [ "$2" = "" ] ; then
+        output=html
+    else
+        output=$2
+    fi
+    java -jar $DIR/$JAR -d lapps.vocab -i table-index.groovy -h template.groovy -o $output
+    exit
+fi
+
+java -jar $DIR/$JAR $@
