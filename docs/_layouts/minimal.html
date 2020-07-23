@@ -1,0 +1,26 @@
+---
+common-css:
+  - "https://www.clams.ai/assets/css/bootstrap.min.css"
+  - "https://www.clams.ai/assets/css/main-minimal.css"
+common-js:
+  - "https://www.clams.ai/assets/js/jquery-1.11.2.min.js"
+  - "https://www.clams.ai/assets/js/bootstrap.min.js"
+---
+
+<!DOCTYPE html>
+<html lang="en">
+
+  {% include head.html %}
+
+  <body>
+
+    <div role="main" class="container main-content">
+      {{ content }}
+    </div>
+
+    {% include footer-minimal.html %}
+
+    {% include footer-scripts.html %}
+
+  </body>
+</html>

@@ -1,0 +1,122 @@
+{
+  "context": "mmif-prototype-0.0.1.jsonld",
+  "metadata": {},
+  "media": [
+    {
+      "id": "0",
+      "type": "audio-video",
+      "location": "/var/archive/cpb-aacip-507-fj2988397d.png",
+      "metadata": {
+        "resolutionX": 640,
+        "resolutionY": 480
+      }
+    }
+  ],
+  "contains": {
+    "object-box": "v_0"
+  },
+  "views": [
+    {
+      "id": "v_0",
+      "contains": {
+        "obejct-box": {
+          "producer": "EAST-wrapper",
+          "gen_time": "2018-10-08T04:05:59.343212"
+        }
+      },
+      "annotations": [
+        {
+          "topleft": [124,28],
+          "bottomright": [200,70],
+          "id": 0,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [207,32],
+          "bottomright": [292,64],
+          "id": 1,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [298,26],
+          "bottomright": [289,70],
+          "id": 2,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [76,108],
+          "bottomright": [206,150],
+          "id": 3,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [53,148],
+          "bottomright": [401,190],
+          "id": 4,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [58,194],
+          "bottomright": [191,237],
+          "id": 5,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [57,242],
+          "bottomright": [207,280],
+          "id": 6,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [208,238],
+          "bottomright": [337,283],
+          "id": 7,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [310,245],
+          "bottomright": [396,280],
+          "id": 8,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [61,292],
+          "bottomright": [243,330],
+          "id": 9,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [232,289],
+          "bottomright": [383,330],
+          "id": 10,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [60,336],
+          "bottomright": [246,372],
+          "id": 11,
+          "attype": "object-box",
+          "feaure": {}
+        },
+        {
+          "topleft": [248,330],
+          "bottomright": [458,372],
+          "id": 12,
+          "attype": "object-box",
+          "feaure": {}
+        }
+      ]
+    }
+  ]
+}

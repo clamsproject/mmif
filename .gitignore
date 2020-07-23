@@ -59,6 +59,9 @@ hs_err_pid* # virtual machine crash logs, see http://www.java.com/en/download/he
 **/*.egg-info
 **/.pytype
 
+# ruby (jekyll)
+Gemfile.lock
+
 # shared folders
 dropbox_shared*/
 github_shared*/
@@ -75,3 +78,6 @@ tags
 # auto-generated files
 mmif-python/**/ver
 mmif-python/**/res
+
+# jekyll files 
+docs/**/_site/**

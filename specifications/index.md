@@ -1,27 +1,33 @@
-# MMIF - Multi-Media Interchange Format
+---
+layout: page
+title: MMIF Specification
+subtitle: version $VERSION
+---
 
-MMIF is an annotation format for audiovisual media as well as associated text like transcripts, closed captions and other OCR. MMIF is a JSON-LD format used to transport data between CLAMS services and is inspired by and partially based on LIF, the [LAPPS Interchange Format](https://wiki.lappsgrid.org/interchange/).
+MMIF is an annotation format for audiovisual media as well as associated text like transcripts, closed captions and other OCR. MMIF is a JSON-LD format used to transport data between CLAMS services and is inspired by and partially based on LIF, the [LAPPS Interchange Format](https://wiki.lappsgrid.org/interchange/). MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
 
-MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
+MMIF consist of three formal components in addition to this more informal specification, they are:
+1. The JSON schema:
+  - [https://mmif.clams.ai/0.1.0/schema/mmif.json](schema/mmif.json)
+1. The Linked Data (JSON-LD) context:
+  - [http://mmif.clams.ai/0.1.0/context/mmif.json](context/mmif.json)
+  - [http://mmif.clams.ai/0.1.0/context/vocab-clams.json](context/vocab-clams.json)
+  - [http://mmif.clams.ai/0.1.0/context/vocab-lapps.json](context/vocab-lapps.json)
+1. The Vocabularies (type hierarchies):
+  - [https://mmif.clams.ai/0.1.0/vocabulary](vocabulary)
+  - [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org)
 
-## 0. Status of this document and MMIF specification.
+The  JSON schema for MMIF defines the syntactic elements of MMIF and the contexts define shortcuts for URIs of the MMIF namespace. Both will be explained at length in this document in section 1. These specifications often refer to elements from the CLAMS  and LAPPS Vocabularies which define concepts and their ontological relations, see section 2 for some more notes on those vocabularies.
 
-As a specification, MMIF consist of three formal components in addition to this verbally documented specification. They are
-1. JSON schema; that defines syntactic elements in MMIF
-1. Linked Data (JSON-LD) context; that defines shortcuts for URIs of the MMIF namespace
-1. Vocabularies (type hierarchy); that defines concepts and their ontological relations
+Along with the formal specifications and documentation, our goal also includes providing a reference implementation of MMIF. Currently it is being developed in the Python programming language and it will be distributed via github (as source code) as well as via the [Python Package Index](https://pypi.org/) (as a Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
 
-> In the following we are still rather cavalier on where all the versioned files are. For now we use version 0.1.0 as an example, but note that files may not yet be available where they are supposed to be.
-
-The current JSON schema for MMIF are at http://mmif.clams.ai/0.1.0/schema/mmif.json and determine part of the syntactic shape of MMIF. The specifications here often refer to elements from the CLAMS  Vocabulary at http://mmif.clams.ai/0.1.0/vocabulary as well as to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). See section 2 in this document for an introduction and comparison of those vocabularies.
-
-Along with the formal specifications and documentation, our goal also includes providing a reference implementation of MMIF. Currently it is being developed in Python programming language and will be distributed via github (as source code) as well as via the [Python Package Index](https://pypi.org/) (as Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
-
-### Versioning 
+**Versioning**
 
 The MMIF specification and its reference implementation (SDK) are now in pre-alpha stage, and during the current development phase, we will use `0.1.x` versions. All present and future versions follow the [semantic versioning](https://semver.org/) specification, and use `major.minor.patch` version scheme. All formal components (this document, JSON schema, JSON-LD context, and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. That is, 
 1. A change in a single component of the specification will increase version numbers of other components as well, and thus some components can be identical to their immediate previous version. 
 1. A specific version of the SDK is tied to certain versions of the specification, and thus the applications based on different versions of SDK may not be compatible to each other, and may not be used together in a single pipeline. 
+
+
 
 
 ## 1. The structure of MMIF files
@@ -381,7 +387,7 @@ Annotations in a MMIF file can also refer to the LAPPS Vocabulary at [http://voc
 
 ## 3. MIFF Examples
 
-The first example is at [../samples/example-1.json](../samples/example-1.json). It contains two media, one pointing at a video and the other at a transcript. For the first medium there are two views, one with bars-and-tone annotations and one with slate annotations. For the second medium there is one view with the results of a tokenizer. This example file, while minimal, has everything required by MMIF. A few things to note:
+The first example is at [samples/example-1.json](samples/example-1.json). It contains two media, one pointing at a video and the other at a transcript. For the first medium there are two views, one with bars-and-tone annotations and one with slate annotations. For the second medium there is one view with the results of a tokenizer. This example file, while minimal, has everything required by MMIF. A few things to note:
 
 - The metadata specify the MMIF version and a top-level specification of what annotation types are in the views. Both are technically not needed because they can be derived from the context and the views, but are there for convenience.
 - Each view has a context that is there to define the expanded forms of the terms in the annotations list. For example, the first view as an annotation object with *@type* equals *TimeFrame*. The context will expand this to http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame. Something similar happens to all property names in the *properties* dictionary. 
@@ -399,47 +405,32 @@ As we move along with integrating new tools, other examples will be added with o
 
 ## 4. User-defined extensions
 
-The value of *@type* in an annotation is typically an element of the CLAMS or LAPPS vocabulary, but you can also enter a user-defined annotation category defined elsewhere, for example by the creator of a tool. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI.
+The value of *@type* in an annotation is typically an element of the CLAMS or LAPPS vocabulary, but you can also enter a user-defined annotation category defined elsewhere, for example by the creator of a tool. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI because the context files will not take care of the proper term expansion. The same is true for any properties used that have meanings defined elsewhere.
 
-> To be finished
+Take as an example the following annotations.
 
+```json
+{
+  "@type": "Clip",
+  "properties": {
+    "id": "clip-29",
+    "actor": "Geena Davis"
+  }
+}
+```
 
+Each view is associated with a context and typically in a CLAMS view that context will help expand "Clip" to http://mmif.clams.ai/0.1.0/vocabulary/Clip, but there is no such page in the CLAMS vocabulary. If third parties want to use their own definition they should use the full form. This is actually also the case for the properties, so if "actor" has a special meaning it should be fully qualified otherwise it will be understood as  http://mmif.clams.ai/0.1.0/vocabulary/Clip#actor:
 
-## 5. Compatibility with LAPPS Tools
+```json
+{
+  "@type": "https://schema.org/Clip",
+  "properties": {
+    "id": "clip-29",
+    "https://schema.org/actor": "Geena Davis"
+  }
+}
+```
 
-> These are highly preliminary notes
-
-A converter is required to run LIF tools with MMIF as input. Here's two possible scenarios that the converter must be able to handle.
-
-##### Running LAPPS tools on the primary text sources
-
-In this simple case, a dummy LIF payload should be generated by the converter with the contents of the primary text source file taken as `text`. LAPPS tools can run taking the dummy LIF and returns a LIF with a number of new views generated. Then the converter takes that regular LIF payload and inserts new views in the LIF to the original MMIF.
-
-##### Running LAPPS tools on existing text annotation objects
-
-**This scenario includes running LAPPS tools on text sources generated from the primary AV meterial.**
-
-* OCR from video -> an annotation per box?  -> then, should LAPPS tools handle each box as one "document"? or can we concatenate all text from all boxes linearly and pass to linguistics tools?
-  * THIS case needs a lot more thoughts.
-* ASR from audio -> an annotation for an entire audio stream? -> then it's easy, treat it as one document
-* forced-aligned text -> forced alignment assumes the existence of a external original primary text file -> it's easy, treat it as primary text source
-
-
-
-## 5. Related Work
-
-> Highly preliminary notes again
-
-An exchange format for multimodal annotations.
-Schmidt et al. 2008. An exchange format for multimodal annotations. In *International LREC Workshop on Multimodal Corpora*.
-
-IIIF (International Image Interoperability Framework). 
-See https://iiif.io/ and https://iiif.io/api/#current-specifications.
-
-CMDI (Component MetaData Infrastructure).
-https://www.clarin.eu/content/component-metadata
-Broeder et all. 2012. CMDI: a component meta- data infrastructure. In *Describing LRs with metadata: towards flexibility and interoperability in the documen- tation of LR workshop programme*. 
-
-Image and video annotation tools.
+Note how the "id" property does not have a full form and it will therefore be understood as a CLAMS or MMIF identifier.
 
 
