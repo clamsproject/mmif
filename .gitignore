@@ -76,6 +76,7 @@ tags
 mmif-python/**/ver
 mmif-python/**/res
 /vocabulary/rdf/clams.vocabulary
+.hypothesis
 
 # re-includes
 !vocabulary/rdf/bin/*.jar
