@@ -2,15 +2,19 @@ import unittest
 import json
 
 import mmif
-from hypothesis import given, strategies as st, settings, HealthCheck
+from hypothesis import given, settings, HealthCheck
 import hypothesis_jsonschema
 
 import pytest
 from jsonschema import ValidationError
-from mmif.serialize import Mmif, Annotation, View
+from mmif.serialize import Mmif, View
 from pkg_resources import resource_stream
 
 from tests.mmif_examples import *
+
+
+DEBUG = False
+SKIP_SCHEMA = True
 
 
 class TestMmif(unittest.TestCase):
@@ -86,7 +90,7 @@ class TestView(unittest.TestCase):
         try:
             _ = View(view1)
         except Exception as ex:
-            self.fail(ex.message)
+            self.fail(str(type(ex)) + str(ex.message))
 
     def test_annotation_order_preserved(self):
         view_serial = self.view_obj.serialize()
@@ -109,6 +113,7 @@ class TestView(unittest.TestCase):
         pass
 
 
+@unittest.skipIf(SKIP_SCHEMA, "Skipping TestSchema by default")
 class TestSchema(unittest.TestCase):
 
     schema_res = resource_stream(f'{mmif.__name__}.{mmif._res_pkg}', mmif._schema_res_name)
@@ -136,5 +141,4 @@ class TestSchema(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    DEBUG = False
     unittest.main()
