@@ -126,7 +126,12 @@
   {% if page.share-img %}
   <meta name="twitter:image" content="{{ page.share-img }}" />
   {% elsif site.avatar %}
-  <meta name="twitter:image" content="{{ site.url }}{{ site.avatar }}" />
+
+    {% if site.avatar contains 'http' %}
+    <meta name="twitter:image" content="{{ site.avatar }}" />
+    {% else %}
+    <meta name="twitter:image" content="{{ site.url }}{{ site.avatar }}" />
+    {% endif %}
   {% endif %}
 
   {% if site.matomo %}
