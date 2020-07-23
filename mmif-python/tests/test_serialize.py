@@ -67,16 +67,57 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_medium_cannot_have_text_and_location(self):
-        mmif = Mmif(json.dumps(self.mmif_json))
-        m1 = mmif.get_medium_by_id('m1')
-        m2 = mmif.get_medium_by_id('m2')
+        mmif_obj = Mmif(json.dumps(self.mmif_json))
+        m1 = mmif_obj.get_medium_by_id('m1')
+        m2 = mmif_obj.get_medium_by_id('m2')
         m1.text = m2.text
         with pytest.raises(ValidationError) as ve:
-            Mmif(mmif.serialize())
+            Mmif(mmif_obj.serialize())
             assert "validating 'oneOf'" in ve.value
 
-    def test___getitem__(self):
-        pass
+
+@unittest.skip("Skipping until #40 is merged")
+class TestGetItem(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.mmif_obj = Mmif(example1)
+        self.view_obj = View(view1)
+
+    def test_mmif_getitem_medium(self):
+        try:
+            m1 = self.mmif_obj['m1']
+            self.assertIs(m1, self.mmif_obj.media.get('m1'))
+        except TypeError:
+            self.fail("__getitem__ not implemented")
+        except KeyError:
+            self.fail("didn't get medium 'm1'")
+
+    def test_mmif_getitem_view(self):
+        try:
+            v1 = self.mmif_obj['v1']
+            self.assertIs(v1, self.mmif_obj.views.get('v1'))
+        except TypeError:
+            self.fail("__getitem__ not implemented")
+        except KeyError:
+            self.fail("didn't get view 'v1'")
+
+    def test_mmif_getitem_annotation(self):
+        try:
+            v1_bb1 = self.mmif_obj['v1:bb1']
+            self.assertIs(v1_bb1, self.mmif_obj.views.get('v1').annotations.get('bb1'))
+        except TypeError:
+            self.fail("__getitem__ not implemented")
+        except KeyError:
+            self.fail("didn't get annotation 'v1:bb1'")
+
+    def test_view_getitem(self):
+        try:
+            bb1 = self.view_obj['bb1']
+            self.assertIs(bb1, self.view_obj.annotations.get('bb1'))
+        except TypeError:
+            self.fail("__getitem__ not implemented")
+        except KeyError:
+            self.fail("didn't get annotation 'bb1'")
 
 
 class TestView(unittest.TestCase):
@@ -92,6 +133,7 @@ class TestView(unittest.TestCase):
         except Exception as ex:
             self.fail(str(type(ex)) + str(ex.message))
 
+    # largely useless until #40 is merged
     def test_annotation_order_preserved(self):
         view_serial = self.view_obj.serialize()
         for original, new in zip(self.view_json['annotations'],
@@ -108,9 +150,6 @@ class TestView(unittest.TestCase):
         for original, new in zip(sorted(self.view_json['annotations'], key=id_func),
                                  sorted(json.loads(view_serial)['annotations'], key=id_func)):
             assert original == new
-
-    def test___getitem__(self):
-        pass
 
 
 @unittest.skipIf(SKIP_SCHEMA, "Skipping TestSchema by default")
