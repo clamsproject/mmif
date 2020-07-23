@@ -2,8 +2,8 @@ import unittest
 import json
 
 import mmif
-from hypothesis import given, settings, HealthCheck
-import hypothesis_jsonschema
+from hypothesis import given, settings, HealthCheck  # pip install hypothesis
+import hypothesis_jsonschema  # pip install hypothesis-jsonschema
 
 import pytest
 from jsonschema import ValidationError
