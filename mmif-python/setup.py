@@ -53,7 +53,7 @@ generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"')
 res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
 
 # assuming build only happens inside the `mmif` git repository
-gittag = get_matching_gittag(version)
+gittag = get_matching_gittag(f'spec-{version}')
 
 # and write resource files
 write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
