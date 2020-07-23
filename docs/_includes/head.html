@@ -12,7 +12,9 @@
   {% endif %}
 
   <link rel="alternate" type="application/rss+xml" title="{{ site.title }} {{ site.title-separator }} {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
-  <link rel="shortcut icon" href="https://www.clams.ai/favicon.png">
+  {% if layout.favicon %}
+    <link rel="shortcut icon" href="{{ layout.favicon }}" />
+  {% endif %}
 
 
   {% include gtag.html %}
@@ -27,7 +29,12 @@
 
   {% if layout.common-css %}
     {% for css in layout.common-css %}
-      <link rel="stylesheet" href="{{ css }}" />
+      {% unless css contains 'http' %}
+      {% capture u %}{{ css | prepend: site.baseurl | replace: '//', '/' }}{% endcapture %}
+      {% else %}
+      {% assign u = css %}
+      {% endunless %}
+      <link rel="stylesheet" href="{{ u }}" />
     {% endfor %}
   {% endif %}
 
@@ -126,7 +133,6 @@
   {% if page.share-img %}
   <meta name="twitter:image" content="{{ page.share-img }}" />
   {% elsif site.avatar %}
-
     {% if site.avatar contains 'http' %}
     <meta name="twitter:image" content="{{ site.avatar }}" />
     {% else %}

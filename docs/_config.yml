@@ -109,7 +109,7 @@ url-pretty: "clams.ai"  # eg. "deanattali.com/beautiful-jekyll"
 # --- Web Statistics Section --- #
 
 # Fill in your Google Analytics gtag.js ID to track your website using gtag
-gtag: "UA-141649660-1"
+gtag: "UA-141649660-2"
 
 # Fill in your Google Analytics ID to track your website using GA
 # google_analytics: "UA-141649660-1"
