@@ -78,6 +78,7 @@ tags
 # auto-generated files
 mmif-python/**/ver
 mmif-python/**/res
+.hypothesis
 
 # jekyll files 
 docs/**/_site/**
@@ -86,4 +87,3 @@ docs/**/_site/**
 /vocabulary/rdf/clams.vocabulary
 # re-includes
 !vocabulary/rdf/bin/*.jar
-

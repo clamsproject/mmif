@@ -48,3 +48,213 @@ example1 = """{
   ]
 }"""
 
+example2 = """{
+  "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/0.1.0",
+    "contains": {
+      "http://mmif.clams.ai/1.0/vocabulary/Segment": ["v1"],
+      "http://vocab.lappsgrid.org/NamedEntity": ["v2"]
+    }
+  },
+
+  "media": [
+    {
+      "id": "m1",
+      "type": "video",
+      "mime": "video/mp4",
+      "location": "/var/archive/video-0012.mp4"
+    },
+    {
+      "id": "m2",
+      "type": "text",
+      "mime": "text/plain",
+      "location": "/var/archive/video-0012-transcript.txt"
+    }
+  ],
+
+  "views": [
+    {
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+      "id": "v1",
+      "metadata": {
+        "medium": "m1",
+        "timestamp": "2020-05-27T12:23:45",
+        "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
+        "contains": {
+          "Segment": { "unit": "seconds" }
+        }
+      },
+
+      "annotations": [
+        {
+          "@type": "Segment",
+          "properties": {
+            "id": "s1",
+            "start": 87,
+            "end": 145,
+            "segmentType": "bars-and-tones",
+            "undefinedProperty": "howdy" 
+          }
+        }
+      ]
+    },
+
+    {
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-lapps.json",
+      "id": "v2",
+      "metadata": {
+        "medium": "m2",
+        "timestamp": "2020-05-27T12:23:45",
+        "tool": "http://tools.clams.ai/lapps/stanford-ner/1.3.2",
+        "contains": {
+          "NamedEntity": { "namedEntityCategorySet": "Stanford" }
+        }
+      },
+
+      "annotations": [
+        {
+          "@type": "NamedEntity",
+          "properties": {
+            "id": "ne1",
+            "start": 12,
+            "end": 45,
+            "type": "location" 
+          }
+        }
+      ]
+    }
+  ]
+}
+"""
+
+example3 = """{
+  "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/0.1.0",
+    "contains": {
+      "http://mmif.clams.ai/1.0/vocabulary/Segment": ["v1"],
+      "http://mmif.clams.ai/0.1.0/vocabulary/TimePoint": ["v1"],
+      "http://vocab.lappsgrid.org/NamedEntity": ["v2"]
+    }
+  },
+
+  "media": [
+    {
+      "id": "m1",
+      "type": "video",
+      "mime": "video/mp4",
+      "location": "/var/archive/video-0012.mp4"
+    },
+    {
+      "id": "m2",
+      "type": "text",
+      "mime": "text/plain",
+      "location": "/var/archive/video-0012-transcript.txt"
+    }
+  ],
+
+  "views": [
+    {
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+      "id": "v1",
+      "metadata": {
+        "medium": "m1",
+        "timestamp": "2020-05-27T12:23:45",
+        "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
+        "contains": {
+          "Segment": { "unit": "seconds" }
+        }
+      },
+
+      "annotations": [
+        {
+          "@type": "Segment",
+          "properties": {
+            "id": "s1",
+            "start": 87,
+            "end": 145,
+            "segmentType": "bars-and-tones",
+            "undefinedProperty": "howdy" 
+          }
+        },
+        {
+          "@type": "TimePoint",
+          "properties": {
+            "id": "t1",
+            "point": 5
+          }
+        }
+      ]
+    },
+
+    {
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-lapps.json",
+      "id": "v2",
+      "metadata": {
+        "medium": "m2",
+        "timestamp": "2020-05-27T12:23:45",
+        "tool": "http://tools.clams.ai/lapps/stanford-ner/1.3.2",
+        "contains": {
+          "NamedEntity": { "namedEntityCategorySet": "Stanford" }
+        }
+      },
+
+      "annotations": [
+        {
+          "@type": "NamedEntity",
+          "properties": {
+            "id": "ne1",
+            "start": 12,
+            "end": 45,
+            "type": "location" 
+          }
+        }
+      ]
+    }
+  ]
+}
+"""
+
+anno2 = """{
+  "@type": "TimePoint",
+  "properties": {
+    "id": "t1",
+    "point": 5
+  }
+}"""
+
+view1 = """{
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+      "id": "v1",
+      "metadata": {
+        "medium": "m1",
+        "timestamp": "2020-05-27T12:23:45",
+        "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
+        "contains": {
+          "Segment": { "unit": "seconds" }
+        }
+      },
+
+      "annotations": [
+        {
+          "@type": "Segment",
+          "properties": {
+            "id": "s1",
+            "start": 87,
+            "end": 145,
+            "segmentType": "bars-and-tones",
+            "undefinedProperty": "howdy" 
+          }
+        },
+        {
+          "@type": "TimePoint",
+          "properties": {
+            "id": "t1",
+            "point": 5
+          }
+        }
+      ]
+    }"""
