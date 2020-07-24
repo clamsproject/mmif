@@ -7,7 +7,7 @@ import hypothesis_jsonschema  # pip install hypothesis-jsonschema
 
 import pytest
 from jsonschema import ValidationError
-from mmif.serialize import Mmif, View
+from mmif.serialize import Mmif, View, MmifObject
 from pkg_resources import resource_stream
 
 from tests.mmif_examples import *
@@ -15,6 +15,23 @@ from tests.mmif_examples import *
 
 DEBUG = False
 SKIP_SCHEMA = True
+SKIP_DICT_DESERIALIZE = "model can't process dicts yet"
+NOT_MERGED_40 = "Skipping until #40 is merged"
+
+
+def to_atsign(d: dict):
+    for k in list(d.keys()):
+        if k.startswith('@'):
+            d[f'_{k[1:]}'] = d.pop(k)
+    return d
+
+
+def traverse_to_atsign(d: dict):
+    to_atsign(d)
+    for key, value in d.items():
+        if type(value) is dict:
+            traverse_to_atsign(value)
+    return d
 
 
 class TestMmif(unittest.TestCase):
@@ -22,13 +39,30 @@ class TestMmif(unittest.TestCase):
     def setUp(self) -> None:
         self.mmif_json: dict = json.loads(example1)
 
-    def test_mmif_deserialize(self):
-        json_str = json.dumps(self.mmif_json)
+    def test_str_mmif_deserialize(self):
         try:
-            mmif_obj = Mmif(json_str)
+            mmif_obj = Mmif(example1)
         except ValidationError as ve:
             self.fail(ve.message)
+        except KeyError as ke:
+            self.fail("didn't swap _ and @")
         self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
+
+    @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
+    def test_json_mmif_deserialize(self):
+        try:
+            mmif_obj = Mmif(traverse_to_atsign(self.mmif_json.copy()))
+        except ValidationError as ve:
+            self.fail(ve.message)
+        except KeyError as ke:
+            self.fail("didn't swap _ and @")
+        self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())))
+
+    @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
+    def test_str_vs_json_deserialize(self):
+        str_mmif_obj = Mmif(example1)
+        json_mmif_obj = Mmif(traverse_to_atsign(self.mmif_json.copy()))
+        self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
 
     def test_bad_mmif_deserialize_no_context(self):
         self.mmif_json.pop('@context')
@@ -67,7 +101,7 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_medium_cannot_have_text_and_location(self):
-        mmif_obj = Mmif(json.dumps(self.mmif_json))
+        mmif_obj = Mmif(example1)
         m1 = mmif_obj.get_medium_by_id('m1')
         m2 = mmif_obj.get_medium_by_id('m2')
         m1.text = m2.text
@@ -76,7 +110,23 @@ class TestMmif(unittest.TestCase):
             assert "validating 'oneOf'" in ve.value
 
 
-@unittest.skip("Skipping until #40 is merged")
+class TestMmifObject(unittest.TestCase):
+
+    def setUp(self) -> None:
+        pass
+
+    def test_load_json_on_str(self):
+        self.assertTrue("_type" in MmifObject._load_str('{ "@type": "some_type", "@value": "some_value"}').keys())
+        self.assertTrue("_value" in MmifObject._load_str('{ "@type": "some_type", "@value": "some_value"}').keys())
+
+    @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
+    def test_load_json_on_dict(self):
+        json_dict = json.loads('{ "@type": "some_type", "@value": "some_value"}')
+        self.assertTrue("_type" in MmifObject._load_str(json_dict.copy()).keys())
+        self.assertTrue("_value" in MmifObject._load_str(json_dict.copy()).keys())
+
+
+@unittest.skipIf(NOT_MERGED_40, NOT_MERGED_40)
 class TestGetItem(unittest.TestCase):
 
     def setUp(self) -> None:
