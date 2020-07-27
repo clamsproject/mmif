@@ -81,3 +81,9 @@ mmif-python/**/res
 
 # jekyll files 
 docs/**/_site/**
+
+# external java library
+/vocabulary/rdf/clams.vocabulary
+# re-includes
+!vocabulary/rdf/bin/*.jar
+
