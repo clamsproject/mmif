@@ -86,4 +86,3 @@ docs/**/_site/**
 /vocabulary/rdf/clams.vocabulary
 # re-includes
 !vocabulary/rdf/bin/*.jar
-

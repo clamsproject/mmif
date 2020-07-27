@@ -53,7 +53,7 @@ class ViewMetadata(MmifObject):
 
     def _deserialize(self, input_dict: dict) -> None:
         self.__dict__ = input_dict
-        self.contains = dict([(at_type, Contain(contain_obj)) for at_type, contain_obj in input_dict.get('contains').items()])
+        self.contains = dict([(at_type, Contain(contain_obj)) for at_type, contain_obj in input_dict.get('contains', {}).items()])
 
     def new_contain(self, at_type: str, contain_dict: dict):
         new_contain = Contain(contain_dict)
