@@ -30,6 +30,16 @@ class MmifObject(object):
         return json.dumps(self._serialize(), indent=2 if pretty else None, cls=MmifObjectEncoder)
 
     def _serialize(self) -> dict:
+        """
+        Maps a MMIF object to a plain python dict object,
+        rewriting internal keys that start with '_' to
+        start with '@' per the JSON-LD schema.
+
+        If a subclass needs special treatment during the mapping, it needs to
+        override this method.
+
+        :return: the prepared dictionary
+        """
         d = {}
         for k, v in list(self.__dict__.items()):
             if k.startswith('_'):
@@ -104,7 +114,7 @@ class MmifObjectEncoder(json.JSONEncoder):
 
     def default(self, obj: 'MmifObject'):
         """
-        Overrides default encoding behavior to prioritize :func: MmifObject.serilize() .
+        Overrides default encoding behavior to prioritize :func: MmifObject.serialize() .
         """
         try:
             return obj._serialize()
