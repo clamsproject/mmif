@@ -2,6 +2,8 @@
 import os
 import shutil
 import subprocess
+import importlib
+import sys
 from os.path import join as pjoin
 from typing import Union
 
@@ -29,7 +31,7 @@ def generate_subpack(pack_name, mod_name, init_contents=""):
 
 
 def get_matching_gittag(version: str):
-    vmaj, vmin, vpat = version.split('.')
+    vmaj, vmin, vpat = version.split('.')[0:3]
     tags = subprocess.check_output(['git', 'tag']).decode().split('\n')
     # sort and return highest version
     return \
@@ -47,10 +49,30 @@ def write_res_file(res_dir: str, res_name: str, res_data: Union[bytes, str]):
     res_file.write(res_data)
     res_file.close()
 
+def dev_ver(ver, devver=1):
+    vmaj, vmac, vpat = map(int, ver.split('.'))
+    return '.'.join(map(str, [vmaj, vmac, vpat+1, f'dev{devver}']))
+
+def bump_ver(ver):
+    new_ver = input(f"Current version is {ver}, please enter new version (default: increase *patch* level by 1): ")
+    if len(new_ver) == 0:
+        vmaj, vmac, vpat = map(int, ver.split('.'))
+        new_ver = '.'.join(map(str, [vmaj, vmac, vpat+1]))
+    return new_ver
+
 # note that `VERSION` file is not included in bdist - bdist should alreay have `mmif._ver_pkg` properly set
 with open('VERSION', 'r') as version_f:
     version = version_f.read().strip()
+    if 'develop' in sys.argv:
+        version = dev_ver(version)
+    elif 'bump' in sys.argv:
+        version = bump_ver(version)
+        sys.argv.remove('bump')
+# the above will generate a new __version__ value based on VERSION file
+# but as `mmif` package is already imported at the top,
+# mmif.__version__ is not updated, so we need to reload the package
 generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"')
+importlib.reload(mmif)
 
 def prep_ext_files(setuptools_cmd):
     ori_run = setuptools_cmd.run
@@ -74,6 +96,15 @@ class SdistCommand(setuptools.command.sdist.sdist):
     pass
 
 
+@prep_ext_files
+class BuildCommand(setuptools.command.build_py.build_py):
+    pass
+
+@prep_ext_files
+class DevelopCommand(setuptools.command.develop.develop):
+    pass
+
+
 with open('README.md') as readme:
     long_desc = readme.read()
 
@@ -82,7 +113,7 @@ with open('requirements.txt') as requirements:
 
 setuptools.setup(
     name="mmif-python",
-    version=version,
+    version=mmif.__version__,
     author="Brandeis Lab for Linguistics and Computation",
     author_email="admin@clams.ai",
     description="Python implementation of MultiMedia Interchange Format specification. (https://mmif.clams.ai)",
@@ -92,6 +123,13 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     cmdclass={
         'sdist': SdistCommand,
+        'develop': DevelopCommand,
+        'build_py': BuildCommand,
+    },
+    # this is for *building*, building (build, bdist_*) doesn't get along with MANIFEST.in
+    # so using this param explicitly is much safer implementation
+    package_data={
+        'mmif': ['res/*'],
     },
     install_requires=requires,
     extras_require={
