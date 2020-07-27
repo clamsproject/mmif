@@ -15,23 +15,8 @@ from tests.mmif_examples import *
 
 DEBUG = False
 SKIP_SCHEMA = True
-SKIP_DICT_DESERIALIZE = "model can't process dicts yet"
+SKIP_DICT_DESERIALIZE = None  # formerly "model can't process dicts yet"
 NOT_MERGED_40 = "Skipping until #40 is merged"
-
-
-def to_atsign(d: dict):
-    for k in list(d.keys()):
-        if k.startswith('@'):
-            d[f'_{k[1:]}'] = d.pop(k)
-    return d
-
-
-def traverse_to_atsign(d: dict):
-    to_atsign(d)
-    for key, value in d.items():
-        if type(value) is dict:
-            traverse_to_atsign(value)
-    return d
 
 
 class TestMmif(unittest.TestCase):
@@ -51,7 +36,7 @@ class TestMmif(unittest.TestCase):
     @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
     def test_json_mmif_deserialize(self):
         try:
-            mmif_obj = Mmif(traverse_to_atsign(self.mmif_json.copy()))
+            mmif_obj = Mmif(self.mmif_json.copy())
         except ValidationError as ve:
             self.fail(ve.message)
         except KeyError as ke:
@@ -61,7 +46,7 @@ class TestMmif(unittest.TestCase):
     @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
     def test_str_vs_json_deserialize(self):
         str_mmif_obj = Mmif(example1)
-        json_mmif_obj = Mmif(traverse_to_atsign(self.mmif_json.copy()))
+        json_mmif_obj = Mmif(self.mmif_json.copy())
         self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
 
     def test_bad_mmif_deserialize_no_context(self):
@@ -116,14 +101,14 @@ class TestMmifObject(unittest.TestCase):
         pass
 
     def test_load_json_on_str(self):
-        self.assertTrue("_type" in MmifObject._load_str('{ "@type": "some_type", "@value": "some_value"}').keys())
-        self.assertTrue("_value" in MmifObject._load_str('{ "@type": "some_type", "@value": "some_value"}').keys())
+        self.assertTrue("_type" in MmifObject._load_json('{ "@type": "some_type", "@value": "some_value"}').keys())
+        self.assertTrue("_value" in MmifObject._load_json('{ "@type": "some_type", "@value": "some_value"}').keys())
 
     @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
     def test_load_json_on_dict(self):
         json_dict = json.loads('{ "@type": "some_type", "@value": "some_value"}')
-        self.assertTrue("_type" in MmifObject._load_str(json_dict.copy()).keys())
-        self.assertTrue("_value" in MmifObject._load_str(json_dict.copy()).keys())
+        self.assertTrue("_type" in MmifObject._load_json(json_dict.copy()).keys())
+        self.assertTrue("_value" in MmifObject._load_json(json_dict.copy()).keys())
 
 
 @unittest.skipIf(NOT_MERGED_40, NOT_MERGED_40)
