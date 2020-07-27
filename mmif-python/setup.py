@@ -96,6 +96,15 @@ class SdistCommand(setuptools.command.sdist.sdist):
     pass
 
 
+@prep_ext_files
+class BuildCommand(setuptools.command.build_py.build_py):
+    pass
+
+@prep_ext_files
+class DevelopCommand(setuptools.command.develop.develop):
+    pass
+
+
 with open('README.md') as readme:
     long_desc = readme.read()
 
@@ -114,6 +123,13 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     cmdclass={
         'sdist': SdistCommand,
+        'develop': DevelopCommand,
+        'build_py': BuildCommand,
+    },
+    # this is for *building*, building (build, bdist_*) doesn't get along with MANIFEST.in
+    # so using this param explicitly is much safer implementation
+    package_data={
+        'mmif': ['res/*'],
     },
     install_requires=requires,
     extras_require={
