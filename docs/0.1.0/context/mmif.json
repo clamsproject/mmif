@@ -1,0 +1,5 @@
+{
+    "@context" : {
+	"@vocab" : "http://mmif.clams.ai/0.1.0/vocab/mmif/"
+    }
+}
