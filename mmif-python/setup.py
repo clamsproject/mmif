@@ -68,9 +68,7 @@ def prep_ext_files(setuptools_cmd):
     setuptools_cmd.run = mod_run
     return setuptools_cmd
 
-# and write resource files
-write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
-write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+
 @prep_ext_files
 class SdistCommand(setuptools.command.sdist.sdist):
     pass
