@@ -1,10 +1,13 @@
+#! /usr/bin/env python3
+import os
+import shutil
 import subprocess
+from os.path import join as pjoin
 from typing import Union
 
-import setuptools
-import os
-from os.path import join as pjoin
-import shutil
+import setuptools.command.build_py
+import setuptools.command.develop
+
 import mmif  # this imports `mmif` directory as a sibling, not `mmif` site-package
 
 
@@ -44,20 +47,34 @@ def write_res_file(res_dir: str, res_name: str, res_data: Union[bytes, str]):
     res_file.write(res_data)
     res_file.close()
 
-
-# TODO (krim @ 6/30/20): this string value should be read from existing source (e.g. `VERSION` file)
-# however, as SDK version is only partially bound to the MMIF "VERSION", need to come up with a separate source
-version = '0.1.1'
+# note that `VERSION` file is not included in bdist - bdist should alreay have `mmif._ver_pkg` properly set
+with open('VERSION', 'r') as version_f:
+    version = version_f.read().strip()
 generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"')
-# making resources into a python package so than `pkg_resources` can access resource files
-res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
 
-# assuming build only happens inside the `mmif` git repository
-gittag = get_matching_gittag(version)
+def prep_ext_files(setuptools_cmd):
+    ori_run = setuptools_cmd.run
+
+    def mod_run(self):
+        # assuming build only happens inside the `mmif` git repository
+        gittag = get_matching_gittag(version)
+        # making resources into a python package so that `pkg_resources` can access resource files
+        res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
+        # and write resource files
+        write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
+        write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+        ori_run(self)
+
+    setuptools_cmd.run = mod_run
+    return setuptools_cmd
 
 # and write resource files
 write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
 write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+@prep_ext_files
+class SdistCommand(setuptools.command.sdist.sdist):
+    pass
+
 
 with open('README.md') as readme:
     long_desc = readme.read()
@@ -75,6 +92,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://mmif.clams.ai",
     packages=setuptools.find_packages(),
+    cmdclass={
+        'sdist': SdistCommand,
+    },
     install_requires=requires,
     extras_require={
         'dev': [
