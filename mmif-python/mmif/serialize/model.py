@@ -1,3 +1,4 @@
+import copy
 import json
 from typing import Union, Any, Dict
 
@@ -70,7 +71,7 @@ class MmifObject(object):
             return d
 
         if type(json_obj) is dict:
-            return traverse_to_atsign(json_obj.copy())
+            return traverse_to_atsign(copy.deepcopy(json_obj))
         elif type(json_obj) is str:
             return json.loads(json_obj, object_hook=to_atsign)
         else:
