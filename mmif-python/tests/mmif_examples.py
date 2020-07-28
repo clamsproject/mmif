@@ -1,4 +1,4 @@
-example1 = """{
+examples = dict(example1="""{
   "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
   "metadata": {
     "mmif": "http://mmif.clams.ai/0.1.0",
@@ -46,9 +46,9 @@ example1 = """{
       ]
     }
   ]
-}"""
+}""",
 
-example2 = """{
+                example2="""{
   "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
 
   "metadata": {
@@ -127,9 +127,9 @@ example2 = """{
     }
   ]
 }
-"""
+""",
 
-example3 = """{
+                example3="""{
   "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
 
   "metadata": {
@@ -216,7 +216,121 @@ example3 = """{
     }
   ]
 }
-"""
+""",
+
+                example4="""{
+  "@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
+
+  "metadata": {
+    "mmif": "http://miff.clams.ai/0.1.0",
+    "contains": {
+      "http://mmif.clams.ai/vocabulary/0.1.0/TimeFrame": ["v1", "v2"],
+      "http://vocab.lappsgrid.org/Token": ["v3"]
+    }
+  },
+
+  "media": [
+    {
+      "id": "m1",
+      "type": "video",
+      "mime": "video/mp4",
+      "location": "/var/archive/video-0012.mp4"
+    },
+    {
+      "id": "m2",
+      "type": "text",
+      "mime": "text/plain",
+      "location": "/var/archive/video-0012-transcript.txt"
+    }
+  ],
+
+  "views": [
+
+    {
+      "id": "v1",
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+
+      "metadata": {
+        "contains": {
+          "http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame": {
+            "unit": "seconds"
+          }
+        },
+        "medium": "m1",
+        "timestamp": "2020-05-27T12:23:45",
+        "tool": "http://tools.clams.ai/bars-and-tones/1.0.5"
+      },
+
+      "annotations": [
+        {
+          "@type": "TimeFrame",
+          "properties": {
+            "id": "s1",
+            "start": 0,
+            "end": 5,
+            "frameType": "bars-and-tones"
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "v2",
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+
+      "metadata": {
+        "contains": {
+          "http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame": {
+            "unit": "seconds"
+          }
+        },
+        "medium": "m1",
+        "timestamp": "2020-05-27T12:23:45",
+        "tool": "http://tools.clams.ai/slates/1.0.3"
+      },
+
+      "annotations": [
+        {
+          "@type": "TimeFrame",
+          "properties": {
+            "id": "s1",
+            "start": 25,
+            "end": 38,
+            "frameType": "slate"
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "v3",
+      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-lapps.json",
+
+      "metadata": {
+        "contains": {
+          "http://vocab.lappsgrid.org/Token": {}
+        },
+        "medium": "m2",
+        "timestamp": "2020-05-27T12:25:15",
+        "tool": "http://tools.clams.ai/slates/1.0.3"
+      },
+
+      "annotations": [
+        {
+          "@type": "Token",
+          "properties": {
+            "id": "s1",
+            "start": 0,
+            "end": 3,
+            "word": "The"
+          }
+        }
+      ]
+    }
+
+  ]
+}
+""")
 
 anno2 = """{
   "@type": "TimePoint",

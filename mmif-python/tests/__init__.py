@@ -7,7 +7,7 @@ import hypothesis_jsonschema  # pip install hypothesis-jsonschema
 
 import pytest
 from jsonschema import ValidationError
-from mmif.serialize import Mmif, View, MmifObject
+from mmif.serialize import Mmif, View, MmifObject, Medium
 from pkg_resources import resource_stream
 
 from tests.mmif_examples import *
@@ -16,77 +16,85 @@ from tests.mmif_examples import *
 DEBUG = False
 SKIP_SCHEMA = True
 SKIP_DICT_DESERIALIZE = None  # formerly "model can't process dicts yet"
+SKIP_FOR_56 = "Skipping issue #56 bug"
 NOT_MERGED_40 = "Skipping until #40 is merged"
 
 
 class TestMmif(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.mmif_json: dict = json.loads(example1)
+        self.examples = examples.copy()
+        self.examples_json = {i: json.loads(example) for i, example in self.examples.items()}
 
+    @unittest.skipIf(SKIP_FOR_56, SKIP_FOR_56)
     def test_str_mmif_deserialize(self):
-        try:
-            mmif_obj = Mmif(example1)
-        except ValidationError as ve:
-            self.fail(ve.message)
-        except KeyError as ke:
-            self.fail("didn't swap _ and @")
-        self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
+        for i, example in self.examples.items():
+            try:
+                mmif_obj = Mmif(example)
+            except ValidationError as ve:
+                self.fail(f"example {i}")
+            except KeyError as ke:
+                self.fail("didn't swap _ and @")
+            self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
 
+    @unittest.skipIf(SKIP_FOR_56, SKIP_FOR_56)
     @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
     def test_json_mmif_deserialize(self):
-        try:
-            mmif_obj = Mmif(self.mmif_json.copy())
-        except ValidationError as ve:
-            self.fail(ve.message)
-        except KeyError as ke:
-            self.fail("didn't swap _ and @")
-        self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())))
+        for i, example in self.examples_json.items():
+            try:
+                mmif_obj = Mmif(example)
+            except ValidationError as ve:
+                self.fail(ve.message)
+            except KeyError as ke:
+                self.fail("didn't swap _ and @")
+            self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())))
 
+    @unittest.skipIf(SKIP_FOR_56, SKIP_FOR_56)
     @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
     def test_str_vs_json_deserialize(self):
-        str_mmif_obj = Mmif(example1)
-        json_mmif_obj = Mmif(self.mmif_json.copy())
-        self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
+        for i, example in self.examples.items():
+            str_mmif_obj = Mmif(example)
+            json_mmif_obj = Mmif(json.loads(example))
+            self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
 
     def test_bad_mmif_deserialize_no_context(self):
-        self.mmif_json.pop('@context')
-        json_str = json.dumps(self.mmif_json)
+        self.examples_json['example1'].pop('@context')
+        json_str = json.dumps(self.examples_json['example1'])
         try:
-            mmif_obj = Mmif(json_str)
+            _ = Mmif(json_str)
             self.fail()
         except ValidationError:
             pass
 
     def test_bad_mmif_deserialize_no_metadata(self):
-        self.mmif_json.pop('metadata')
-        json_str = json.dumps(self.mmif_json)
+        self.examples_json['example1'].pop('metadata')
+        json_str = json.dumps(self.examples_json['example1'])
         try:
-            mmif_obj = Mmif(json_str)
+            _ = Mmif(json_str)
             self.fail()
         except ValidationError:
             pass
 
     def test_bad_mmif_deserialize_no_media(self):
-        self.mmif_json.pop('media')
-        json_str = json.dumps(self.mmif_json)
+        self.examples_json['example1'].pop('media')
+        json_str = json.dumps(self.examples_json['example1'])
         try:
-            mmif_obj = Mmif(json_str)
+            _ = Mmif(json_str)
             self.fail()
         except ValidationError:
             pass
 
     def test_bad_mmif_deserialize_no_views(self):
-        self.mmif_json.pop('views')
-        json_str = json.dumps(self.mmif_json)
+        self.examples_json['example1'].pop('views')
+        json_str = json.dumps(self.examples_json['example1'])
         try:
-            mmif_obj = Mmif(json_str)
+            _ = Mmif(json_str)
             self.fail()
         except ValidationError:
             pass
 
     def test_medium_cannot_have_text_and_location(self):
-        mmif_obj = Mmif(example1)
+        mmif_obj = Mmif(self.examples['example1'])
         m1 = mmif_obj.get_medium_by_id('m1')
         m2 = mmif_obj.get_medium_by_id('m2')
         m1.text = m2.text
@@ -115,7 +123,7 @@ class TestMmifObject(unittest.TestCase):
 class TestGetItem(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.mmif_obj = Mmif(example1)
+        self.mmif_obj = Mmif(examples['example1'])
         self.view_obj = View(view1)
 
     def test_mmif_getitem_medium(self):
@@ -185,6 +193,29 @@ class TestView(unittest.TestCase):
         for original, new in zip(sorted(self.view_json['annotations'], key=id_func),
                                  sorted(json.loads(view_serial)['annotations'], key=id_func)):
             assert original == new
+
+
+class TestAnnotation(unittest.TestCase):
+    # TODO (angus-lherrou @ 7/27/2020): testing should include validation for required attrs
+    #  once that is implemented (issue #23)
+    ...
+
+
+class TestMedium(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.example1 = json.loads(examples['example1'])
+        self.example2 = json.loads(examples['example2'])
+
+    def test_init(self):
+        try:
+            _ = Medium(self.example1['media'][0])
+            _ = Medium(self.example1['media'][1])
+            _ = Medium(self.example2['media'][0])
+            _ = Medium(self.example2['media'][1])
+        except Exception as ex:
+            self.fail(str(type(ex)) + str(ex.message))
+    ...
 
 
 @unittest.skipIf(SKIP_SCHEMA, "Skipping TestSchema by default")
