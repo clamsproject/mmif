@@ -2,6 +2,9 @@ import json
 from typing import Union, Any, Dict
 
 
+__all__ = ['MmifObject', 'MmifObjectEncoder']
+
+
 class MmifObject(object):
     """
     Abstract superclass for MMIF related key-value pair objects.

@@ -3,6 +3,9 @@ from typing import Dict, Union, Optional
 from .model import MmifObject
 
 
+__all__ = ['Annotation', 'AnnotationProperties']
+
+
 class Annotation(MmifObject):
     properties: 'AnnotationProperties'
     _type: str

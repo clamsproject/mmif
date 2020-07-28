@@ -5,6 +5,9 @@ from .annotation import Annotation
 from .model import MmifObject
 
 
+__all__ = ['View', 'ViewMetadata', 'Contain']
+
+
 class View(MmifObject):
     id: str
     metadata: 'ViewMetadata'

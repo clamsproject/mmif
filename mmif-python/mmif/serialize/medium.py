@@ -3,6 +3,9 @@ from typing import Union, Optional, List
 from .model import MmifObject
 
 
+__all__ = ['Medium', 'MediumMetadata', 'Submedia']
+
+
 class Medium(MmifObject):
     id: str
     type: str
