@@ -7,7 +7,8 @@ import hypothesis_jsonschema  # pip install hypothesis-jsonschema
 
 import pytest
 from jsonschema import ValidationError
-from mmif.serialize import Mmif, View, MmifObject, Medium
+from mmif.serialize import *
+from mmif.serialize.model import *
 from pkg_resources import resource_stream
 
 from tests.mmif_examples import *
@@ -23,12 +24,11 @@ NOT_MERGED_40 = "Skipping until #40 is merged"
 class TestMmif(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.examples = examples.copy()
-        self.examples_json = {i: json.loads(example) for i, example in self.examples.items()}
+        self.examples_json = {i: json.loads(example) for i, example in examples.items()}
 
     @unittest.skipIf(SKIP_FOR_56, SKIP_FOR_56)
     def test_str_mmif_deserialize(self):
-        for i, example in self.examples.items():
+        for i, example in examples.items():
             try:
                 mmif_obj = Mmif(example)
             except ValidationError as ve:
@@ -52,7 +52,7 @@ class TestMmif(unittest.TestCase):
     @unittest.skipIf(SKIP_FOR_56, SKIP_FOR_56)
     @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
     def test_str_vs_json_deserialize(self):
-        for i, example in self.examples.items():
+        for i, example in examples.items():
             str_mmif_obj = Mmif(example)
             json_mmif_obj = Mmif(json.loads(example))
             self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
@@ -94,7 +94,7 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_medium_cannot_have_text_and_location(self):
-        mmif_obj = Mmif(self.examples['example1'])
+        mmif_obj = Mmif(examples['example1'])
         m1 = mmif_obj.get_medium_by_id('m1')
         m2 = mmif_obj.get_medium_by_id('m2')
         m1.text = m2.text
@@ -204,18 +204,66 @@ class TestAnnotation(unittest.TestCase):
 class TestMedium(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.example1 = json.loads(examples['example1'])
-        self.example2 = json.loads(examples['example2'])
+        self.examples = {}
+        for i, example in examples.items():
+            try:
+                Mmif(example)
+                self.examples[i] = example
+            except ValidationError:
+                continue
+        self.data = {i: {'string': example,
+                         'json': json.loads(example),
+                         'mmif': Mmif(example),
+                         'media': json.loads(example)['media']}
+                     for i, example in self.examples.items()}
 
     def test_init(self):
-        try:
-            _ = Medium(self.example1['media'][0])
-            _ = Medium(self.example1['media'][1])
-            _ = Medium(self.example2['media'][0])
-            _ = Medium(self.example2['media'][1])
-        except Exception as ex:
-            self.fail(str(type(ex)) + str(ex.message))
-    ...
+        for i, datum in self.data.items():
+            for j, medium in enumerate(datum['media']):
+                try:
+                    _ = Medium(medium)
+                except Exception as ex:
+                    self.fail(f"{type(ex)}: {ex.message}: example {i}, medium {j}")
+
+    def test_deserialize_with_whole_mmif(self):
+        for i, datum in self.data.items():
+            for j, medium in enumerate(datum['media']):
+                try:
+                    medium_obj = datum['mmif'].get_medium_by_id(medium['id'])
+                except Exception:
+                    self.fail(f"Medium {medium['id']} not found in MMIF")
+                self.assertIsInstance(medium_obj, Medium)
+                if 'metadata' in medium:
+                    self.assertIsInstance(medium_obj.metadata, MediumMetadata)
+                if 'submedia' in medium:
+                    self.assertIsInstance(medium_obj.submedia, list)
+                    for submedium in medium_obj.submedia:
+                        self.assertIsInstance(submedium, Submedia)
+
+    def test_deserialize_with_medium_str(self):
+        for i, datum in self.data.items():
+            for j, medium in enumerate(datum['media']):
+                medium_obj = Medium(medium)
+                self.assertIsInstance(medium_obj, Medium)
+                if 'metadata' in medium:
+                    self.assertIsInstance(medium_obj.metadata, MediumMetadata)
+                if 'submedia' in medium:
+                    self.assertIsInstance(medium_obj.submedia, list)
+                    for submedium in medium_obj.submedia:
+                        self.assertIsInstance(submedium, Submedia)
+
+    def test_serialize_to_medium_str(self):
+        for i, datum in self.data.items():
+            for j, medium in enumerate(datum['media']):
+                medium_obj = Medium(medium)
+                serialized = json.loads(medium_obj.serialize())
+                self.assertEqual(medium, serialized)
+
+    def test_serialize_with_whole_mmif(self):
+        for i, datum in self.data.items():
+            for j, medium in enumerate(datum['media']):
+                medium_serialized = json.loads(datum['mmif'].serialize())['media'][j]
+                self.assertEqual(medium, medium_serialized)
 
 
 @unittest.skipIf(SKIP_SCHEMA, "Skipping TestSchema by default")
