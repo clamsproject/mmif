@@ -97,6 +97,23 @@ class Mmif(MmifObject):
         return None
 
     def __getitem__(self, item: str):
+        """
+        getitem implementation for Mmif.
+
+        >>> obj = Mmif('''{"@context": "http://mmif.clams.ai/0.1.0/context/mmif.json","metadata": {"mmif": "http://mmif.clams.ai/0.1.0","contains": {"http://mmif.clams.ai/vocabulary/0.1.0/BoundingBox": ["v1"]}},"media": [{"id": "m1","type": "image","mime": "image/jpeg","location": "/var/archive/image-0012.jpg"}],"views": [{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"medium": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}]}''')
+        >>> type(obj['m1'])
+        <class 'mmif.serialize.medium.Medium'>
+        >>> type(obj['v1'])
+        <class 'mmif.serialize.view.View'>
+        >>> type(obj['v1:bb1'])
+        <class 'mmif.serialize.annotation.Annotation'>
+        >>> obj['asdf']
+        KeyError: 'ID not found: asdf'
+
+        :raises KeyError: if the item is not found or if the search results are ambiguous
+        :param item: the search string, a medium ID, a view ID, or a view-scoped annotation ID
+        :return: the object searched for
+        """
         split_attempt = item.split(':')
 
         medium_result = self.media.get(split_attempt[0])

@@ -45,6 +45,19 @@ class View(MmifObject):
         return annotation
 
     def __getitem__(self, item):
+        """
+        getitem implementation for Mmif.
+
+        >>> obj = View('''{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"medium": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}''')
+        >>> type(obj['bb1'])
+        <class 'mmif.serialize.annotation.Annotation'>
+        >>> obj['asdf']
+        KeyError: 'Annotation ID not found: asdf'
+
+        :raises KeyError: if the item is not found or if the search results are ambiguous
+        :param item: the search string.
+        :return: the object searched for
+        """
         anno_result = self.annotations.get(item)
         if not anno_result:
             raise KeyError("Annotation ID not found: %s" % item)
