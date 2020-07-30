@@ -15,7 +15,7 @@ from tests.mmif_examples import *
 
 
 # Flags for skipping tests
-DEBUG = False, "Debug"
+DEBUG = False
 SKIP_SCHEMA = False, "Skipping TestSchema by default"
 SKIP_FOR_56 = True, "Skipping issue #56 bug"
 NOT_MERGED_40 = True, "Skipping until #40 is merged"
@@ -274,10 +274,10 @@ class TestSchema(unittest.TestCase):
         if DEBUG:
             self.hypos = []
 
-    @unittest.skipUnless(*DEBUG)
     def tearDown(self) -> None:
-        with open('hypotheses.json', 'w') as dump:
-            json.dump(self.hypos, dump, indent=2)
+        if DEBUG:
+            with open('hypotheses.json', 'w') as dump:
+                json.dump(self.hypos, dump, indent=2)
 
     @given(hypothesis_jsonschema.from_schema(schema))
     @settings(suppress_health_check=HealthCheck.all())
