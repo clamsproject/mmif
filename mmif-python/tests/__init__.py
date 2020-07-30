@@ -14,11 +14,11 @@ from pkg_resources import resource_stream
 from tests.mmif_examples import *
 
 
-DEBUG = False
-SKIP_SCHEMA = True
-SKIP_DICT_DESERIALIZE = None  # formerly "model can't process dicts yet"
-SKIP_FOR_56 = "Skipping issue #56 bug"
-NOT_MERGED_40 = "Skipping until #40 is merged"
+# Flags for skipping tests
+DEBUG = False, "Debug"
+SKIP_SCHEMA = False, "Skipping TestSchema by default"
+SKIP_FOR_56 = True, "Skipping issue #56 bug"
+NOT_MERGED_40 = True, "Skipping until #40 is merged"
 
 
 class TestMmif(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestMmif(unittest.TestCase):
     def setUp(self) -> None:
         self.examples_json = {i: json.loads(example) for i, example in examples.items()}
 
-    @unittest.skipIf(SKIP_FOR_56, SKIP_FOR_56)
+    @unittest.skipIf(*SKIP_FOR_56)
     def test_str_mmif_deserialize(self):
         for i, example in examples.items():
             try:
@@ -37,8 +37,7 @@ class TestMmif(unittest.TestCase):
                 self.fail("didn't swap _ and @")
             self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
 
-    @unittest.skipIf(SKIP_FOR_56, SKIP_FOR_56)
-    @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
+    @unittest.skipIf(*SKIP_FOR_56)
     def test_json_mmif_deserialize(self):
         for i, example in self.examples_json.items():
             try:
@@ -49,8 +48,7 @@ class TestMmif(unittest.TestCase):
                 self.fail("didn't swap _ and @")
             self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())))
 
-    @unittest.skipIf(SKIP_FOR_56, SKIP_FOR_56)
-    @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
+    @unittest.skipIf(*SKIP_FOR_56)
     def test_str_vs_json_deserialize(self):
         for i, example in examples.items():
             str_mmif_obj = Mmif(example)
@@ -112,14 +110,13 @@ class TestMmifObject(unittest.TestCase):
         self.assertTrue("_type" in MmifObject._load_json('{ "@type": "some_type", "@value": "some_value"}').keys())
         self.assertTrue("_value" in MmifObject._load_json('{ "@type": "some_type", "@value": "some_value"}').keys())
 
-    @unittest.skipIf(SKIP_DICT_DESERIALIZE, SKIP_DICT_DESERIALIZE)
     def test_load_json_on_dict(self):
         json_dict = json.loads('{ "@type": "some_type", "@value": "some_value"}')
         self.assertTrue("_type" in MmifObject._load_json(json_dict.copy()).keys())
         self.assertTrue("_value" in MmifObject._load_json(json_dict.copy()).keys())
 
 
-@unittest.skipIf(NOT_MERGED_40, NOT_MERGED_40)
+@unittest.skipIf(*NOT_MERGED_40)
 class TestGetItem(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -266,7 +263,7 @@ class TestMedium(unittest.TestCase):
                 self.assertEqual(medium, medium_serialized)
 
 
-@unittest.skipIf(SKIP_SCHEMA, "Skipping TestSchema by default")
+@unittest.skipIf(*SKIP_SCHEMA)
 class TestSchema(unittest.TestCase):
 
     schema_res = resource_stream(f'{mmif.__name__}.{mmif._res_pkg}', mmif._schema_res_name)
@@ -277,10 +274,10 @@ class TestSchema(unittest.TestCase):
         if DEBUG:
             self.hypos = []
 
+    @unittest.skipUnless(*DEBUG)
     def tearDown(self) -> None:
-        if DEBUG:
-            with open('hypotheses.json', 'w') as dump:
-                json.dump(self.hypos, dump, indent=2)
+        with open('hypotheses.json', 'w') as dump:
+            json.dump(self.hypos, dump, indent=2)
 
     @given(hypothesis_jsonschema.from_schema(schema))
     @settings(suppress_health_check=HealthCheck.all())
