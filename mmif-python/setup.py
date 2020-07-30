@@ -71,7 +71,8 @@ def prep_ext_files(setuptools_cmd):
 
     def mod_run(self):
         # assuming build only happens inside the `mmif` git repository
-        gittag = get_matching_gittag(version)
+        # also, NOTE that when in `make develop`, it will use resource files in the same branch
+        gittag = get_matching_gittag(version) if '.dev' not in version else "HEAD"
         # making resources into a python package so that `pkg_resources` can access resource files
         res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
         # and write resource files
