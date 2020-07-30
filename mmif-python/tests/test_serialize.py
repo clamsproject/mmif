@@ -20,7 +20,6 @@ from tests.mmif_examples import *
 DEBUG = False
 SKIP_SCHEMA = True, "Skipping TestSchema by default"
 SKIP_FOR_56 = True, "Skipping issue #56 bug"
-NOT_MERGED_40 = True, "Skipping until #40 is merged"
 
 
 class TestMmif(unittest.TestCase):
@@ -224,7 +223,6 @@ class TestMmifObject(unittest.TestCase):
             self.assertEqual(json.loads(examples['example1']), json.loads(fake_out.getvalue()))
 
 
-@unittest.skipIf(*NOT_MERGED_40)
 class TestGetItem(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -287,12 +285,12 @@ class TestGetItem(unittest.TestCase):
 
     def test_view_getitem(self):
         try:
-            bb1 = self.view_obj['bb1']
-            self.assertIs(bb1, self.view_obj.annotations.get('bb1'))
+            s1 = self.view_obj['s1']
+            self.assertIs(s1, self.view_obj.annotations.get('s1'))
         except TypeError:
             self.fail("__getitem__ not implemented")
         except KeyError:
-            self.fail("didn't get annotation 'bb1'")
+            self.fail("didn't get annotation 's1'")
 
 
 class TestView(unittest.TestCase):
