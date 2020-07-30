@@ -16,7 +16,7 @@ from tests.mmif_examples import *
 
 # Flags for skipping tests
 DEBUG = False
-SKIP_SCHEMA = False, "Skipping TestSchema by default"
+SKIP_SCHEMA = True, "Skipping TestSchema by default"
 SKIP_FOR_56 = True, "Skipping issue #56 bug"
 NOT_MERGED_40 = True, "Skipping until #40 is merged"
 
