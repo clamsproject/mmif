@@ -21,7 +21,7 @@ sdist: dist/$(sdistname)-*.tar.gz
 dist/$(sdistname)-*.dev*.tar.gz: devversion dist/$(sdistname)-*.tar.gz
 dist/$(sdistname)-*.tar.gz: VERSION; python3 setup.py sdist
 
-develop: devversion test dist/$(sdistname)-*.dev*.tar.gz
+develop: clean devversion test dist/$(sdistname)-*.dev*.tar.gz
 	python3 setup.py develop --uninstall
 	python3 setup.py develop
 	twine upload --repository-url http://morbius.cs-i.brandeis.edu:8081/repository/pypi-develop/ \
