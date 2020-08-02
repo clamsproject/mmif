@@ -10,6 +10,9 @@ from .medium import Medium
 from .model import MmifObject
 
 
+__all__ = ['Mmif']
+
+
 class Mmif(MmifObject):
     # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
     _context: str

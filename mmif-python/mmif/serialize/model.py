@@ -2,6 +2,9 @@ import json
 from typing import Union, Any, Dict
 
 
+__all__ = ['MmifObject', 'MmifObjectEncoder']
+
+
 class MmifObject(object):
     """
     Abstract superclass for MMIF related key-value pair objects.
@@ -39,14 +42,15 @@ class MmifObject(object):
         return d
 
     @staticmethod
-    def _load_str(json_str: str):
+    def _load_json(json_obj: Union[dict, str]):
         """
-        Turns JSON-format string into python dict. In doing so, it replaces "@"
+        Maps JSON-LD-format MMIF strings and dicts into Python dicts
+        with identifier-compliant keys. To do this, it replaces "@"
         signs in JSON-LD field names with "_" to be python-compliant.
 
-        >>> "_type" in MmifObject._load_str('{ "@type": "some_type", "@value": "some_value"}').keys()
+        >>> "_type" in MmifObject._load_json('{ "@type": "some_type", "@value": "some_value"}').keys()
         True
-        >>> "_value" in MmifObject._load_str('{ "@type": "some_type", "@value": "some_value"}').keys()
+        >>> "_value" in MmifObject._load_json('{ "@type": "some_type", "@value": "some_value"}').keys()
         True
 
         :param json_str:
@@ -57,21 +61,32 @@ class MmifObject(object):
                 if k.startswith('@'):
                     d[f'_{k[1:]}'] = d.pop(k)
             return d
-        return json.loads(json_str, object_hook=to_atsign)
+
+        def traverse_to_atsign(d: dict):
+            new_d = d.copy()
+            to_atsign(new_d)
+            for key, value in new_d.items():
+                if type(value) is dict:
+                    new_d[key] = traverse_to_atsign(value)
+            return new_d
+
+        if type(json_obj) is dict:
+            return traverse_to_atsign(json_obj)
+        elif type(json_obj) is str:
+            return json.loads(json_obj, object_hook=to_atsign)
+        else:
+            raise TypeError("tried to load MMIF JSON in a format other than str or dict")
 
     def deserialize(self, mmif_json: Union[str, dict]) -> None:
         """
         Takes a JSON-formatted string or a simple `dict` that's json-loaded from
         such a string as an input and populates object's fields with the values
         specified in the input.
-        NB: this assumes when input is dict type, the keys are properly renamed
-        (@xxx -> _xxx)
 
         :param mmif_json: JSON-formatted string or dict from such a string
          that represents a MMIF object
         """
-        if type(mmif_json) == str:
-            mmif_json = self._load_str(mmif_json)
+        mmif_json = self._load_json(mmif_json)
         self._deserialize(mmif_json)
 
     def _deserialize(self, input_dict: dict) -> None:
