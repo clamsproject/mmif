@@ -17,28 +17,27 @@ class Mmif(MmifObject):
     # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
     _context: str
     metadata: Dict[str, str]
-    media: Dict[str, 'Medium']
-    views: Dict[str, 'View']
+    media: 'MediaList'
+    views: 'ViewsList'
 
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
         self._context = ''
         self.metadata = {}
-        self.media: Dict[str, Medium] = {}
-        self.views: Dict[str, View] = {}
+        self.media: 'MediaList' = MediaList([])
+        self.views: 'ViewsList' = ViewsList([])
         if validate:
             self.validate(mmif_obj)
         super().__init__(mmif_obj)
 
-    def _serialize(self) -> dict:
-        intermediate = super()._serialize()
-        intermediate.update(media=list(self.media.values()), views=list(self.views.values()))
-        return intermediate
+    # def _serialize(self) -> dict:
+    #     intermediate = super()._serialize()
+    #     return intermediate
 
     def _deserialize(self, input_dict: dict) -> None:
         self._context = input_dict['_context']
         self.metadata = input_dict['metadata']
-        self.media = {m['id']: Medium(m) for m in input_dict['media']}
-        self.views = {v['id']: View(v) for v in input_dict['views']}
+        self.media = MediaList(input_dict['media'])
+        self.views = ViewsList(input_dict['views'])
 
     @staticmethod
     def validate(json_str: Union[str, dict]):
@@ -69,22 +68,22 @@ class Mmif(MmifObject):
             self.media[medium.id] = medium
 
     def get_medium_location(self, md_type: str):
-        for medium in self.media.values():
+        for medium in self.media:
             if medium.type == md_type:
                 return medium.location
         raise Exception("{} type media not found".format(md_type))
 
     def get_medium_by_id(self, req_med_id: str):
-        for med_id, medium in self.media.items():
-            if med_id == req_med_id:
-                return medium
-        raise Exception("{} medium not found".format(req_med_id))
+        result = self[req_med_id]
+        if not isinstance(result, Medium):
+            raise KeyError("{} medium not found".format(req_med_id))
+        return result
 
     def get_view_by_id(self, req_view_id: str):
-        for view_id, view in self.views.items():
-            if view_id == req_view_id:
-                return view
-        raise Exception("{} view not found".format(req_view_id))
+        result = self[req_view_id]
+        if not isinstance(result, View):
+            raise KeyError("{} medium not found".format(req_view_id))
+        return result
 
     def get_view_contains(self, at_type: str):
         # will return the *latest* view
@@ -92,7 +91,7 @@ class Mmif(MmifObject):
         from sys import version_info
         if version_info < (3, 6):
             print("Warning: get_view_contains requires Python 3.6+ for correct behavior")
-        for view_id, view in reversed(self.views.items()):
+        for view in reversed(self.views):
             return view
         return None
 
@@ -131,3 +130,51 @@ class Mmif(MmifObject):
         if not (view_result or medium_result):
             raise KeyError("ID not found: %s" % item)
         return anno_result or view_result or medium_result
+
+
+class DataList(MmifObject):
+    def __init__(self, mmif_obj: Union[str, list] = None):
+        self.items = dict()
+        if mmif_obj is None:
+            mmif_obj = []
+        super().__init__(mmif_obj)
+
+    def _serialize(self) -> list:
+        return list(self.items.values())
+
+    def deserialize(self, mmif_json: Union[str, list]) -> None:
+        if isinstance(mmif_json, str):
+            mmif_json = json.loads(mmif_json)
+        self._deserialize(mmif_json)
+
+    def get(self, item, default=None):
+        return self.items.get(item, default)
+
+    def __getitem__(self, item):
+        return self.items.__getitem__(item)
+
+    def __setitem__(self, key, value):
+        self.items.__setitem__(key, value)
+
+    def __iter__(self):
+        return self.items.values().__iter__()
+
+    def __len__(self):
+        return self.items.__len__()
+
+    def __reversed__(self):
+        return reversed(self.items.values())
+
+
+class MediaList(DataList):
+    items: Dict[str, Medium]
+
+    def _deserialize(self, input_list: list) -> None:
+        self.items = {item['id']: Medium(item) for item in input_list}
+
+
+class ViewsList(DataList):
+    items: Dict[str, View]
+
+    def _deserialize(self, input_list: list) -> None:
+        self.items = {item['id']: View(item) for item in input_list}
