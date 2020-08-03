@@ -23,11 +23,11 @@ class Annotation(MmifObject):
         self._type = at_type
 
     @property
-    def id(self):
+    def id(self) -> str:
         return self.properties.id
 
     @id.setter
-    def id(self, aid):
+    def id(self, aid: str) -> None:
         self.properties.id = aid
 
     def _deserialize(self, input_dict: dict) -> None:
@@ -39,7 +39,7 @@ class Annotation(MmifObject):
         intermediate.update(properties=self.properties._serialize())
         return intermediate
 
-    def add_property(self, name: str, value: str):
+    def add_property(self, name: str, value: str) -> None:
         name = name.replace('@', '_')
         assert name.isidentifier(), "Annotation property name must be a valid Python identifier"
         setattr(self.properties, name, value)

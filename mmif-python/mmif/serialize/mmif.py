@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 import jsonschema.validators
 from pkg_resources import resource_stream
@@ -7,6 +7,7 @@ from pkg_resources import resource_stream
 import mmif
 from .view import View
 from .medium import Medium
+from .annotation import Annotation
 from .model import MmifObject, DataList
 
 
@@ -36,7 +37,7 @@ class Mmif(MmifObject):
         self.views = ViewsList(input_dict['views'])
 
     @staticmethod
-    def validate(json_str: Union[str, dict]):
+    def validate(json_str: Union[str, dict]) -> None:
         # NOTE that schema file first needs to be copied to resources directory
         # this is automatically done via setup.py, so for users this shouldn't be a matter
 
@@ -47,41 +48,41 @@ class Mmif(MmifObject):
             json_str = json.loads(json_str)
         jsonschema.validate(json_str, schema)
 
-    def new_view_id(self):
+    def new_view_id(self) -> str:
         return 'v_' + str(len(self.views))
 
-    def new_view(self):
+    def new_view(self) -> View:
         new_view = View()
         new_view.id = self.new_view_id()
         self.views[new_view.id] = new_view
         return new_view
 
-    def add_media(self, medium: Medium):
+    def add_media(self, medium: Medium) -> None:
         try:
             self.get_medium_location(medium.type)
         # TODO (krim @ 10/7/2018): if get_m_location returns, raise "already exists" error
         except Exception:
             self.media[medium.id] = medium
 
-    def get_medium_location(self, md_type: str):
+    def get_medium_location(self, md_type: str) -> Optional[str]:
         for medium in self.media:
             if medium.type == md_type:
                 return medium.location
         raise Exception("{} type media not found".format(md_type))
 
-    def get_medium_by_id(self, req_med_id: str):
+    def get_medium_by_id(self, req_med_id: str) -> Medium:
         result = self[req_med_id]
         if not isinstance(result, Medium):
             raise KeyError("{} medium not found".format(req_med_id))
         return result
 
-    def get_view_by_id(self, req_view_id: str):
+    def get_view_by_id(self, req_view_id: str) -> View:
         result = self[req_view_id]
         if not isinstance(result, View):
             raise KeyError("{} medium not found".format(req_view_id))
         return result
 
-    def get_view_contains(self, at_type: str):
+    def get_view_contains(self, at_type: str) -> Optional[View]:
         # will return the *latest* view
         # works as of python 3.6+ because dicts are deterministically ordered by insertion order
         from sys import version_info
@@ -91,7 +92,7 @@ class Mmif(MmifObject):
             return view
         return None
 
-    def __getitem__(self, item: str):
+    def __getitem__(self, item: str) -> Union[Medium, View, Annotation]:
         """
         getitem implementation for Mmif.
 

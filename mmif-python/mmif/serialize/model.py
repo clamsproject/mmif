@@ -1,6 +1,5 @@
 import json
-from typing import Union, Any, Dict
-
+from typing import Union, Any, Dict, Optional
 
 __all__ = ['MmifObject', 'MmifObjectEncoder', 'DataList']
 
@@ -42,7 +41,7 @@ class MmifObject(object):
         return d
 
     @staticmethod
-    def _load_json(json_obj: Union[dict, str]):
+    def _load_json(json_obj: Union[dict, str]) -> dict:
         """
         Maps JSON-LD-format MMIF strings and dicts into Python dicts
         with identifier-compliant keys. To do this, it replaces "@"
@@ -56,13 +55,13 @@ class MmifObject(object):
         :param json_str:
         :return:
         """
-        def to_atsign(d: Dict[str, Any]):
+        def to_atsign(d: Dict[str, Any]) -> dict:
             for k in list(d.keys()):
                 if k.startswith('@'):
                     d[f'_{k[1:]}'] = d.pop(k)
             return d
 
-        def traverse_to_atsign(d: dict):
+        def traverse_to_atsign(d: dict) -> dict:
             new_d = d.copy()
             to_atsign(new_d)
             for key, value in new_d.items():
@@ -133,7 +132,7 @@ class MmifObjectEncoder(json.JSONEncoder):
 
 class DataList(MmifObject):
     def __init__(self, mmif_obj: Union[str, list] = None):
-        self.items = dict()
+        self.items: Dict[str, MmifObject] = dict()
         if mmif_obj is None:
             mmif_obj = []
         super().__init__(mmif_obj)
@@ -146,8 +145,8 @@ class DataList(MmifObject):
             mmif_json = json.loads(mmif_json)
         self._deserialize(mmif_json)
 
-    def get(self, item, default=None):
-        return self.items.get(item, default)
+    def get(self, key: str) -> Optional[MmifObject]:
+        return self.items.get(key)
 
     def __getitem__(self, item):
         return self.items.__getitem__(item)

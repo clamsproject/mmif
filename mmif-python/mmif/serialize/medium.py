@@ -20,7 +20,7 @@ class Medium(MmifObject):
         self.type = ''
         super().__init__(medium_obj)
 
-    def _deserialize(self, medium_dict: dict):
+    def _deserialize(self, medium_dict: dict) -> None:
         self.id = medium_dict['id']
         self.type = medium_dict['type']
         if 'metadata' in medium_dict:
@@ -32,7 +32,7 @@ class Medium(MmifObject):
         if 'text' in medium_dict:
             self.text = Text(medium_dict['text'])
 
-    def add_metadata(self, name: str, value: str):
+    def add_metadata(self, name: str, value: str) -> None:
         name = name.replace('@', '_')
         assert name.isidentifier(), "Annotation property name must be a valid Python identifier"
         setattr(self.metadata, name, value)

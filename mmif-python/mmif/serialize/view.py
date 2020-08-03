@@ -19,7 +19,7 @@ class View(MmifObject):
         self.annotations = AnnotationsList()
         super().__init__(view_obj)
 
-    def _deserialize(self, view_dict: dict):
+    def _deserialize(self, view_dict: dict) -> None:
         self.id = view_dict['id']
         self.metadata = ViewMetadata(view_dict['metadata'])
         self.annotations = AnnotationsList(view_dict['annotations'])
@@ -27,7 +27,7 @@ class View(MmifObject):
     def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
 
-    def new_annotation(self, aid: str, at_type: str):
+    def new_annotation(self, aid: str, at_type: str) -> 'Annotation':
         new_annotation = Annotation()
         new_annotation.at_type = at_type
         new_annotation.id = aid
@@ -38,9 +38,9 @@ class View(MmifObject):
         self.new_contain(annotation.at_type)
         return annotation
 
-    def __getitem__(self, item):
+    def __getitem__(self, key: str) -> 'Annotation':
         """
-        getitem implementation for Mmif.
+        getitem implementation for View.
 
         >>> obj = View('''{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"medium": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}''')
         >>> type(obj['bb1'])
@@ -48,13 +48,13 @@ class View(MmifObject):
         >>> obj['asdf']
         KeyError: 'Annotation ID not found: asdf'
 
-        :raises KeyError: if the item is not found or if the search results are ambiguous
-        :param item: the search string.
+        :raises KeyError: if the key is not found or if the search results are ambiguous
+        :param key: the search string.
         :return: the object searched for
         """
-        anno_result = self.annotations.get(item)
+        anno_result = self.annotations.get(key)
         if not anno_result:
-            raise KeyError("Annotation ID not found: %s" % item)
+            raise KeyError("Annotation ID not found: %s" % key)
         return anno_result
 
 
