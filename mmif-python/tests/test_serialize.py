@@ -37,6 +37,16 @@ class TestMmif(unittest.TestCase):
                 self.fail("didn't swap _ and @")
             self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
 
+    @unittest.skipUnless(*SKIP_FOR_56)
+    def test_temp_str_mmif_deserialize(self):
+        try:
+            mmif_obj = Mmif(examples['example1'])
+        except ValidationError as ve:
+            self.fail("example 1")
+        except KeyError as ke:
+            self.fail("didn't swap _ and @")
+        self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
+
     @unittest.skipIf(*SKIP_FOR_56)
     def test_json_mmif_deserialize(self):
         for i, example in self.examples_json.items():
@@ -48,12 +58,28 @@ class TestMmif(unittest.TestCase):
                 self.fail("didn't swap _ and @")
             self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())))
 
+    @unittest.skipUnless(*SKIP_FOR_56)
+    def test_temp_json_mmif_deserialize(self):
+        try:
+            mmif_obj = Mmif(json.loads(examples['example1']))
+        except ValidationError as ve:
+            self.fail("example 1")
+        except KeyError as ke:
+            self.fail("didn't swap _ and @")
+        self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
+
     @unittest.skipIf(*SKIP_FOR_56)
     def test_str_vs_json_deserialize(self):
         for i, example in examples.items():
             str_mmif_obj = Mmif(example)
             json_mmif_obj = Mmif(json.loads(example))
             self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
+
+    @unittest.skipUnless(*SKIP_FOR_56)
+    def test_temp_str_vs_json_deserialize(self):
+        str_mmif_obj = Mmif(examples['example1'])
+        json_mmif_obj = Mmif(json.loads(examples['example1']))
+        self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
 
     def test_bad_mmif_deserialize_no_context(self):
         self.examples_json['example1'].pop('@context')
