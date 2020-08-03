@@ -7,7 +7,7 @@ from pkg_resources import resource_stream
 import mmif
 from .view import View
 from .medium import Medium
-from .model import MmifObject
+from .model import MmifObject, DataList
 
 
 __all__ = ['Mmif']
@@ -23,15 +23,11 @@ class Mmif(MmifObject):
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
         self._context = ''
         self.metadata = {}
-        self.media: 'MediaList' = MediaList([])
-        self.views: 'ViewsList' = ViewsList([])
+        self.media = MediaList()
+        self.views = ViewsList()
         if validate:
             self.validate(mmif_obj)
         super().__init__(mmif_obj)
-
-    # def _serialize(self) -> dict:
-    #     intermediate = super()._serialize()
-    #     return intermediate
 
     def _deserialize(self, input_dict: dict) -> None:
         self._context = input_dict['_context']
@@ -130,40 +126,6 @@ class Mmif(MmifObject):
         if not (view_result or medium_result):
             raise KeyError("ID not found: %s" % item)
         return anno_result or view_result or medium_result
-
-
-class DataList(MmifObject):
-    def __init__(self, mmif_obj: Union[str, list] = None):
-        self.items = dict()
-        if mmif_obj is None:
-            mmif_obj = []
-        super().__init__(mmif_obj)
-
-    def _serialize(self) -> list:
-        return list(self.items.values())
-
-    def deserialize(self, mmif_json: Union[str, list]) -> None:
-        if isinstance(mmif_json, str):
-            mmif_json = json.loads(mmif_json)
-        self._deserialize(mmif_json)
-
-    def get(self, item, default=None):
-        return self.items.get(item, default)
-
-    def __getitem__(self, item):
-        return self.items.__getitem__(item)
-
-    def __setitem__(self, key, value):
-        self.items.__setitem__(key, value)
-
-    def __iter__(self):
-        return self.items.values().__iter__()
-
-    def __len__(self):
-        return self.items.__len__()
-
-    def __reversed__(self):
-        return reversed(self.items.values())
 
 
 class MediaList(DataList):

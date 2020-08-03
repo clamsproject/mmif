@@ -2,7 +2,7 @@ import json
 from typing import Union, Any, Dict
 
 
-__all__ = ['MmifObject', 'MmifObjectEncoder']
+__all__ = ['MmifObject', 'MmifObjectEncoder', 'DataList']
 
 
 class MmifObject(object):
@@ -130,3 +130,36 @@ class MmifObjectEncoder(json.JSONEncoder):
         else:
             return json.JSONEncoder.default(self, obj)
 
+
+class DataList(MmifObject):
+    def __init__(self, mmif_obj: Union[str, list] = None):
+        self.items = dict()
+        if mmif_obj is None:
+            mmif_obj = []
+        super().__init__(mmif_obj)
+
+    def _serialize(self) -> list:
+        return list(self.items.values())
+
+    def deserialize(self, mmif_json: Union[str, list]) -> None:
+        if isinstance(mmif_json, str):
+            mmif_json = json.loads(mmif_json)
+        self._deserialize(mmif_json)
+
+    def get(self, item, default=None):
+        return self.items.get(item, default)
+
+    def __getitem__(self, item):
+        return self.items.__getitem__(item)
+
+    def __setitem__(self, key, value):
+        self.items.__setitem__(key, value)
+
+    def __iter__(self):
+        return self.items.values().__iter__()
+
+    def __len__(self):
+        return self.items.__len__()
+
+    def __reversed__(self):
+        return reversed(self.items.values())

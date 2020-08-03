@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Dict, List, Union, Optional
 
 from .annotation import Annotation
-from .model import MmifObject
+from .model import MmifObject, DataList
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
@@ -11,24 +11,18 @@ __all__ = ['View', 'ViewMetadata', 'Contain']
 class View(MmifObject):
     id: str
     metadata: 'ViewMetadata'
-    annotations: Dict[str, 'Annotation']
+    annotations: 'AnnotationsList'
 
     def __init__(self, view_obj: Union[str, dict] = None):
         self.id = ''
         self.metadata = ViewMetadata()
-        self.annotations = {}
+        self.annotations = AnnotationsList()
         super().__init__(view_obj)
-
-    def _serialize(self) -> dict:
-        intermediate = super()._serialize()
-        intermediate.update(annotations=list(self.annotations.values()))
-        return intermediate
 
     def _deserialize(self, view_dict: dict):
         self.id = view_dict['id']
         self.metadata = ViewMetadata(view_dict['metadata'])
-        for anno_dict in view_dict['annotations']:
-            self.add_annotation(Annotation(anno_dict))
+        self.annotations = AnnotationsList(view_dict['annotations'])
 
     def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
@@ -99,3 +93,10 @@ class Contain(MmifObject):
         self.producer = ''
         self.gen_time = datetime.now()     # datetime.datetime
         super().__init__(contain_obj)
+
+
+class AnnotationsList(DataList):
+    items: Dict[str, Annotation]
+
+    def _deserialize(self, input_list: list) -> None:
+        self.items = {item['properties']['id']: Annotation(item) for item in input_list}
