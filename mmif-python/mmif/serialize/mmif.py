@@ -129,21 +129,13 @@ class Mmif(MmifObject):
         return anno_result or view_result or medium_result
 
 
-class MediaList(DataList):
-    items: Dict[str, Medium]
+class MediaList(DataList[Medium]):
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: Medium(item) for item in input_list}
 
-    def get(self, key: str) -> Optional[Medium]:
-        return super().get(key)
 
-
-class ViewsList(DataList):
-    items: Dict[str, View]
+class ViewsList(DataList[View]):
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: View(item) for item in input_list}
-
-    def get(self, key: str) -> Optional[View]:
-        return super().get(key)

@@ -95,11 +95,9 @@ class Contain(MmifObject):
         super().__init__(contain_obj)
 
 
-class AnnotationsList(DataList):
+class AnnotationsList(DataList[Annotation]):
     items: Dict[str, Annotation]
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['properties']['id']: Annotation(item) for item in input_list}
 
-    def get(self, key: str) -> Optional[Annotation]:
-        return super().get(key)

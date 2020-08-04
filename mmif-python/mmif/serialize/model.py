@@ -1,6 +1,8 @@
 import json
-from typing import Union, Any, Dict, Optional, Type
+from typing import Union, Any, Dict, Optional, TypeVar, Generic
 
+
+T = TypeVar('T')
 __all__ = ['MmifObject', 'MmifObjectEncoder', 'DataList']
 
 
@@ -130,9 +132,9 @@ class MmifObjectEncoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
 
 
-class DataList(MmifObject):
+class DataList(MmifObject, Generic[T]):
     def __init__(self, mmif_obj: Union[str, list] = None):
-        self.items: Dict[str, Type[MmifObject]] = dict()
+        self.items: Dict[str, T] = dict()
         if mmif_obj is None:
             mmif_obj = []
         super().__init__(mmif_obj)
@@ -148,13 +150,13 @@ class DataList(MmifObject):
     def _deserialize(self, input_dict):
         raise NotImplementedError
 
-    def get(self, key: str) -> Optional[Type[MmifObject]]:
+    def get(self, key: str) -> Optional[T]:
         return self.items.get(key)
 
     def __getitem__(self, key: str):
         return self.items.__getitem__(key)
 
-    def __setitem__(self, key: str, value: Type[MmifObject]):
+    def __setitem__(self, key: str, value: T):
         self.items.__setitem__(key, value)
 
     def __iter__(self):
