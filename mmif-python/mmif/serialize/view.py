@@ -100,3 +100,6 @@ class AnnotationsList(DataList):
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['properties']['id']: Annotation(item) for item in input_list}
+
+    def get(self, key: str) -> Optional[Annotation]:
+        return super().get(key)

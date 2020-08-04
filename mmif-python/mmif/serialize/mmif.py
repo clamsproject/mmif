@@ -135,9 +135,15 @@ class MediaList(DataList):
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: Medium(item) for item in input_list}
 
+    def get(self, key: str) -> Optional[Medium]:
+        return super().get(key)
+
 
 class ViewsList(DataList):
     items: Dict[str, View]
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: View(item) for item in input_list}
+
+    def get(self, key: str) -> Optional[View]:
+        return super().get(key)
