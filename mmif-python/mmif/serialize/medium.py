@@ -47,6 +47,19 @@ class Text(MmifObject):
 class MediumMetadata(MmifObject):
     source: str
     tool: str
+    metadata: dict
+
+    def _deserialize(self, input_dict: dict) -> None:
+        self.metadata = input_dict
+
+    def _serialize(self):
+        return MmifObject(self.metadata)._serialize()
+
+    def __setitem__(self, key, value):
+        self.metadata[key] = value
+
+    def __getitem__(self, key):
+        return self.metadata[key]
 
 
 class Submedia(MmifObject):

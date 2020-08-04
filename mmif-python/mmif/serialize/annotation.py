@@ -35,3 +35,16 @@ class AnnotationProperties(MmifObject):
     id: str
     start: Optional[int] = -1
     end: Optional[int] = -1
+    properties: dict
+
+    def _deserialize(self, input_dict: dict) -> None:
+        self.properties = input_dict
+
+    def _serialize(self):
+        return MmifObject(self.properties)._serialize()
+
+    def __setitem__(self, key, value):
+        self.properties[key] = value
+
+    def __getitem__(self, key):
+        return self.properties[key]
