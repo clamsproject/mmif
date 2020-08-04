@@ -11,7 +11,7 @@ from mmif.serialize import *
 from mmif.serialize.model import *
 from pkg_resources import resource_stream
 
-from mmif_examples import *
+from tests.mmif_examples import *
 
 
 # Flags for skipping tests
