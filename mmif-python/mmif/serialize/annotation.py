@@ -39,6 +39,7 @@ class AnnotationProperties(MmifObject):
 
     def _deserialize(self, input_dict: dict) -> None:
         self.properties = input_dict
+        self.id = input_dict['id']
 
     def _serialize(self):
         return MmifObject(self.properties)._serialize()
