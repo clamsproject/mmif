@@ -55,6 +55,9 @@ class ViewMetadata(MmifObject):
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
+        # TODO (angus-lherrou @ 8/4/2020): using __dict__ with potentially non-identifier
+        #  keys "works" but is not pythonic so better to wrap a dict property.
+        #  Unify implementations of this and MediumMetadata
         self.__dict__ = input_dict
         self.contains = dict([(at_type, Contain(contain_obj)) for at_type, contain_obj in input_dict.get('contains', {}).items()])
 
