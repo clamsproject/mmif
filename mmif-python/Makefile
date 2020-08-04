@@ -33,7 +33,7 @@ publish: test sdist
 build/lib/mmif: VERSION; python3 setup.py build
 
 test: VERSION
-	pytype .
+	pytype mmif/
 	python3 -m pytest --doctest-modules
 
 devversion: VERSION.dev VERSION; cat VERSION
