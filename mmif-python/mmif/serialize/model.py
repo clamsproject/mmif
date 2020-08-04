@@ -164,4 +164,4 @@ class DataList(MmifObject):
         return self.items.__len__()
 
     def __reversed__(self):
-        return reversed(self.items.values())
+        return reversed(list(self.items.values()))
