@@ -221,7 +221,26 @@ class TestView(unittest.TestCase):
 class TestAnnotation(unittest.TestCase):
     # TODO (angus-lherrou @ 7/27/2020): testing should include validation for required attrs
     #  once that is implemented (issue #23)
-    ...
+    def setUp(self) -> None:
+        self.examples = {}
+        for i, example in examples.items():
+            try:
+                Mmif(example)
+                self.examples[i] = example
+            except ValidationError:
+                continue
+        self.data = {i: {'string': example,
+                         'json': json.loads(example),
+                         'mmif': Mmif(example),
+                         'annotations': [annotation
+                                         for view in json.loads(example)['views']
+                                         for annotation in view['annotations']]}
+                     for i, example in self.examples.items()}
+
+    def test_annotation_properties(self):
+        props_json = self.data['example1']['annotations'][0]['properties']
+        props_obj = MediumMetadata(props_json)
+        self.assertEqual(json.loads(props_obj.serialize()), props_json)
 
 
 class TestMedium(unittest.TestCase):
@@ -247,6 +266,11 @@ class TestMedium(unittest.TestCase):
                     _ = Medium(medium)
                 except Exception as ex:
                     self.fail(f"{type(ex)}: {ex.message}: example {i}, medium {j}")
+
+    def test_medium_metadata(self):
+        metadata_json = self.data['example1']['media'][1]['metadata']
+        metadata_obj = MediumMetadata(metadata_json)
+        self.assertEqual(json.loads(metadata_obj.serialize()), metadata_json)
 
     def test_deserialize_with_whole_mmif(self):
         for i, datum in self.data.items():
