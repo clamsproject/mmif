@@ -1,5 +1,6 @@
 hypothesis
 hypothesis-jsonschema
 pytest>=6
+pytest-cov
 pytype
 
