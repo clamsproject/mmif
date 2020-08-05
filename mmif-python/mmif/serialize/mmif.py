@@ -141,18 +141,17 @@ class Mmif(MmifObject):
 
     def get_all_views_contain(self, at_type: str) -> List[View]:
         """
-        DEPRECATED:
         Returns the list of all views in the MMIF if a given type
-        type is present in the top-level 'contains' field.
+        type is present in that view's 'contains' metadata.
         :param at_type: the type to check for
-        :return: the list of views, or an empty list if the type is not found
+        :return: the list of views that contain the type
         """
         return [view for view in self.views if at_type in view.metadata.contains]
 
     def get_view_contains(self, at_type: str):
         """
-        Returns the last view appended if the given type is
-        present in the top-level 'contains' field.
+        Returns the last view appended that contains the given
+        type in its 'contains' metadata.
         :param at_type: the type to check for
         :return: the view, or None if the type is not found
         """
