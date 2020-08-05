@@ -52,4 +52,4 @@ VERSION:
 	fi
 
 clean: 
-	@rm -rf VERSION VERSION.dev build dist $(bdistname).egg-info
+	@rm -rf VERSION VERSION.dev build dist $(bdistname).egg-info mmif/res mmif/ver
