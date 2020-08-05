@@ -1,5 +1,7 @@
 import unittest
 import json
+from io import StringIO
+from unittest.mock import patch
 
 import mmif
 from hypothesis import given, settings, HealthCheck  # pip install hypothesis
@@ -186,6 +188,13 @@ class TestMmif(unittest.TestCase):
         views = mmif_obj.get_all_views_contain('BoundingBox')
         self.assertEqual(views_len, len(views))
 
+    def test_get_view_contains(self):
+        # TODO (angus-lherrou @ 8/5/2020): expand to better examples once schema is fixed
+        mmif_obj = Mmif(examples['example1'])
+        view = mmif_obj.get_view_contains('BoundingBox')
+        self.assertIsNotNone(view)
+        self.assertEqual(view.id, 'v1')
+
 
 class TestMmifObject(unittest.TestCase):
 
@@ -200,6 +209,12 @@ class TestMmifObject(unittest.TestCase):
         json_dict = json.loads('{ "@type": "some_type", "@value": "some_value"}')
         self.assertTrue("_type" in MmifObject._load_json(json_dict.copy()).keys())
         self.assertTrue("_value" in MmifObject._load_json(json_dict.copy()).keys())
+
+    def test_print_mmif(self):
+        with patch('sys.stdout', new=StringIO()) as fake_out:
+            mmif_obj = Mmif(examples['example1'])
+            print(mmif_obj)
+            self.assertEqual(json.loads(examples['example1']), json.loads(fake_out.getvalue()))
 
 
 @unittest.skipIf(*NOT_MERGED_40)
@@ -276,6 +291,25 @@ class TestView(unittest.TestCase):
         for original, new in zip(sorted(self.view_json['annotations'], key=id_func),
                                  sorted(json.loads(view_serial)['annotations'], key=id_func)):
             assert original == new
+
+    def test_add_annotation(self):
+        anno_obj = Annotation(json.loads(anno1))
+        old_len = len(self.view_obj.annotations)
+        try:
+            self.view_obj.add_annotation(anno_obj)
+        except Exception as ex:
+            self.fail('failed to add annotation to view: '+ex.message)
+        self.assertEqual(len(self.view_obj.annotations), old_len+1)
+        # TODO (angus-lherrou @ 8/5/2020): fix this, but do we even need
+        #  contains at all if it can all be done programmatically?
+        self.assertIn('Token', self.view_obj.metadata.contains)
+    
+    def test_new_annotation(self):
+        try:
+            self.view_obj.new_annotation('relation1', 'Relation')
+        except Exception as ex:
+            self.fail('failed to create new annotation in view: '+ex.message)
+        self.assertIn('Relation', self.view_obj.metadata.contains)
 
 
 class TestAnnotation(unittest.TestCase):

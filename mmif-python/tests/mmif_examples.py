@@ -332,6 +332,16 @@ examples = dict(example1="""{
 }
 """)
 
+anno1 = """{
+          "@type": "Token",
+          "properties": {
+            "id": "token1",
+            "start": 0,
+            "end": 3,
+            "word": "The"
+          }
+        }"""
+
 anno2 = """{
   "@type": "TimePoint",
   "properties": {
