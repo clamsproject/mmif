@@ -27,11 +27,20 @@ class Annotation(MmifObject):
         self.properties.id = aid
 
     def _deserialize(self, input_dict: dict) -> None:
-        self._type = input_dict['_type']
+        self._type = get(input_dict['_type'])
         self.properties = AnnotationProperties(input_dict['properties'])
 
+    def _serialize(self) -> dict:
+        intermediate = super()._serialize()
+        if self.at_type.namespace == 'custom':
+            intermediate['@type'] = self.at_type.uri
+        elif self.at_type.namespace.upper() == 'MMIF':
+            intermediate['@type'] = self.at_type.shortname
+        else:
+            intermediate['@type'] = f'{self.at_type.namespace}:{self.at_type.shortname}'
+        return intermediate
+
     def __init__(self, anno_obj: Union[str, dict] = None):
-        self._type = ''
         self.properties = AnnotationProperties()
         super().__init__(anno_obj)
 
