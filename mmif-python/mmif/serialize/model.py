@@ -121,7 +121,12 @@ class MmifObjectEncoder(json.JSONEncoder):
         """
         Overrides default encoding behavior to prioritize :func: MmifObject.serilize() .
         """
-        try:
+        if hasattr(obj, '_serialize'):
             return obj._serialize()
-        except:
+        elif hasattr(obj, 'isoformat'): # for datetime objects
+            return obj.isoformat()
+        elif hasattr(obj, '__str__'):
+            return str(obj)
+        else:
             return json.JSONEncoder.default(self, obj)
+
