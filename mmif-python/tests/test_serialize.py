@@ -290,7 +290,7 @@ class TestView(unittest.TestCase):
 
         for original, new in zip(sorted(self.view_json['annotations'], key=id_func),
                                  sorted(json.loads(view_serial)['annotations'], key=id_func)):
-            assert original == new
+            self.assertEqual(original, new)
 
     def test_add_annotation(self):
         anno_obj = Annotation(json.loads(anno1))
