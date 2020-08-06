@@ -210,6 +210,13 @@ class TestMmifObject(unittest.TestCase):
         self.assertTrue("_type" in MmifObject._load_json(json_dict.copy()).keys())
         self.assertTrue("_value" in MmifObject._load_json(json_dict.copy()).keys())
 
+    def test_load_json_on_other(self):
+        try:
+            MmifObject._load_json(123)
+            self.fail()
+        except TypeError:
+            pass
+
     def test_print_mmif(self):
         with patch('sys.stdout', new=StringIO()) as fake_out:
             mmif_obj = Mmif(examples['example1'])
@@ -251,6 +258,33 @@ class TestGetItem(unittest.TestCase):
         except KeyError:
             self.fail("didn't get annotation 'v1:bb1'")
 
+    def test_mmif_fail_getitem_toplevel(self):
+        try:
+            _ = self.mmif_obj['v5']
+            self.fail("didn't except on bad getitem")
+        except KeyError:
+            pass
+        except:
+            self.fail('wrong exception')
+
+    def test_mmif_fail_getitem_annotation_no_view(self):
+        try:
+            _ = self.mmif_obj['v5:s1']
+            self.fail("didn't except on annotation getitem on bad view")
+        except KeyError:
+            pass
+        except:
+            self.fail('wrong exception')
+
+    def test_mmif_fail_getitem_no_annotation(self):
+        try:
+            _ = self.mmif_obj['v1:s1']
+            self.fail("didn't except on bad annotation getitem")
+        except KeyError:
+            pass
+        except:
+            self.fail('wrong exception')
+
     def test_view_getitem(self):
         try:
             bb1 = self.view_obj['bb1']
@@ -274,7 +308,6 @@ class TestView(unittest.TestCase):
         except Exception as ex:
             self.fail(str(type(ex)) + str(ex.message))
 
-    # largely useless until #40 is merged
     def test_annotation_order_preserved(self):
         view_serial = self.view_obj.serialize()
         for original, new in zip(self.view_json['annotations'],
@@ -301,6 +334,10 @@ class TestView(unittest.TestCase):
             self.fail('failed to add annotation to view: '+ex.message)
         self.assertEqual(len(self.view_obj.annotations), old_len+1)
         self.assertIn('Token', self.view_obj.metadata.contains)
+        try:
+            _ = self.view_obj.serialize()
+        except Exception as ex:
+            self.fail(ex.message)
     
     def test_new_annotation(self):
         try:
@@ -333,6 +370,17 @@ class TestAnnotation(unittest.TestCase):
         props_json = self.data['example1']['annotations'][0]['properties']
         props_obj = MediumMetadata(props_json)
         self.assertEqual(json.loads(props_obj.serialize()), props_json)
+
+    def test_add_property(self):
+        for datum in self.data.values():
+            view_id = datum['json']['views'][0]['id']
+            anno_id = datum['json']['views'][0]['annotations'][0]['properties']['id']
+            props = datum['json']['views'][0]['annotations'][0]['properties']
+            removed_prop_key, removed_prop_value = list(props.items())[-1]
+            props.pop(removed_prop_key)
+            new_mmif = Mmif(datum['json'])
+            new_mmif[f'{view_id}:{anno_id}'].add_property(removed_prop_key, removed_prop_value)
+            self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']))
 
 
 class TestMedium(unittest.TestCase):
@@ -403,6 +451,17 @@ class TestMedium(unittest.TestCase):
             for j, medium in enumerate(datum['media']):
                 medium_serialized = json.loads(datum['mmif'].serialize())['media'][j]
                 self.assertEqual(medium, medium_serialized)
+
+    def test_add_metadata(self):
+        for i, datum in self.data.items():
+            medium_id = datum['json']['media'][0]['id']
+            metadata = datum['json']['media'][0].get('metadata')
+            if metadata:
+                removed_metadatum_key, removed_metadatum_value = list(metadata.items())[-1]
+                metadata.pop(removed_metadatum_key)
+                new_mmif = Mmif(datum['json'])
+                new_mmif[f'{medium_id}'].add_metadata(removed_metadatum_key, removed_metadatum_value)
+                self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']))
 
 
 @unittest.skipIf(*SKIP_SCHEMA)
