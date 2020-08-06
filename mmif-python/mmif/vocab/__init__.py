@@ -62,13 +62,16 @@ class NamespaceType(Enum):
     MMIF = MmifVocabularyItem
 
 
-def get(*, uri: str = None, name: str = None) -> AnnotationType:
-    if not ((uri is None) ^ (name is None)):
-        raise ValueError("Either pass a URI or a namespace")
+def get(value: str, *, is_uri=False) -> AnnotationType:
+    if is_uri or uri_validator(value):
+        uri = value
+    else:
+        uri = None
+
     if uri is not None:
         shortname = None
         try:
-            prefix, shortname = uri.rsplit('/')
+            prefix, shortname = uri.rsplit('/', 1)
             if prefix[-2:] == ':/':  # so sad
                 raise ValueError
             namespace = URI(prefix).name
@@ -77,11 +80,11 @@ def get(*, uri: str = None, name: str = None) -> AnnotationType:
                                   shortname=shortname if shortname else uri,
                                   uri=uri)
     else:
-        assert name is not None  # for PyCharm, with love
+        assert value is not None  # for PyCharm, with love
         try:
-            namespace, shortname = name.split(':')
+            namespace, shortname = value.split(':')
         except ValueError:
-            namespace, shortname = 'MMIF', name
+            namespace, shortname = 'MMIF', value
         try:
             uri = f'{URI[namespace.upper()].value}/{shortname}'
         except KeyError:
@@ -99,7 +102,8 @@ def get(*, uri: str = None, name: str = None) -> AnnotationType:
 if __name__ == '__main__':
     x = MmifVocabularyItem.Span
     y = MmifVocabularyItem('https://mmif.clams.ai/0.1.0/vocabulary/Annotation')
-    print(get(name='Annotation'))
-    print(get(uri='https://mmif.clams.ai/0.1.0/vocabulary/Annotation'))
-    print(get(uri='https://a.com'))
-    print(get(name='mmif:BoundingBox'))
+    print(get('Annotation'))
+    print(get('https://mmif.clams.ai/0.1.0/vocabulary/Annotation'))
+    print(get('https://a.com/Steve'))
+    print(get('mmif:BoundingBox'))
+    print(get("bad uri but we'll take it anyway", is_uri=True))
