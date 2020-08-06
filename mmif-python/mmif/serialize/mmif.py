@@ -119,7 +119,7 @@ class Mmif(MmifObject):
         medium_result = self.media.get(split_attempt[0])
         view_result = self.views.get(split_attempt[0])
 
-        if len(split_attempt) == 1 or not view_result:
+        if len(split_attempt) == 1:
             anno_result = None
         elif view_result:
             anno_result = view_result[split_attempt[1]]
