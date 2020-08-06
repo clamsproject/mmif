@@ -54,7 +54,7 @@ examples = dict(example1="""{
   "metadata": {
     "mmif": "http://mmif.clams.ai/0.1.0",
     "contains": {
-      "http://mmif.clams.ai/1.0/vocabulary/Segment": ["v1"],
+      "http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame": ["v1"],
       "http://vocab.lappsgrid.org/NamedEntity": ["v2"]
     }
   },
@@ -83,18 +83,18 @@ examples = dict(example1="""{
         "timestamp": "2020-05-27T12:23:45",
         "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
         "contains": {
-          "Segment": { "unit": "seconds" }
+          "TimeFrame": { "unit": "seconds" }
         }
       },
 
       "annotations": [
         {
-          "@type": "Segment",
+          "@type": "TimeFrame",
           "properties": {
             "id": "s1",
             "start": 87,
             "end": 145,
-            "segmentType": "bars-and-tones",
+            "frameType": "bars-and-tones",
             "undefinedProperty": "howdy" 
           }
         }
@@ -135,7 +135,7 @@ examples = dict(example1="""{
   "metadata": {
     "mmif": "http://mmif.clams.ai/0.1.0",
     "contains": {
-      "http://mmif.clams.ai/1.0/vocabulary/Segment": ["v1"],
+      "http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame": ["v1"],
       "http://mmif.clams.ai/0.1.0/vocabulary/TimePoint": ["v1"],
       "http://vocab.lappsgrid.org/NamedEntity": ["v2"]
     }
@@ -165,18 +165,18 @@ examples = dict(example1="""{
         "timestamp": "2020-05-27T12:23:45",
         "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
         "contains": {
-          "Segment": { "unit": "seconds" }
+          "TimeFrame": { "unit": "seconds" }
         }
       },
 
       "annotations": [
         {
-          "@type": "Segment",
+          "@type": "TimeFrame",
           "properties": {
             "id": "s1",
             "start": 87,
             "end": 145,
-            "segmentType": "bars-and-tones",
+            "frameType": "bars-and-tones",
             "undefinedProperty": "howdy" 
           }
         },
@@ -317,7 +317,7 @@ examples = dict(example1="""{
 
       "annotations": [
         {
-          "@type": "Token",
+          "@type": "http://vocab.lappsgrid.org/Token",
           "properties": {
             "id": "s1",
             "start": 0,
@@ -333,7 +333,7 @@ examples = dict(example1="""{
 """)
 
 anno1 = """{
-          "@type": "Token",
+          "@type": "http://vocab.lappsgrid.org/Token",
           "properties": {
             "id": "token1",
             "start": 0,
@@ -358,18 +358,18 @@ view1 = """{
         "timestamp": "2020-05-27T12:23:45",
         "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
         "contains": {
-          "Segment": { "unit": "seconds" }
+          "TimeFrame": { "unit": "seconds" }
         }
       },
 
       "annotations": [
         {
-          "@type": "Segment",
+          "@type": "TimeFrame",
           "properties": {
             "id": "s1",
             "start": 87,
             "end": 145,
-            "segmentType": "bars-and-tones",
+            "frameType": "bars-and-tones",
             "undefinedProperty": "howdy" 
           }
         },
