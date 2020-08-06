@@ -15,8 +15,8 @@ class Annotation(MmifObject):
         return self._type
 
     @at_type.setter
-    def at_type(self, at_type: str):
-        self._type = get(at_type)
+    def at_type(self, new_type: str):
+        self._type = get(new_type)
 
     @property
     def id(self):
@@ -32,12 +32,7 @@ class Annotation(MmifObject):
 
     def _serialize(self) -> dict:
         intermediate = super()._serialize()
-        if self.at_type.namespace == 'custom':
-            intermediate['@type'] = self.at_type.uri
-        elif self.at_type.namespace.upper() == 'MMIF':
-            intermediate['@type'] = self.at_type.shortname
-        else:
-            intermediate['@type'] = f'{self.at_type.namespace}:{self.at_type.shortname}'
+        intermediate['@type'] = self.at_type.canonical()
         return intermediate
 
     def __init__(self, anno_obj: Union[str, dict] = None):

@@ -24,6 +24,14 @@ class AnnotationType:
     shortname = attr.ib()
     uri = attr.ib()
 
+    def canonical(self):
+        if self.namespace.upper() == 'MMIF':
+            return self.shortname
+        elif self.namespace.upper() in URI:
+            return f'{self.namespace.upper()}:{self.shortname}'
+        else:
+            return self.uri
+
 
 class URI(Enum):
     MMIF = f"https://mmif.clams.ai/{__version__}/vocabulary"
