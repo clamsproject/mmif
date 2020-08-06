@@ -5,7 +5,6 @@ _schema_res_oriname = 'schema/mmif.json'
 _schema_res_name = 'mmif.json'
 _vocab_res_oriname = 'vocabulary/clams.vocabulary.yaml'
 _vocab_res_name = 'clams.vocabulary.yaml'
-_URI = f"https://mmif.clams.ai/{__version__}/vocabulary"
 
 try:
     import importlib
