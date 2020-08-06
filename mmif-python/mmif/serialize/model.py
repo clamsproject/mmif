@@ -147,11 +147,11 @@ class DataList(MmifObject, Generic[T]):
             mmif_json = json.loads(mmif_json)
         self._deserialize(mmif_json)
 
-    def _deserialize(self, input_dict):
-        raise NotImplementedError
-
     def get(self, key: str) -> Optional[T]:
-        return self.items.get(key)
+        try:
+            return self[key]
+        except KeyError:
+            return None
 
     def __getitem__(self, key: str):
         return self.items.__getitem__(key)
