@@ -38,7 +38,9 @@ class View(MmifObject):
     def add_annotation(self, annotation: 'Annotation') -> 'Annotation':
         self.annotations.append(annotation)
         self.anno_ids.add(annotation.id)
-        self.new_contain(annotation.at_type)
+        # TODO (angus-lherrou @ 8/6/2020): work out better logic for how
+        #  to include a type in `contains` beyond just the shortname
+        self.new_contain(annotation.at_type.shortname)
         return annotation
 
 
@@ -77,4 +79,3 @@ class Contain(MmifObject):
         self.producer = ''
         self.gen_time = datetime.now()     # datetime.datetime
         super().__init__(contain_obj)
-
