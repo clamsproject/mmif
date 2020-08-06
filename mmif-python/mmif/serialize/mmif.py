@@ -82,6 +82,9 @@ class Mmif(MmifObject):
             raise KeyError("{} medium not found".format(req_view_id))
         return result
 
+    def get_all_views_contain(self, at_type: str):
+        return [view for view in self.views if at_type in view.metadata.contains]
+
     def get_view_contains(self, at_type: str) -> Optional[View]:
         # will return the *latest* view
         # works as of python 3.6+ because dicts are deterministically ordered by insertion order
@@ -89,7 +92,8 @@ class Mmif(MmifObject):
         if version_info < (3, 6):
             print("Warning: get_view_contains requires Python 3.6+ for correct behavior")
         for view in reversed(self.views):
-            return view
+            if at_type in view.metadata.contains:
+                return view
         return None
 
     def __getitem__(self, item: str) -> Union[Medium, View, Annotation]:
