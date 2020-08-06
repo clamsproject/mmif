@@ -40,20 +40,27 @@ class Annotation(MmifObject):
         return intermediate
 
     def add_property(self, name: str, value: str) -> None:
-        name = name.replace('@', '_')
-        assert name.isidentifier(), "Annotation property name must be a valid Python identifier"
-        setattr(self.properties, name, value)
+        self.properties[name] = value
 
 
 class AnnotationProperties(MmifObject):
-    id: str
-    start: Optional[int] = -1
-    end: Optional[int] = -1
     properties: dict
+
+    def __init__(self, mmif_obj: Union[str, dict] = None):
+        if mmif_obj is None:
+            mmif_obj = {}
+        super().__init__(mmif_obj)
+
+    @property
+    def id(self):
+        return self.properties['id']
+
+    @id.setter
+    def id(self, aid: str):
+        self.properties['id'] = aid
 
     def _deserialize(self, input_dict: dict) -> None:
         self.properties = input_dict
-        self.id = input_dict['id']
 
     def _serialize(self):
         return MmifObject(self.properties)._serialize()
