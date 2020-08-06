@@ -300,8 +300,6 @@ class TestView(unittest.TestCase):
         except Exception as ex:
             self.fail('failed to add annotation to view: '+ex.message)
         self.assertEqual(len(self.view_obj.annotations), old_len+1)
-        # TODO (angus-lherrou @ 8/5/2020): fix this, but do we even need
-        #  contains at all if it can all be done programmatically?
         self.assertIn('Token', self.view_obj.metadata.contains)
     
     def test_new_annotation(self):
