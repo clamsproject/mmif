@@ -29,31 +29,19 @@ class URI(Enum):
     MMIF = f"https://mmif.clams.ai/{__version__}/vocabulary"
 
 
-class MmifVocabulary(Enum):
+class VocabularyItem(Enum):
+    pass
+
+
+class MmifVocabularyItem(VocabularyItem):
     def __new__(cls, atype: AnnotationType):
         obj = object.__new__(cls)
         obj._value_ = atype.uri
-        obj.__dict__.update(atype.__dict__)
+        obj.atype = atype
         return obj
 
-    @classmethod
-    def _missing_(cls, value):
-        if not uri_validator(value):
-            try:
-                namespace, shortname = value.split(':')
-            except ValueError:
-                namespace, shortname = 'MMIF', value
-            try:
-                value = f'{URI[namespace.upper()].value}/{shortname}'
-            except KeyError:
-                raise VocabularyException(f"Namespace '{namespace}' not found. "
-                                          f"If you are using a custom vocabulary, please use full URIs.")
-        elif value not in MmifVocabulary:
-            raise Exception("This shouldn't ever get raised by client code")
-        return MmifVocabulary(value)
-
     def _generate_next_value_(name, start, count, last_values):
-        return AnnotationType(namespace='mmif',
+        return AnnotationType(namespace='MMIF',
                               shortname=name,
                               uri=f'{URI.MMIF.value}/{name}')
     Annotation = auto()
@@ -70,9 +58,48 @@ class MmifVocabulary(Enum):
     Alignment = auto()
 
 
+class NamespaceType(Enum):
+    MMIF = MmifVocabularyItem
+
+
+def get(*, uri: str = None, name: str = None) -> AnnotationType:
+    if not ((uri is None) ^ (name is None)):
+        raise ValueError("Either pass a URI or a namespace")
+    if uri is not None:
+        shortname = None
+        try:
+            prefix, shortname = uri.rsplit('/')
+            if prefix[-2:] == ':/':  # so sad
+                raise ValueError
+            namespace = URI(prefix).name
+        except ValueError:  # either couldn't split on '/' or namespace not in URI enum
+            return AnnotationType(namespace='custom',
+                                  shortname=shortname if shortname else uri,
+                                  uri=uri)
+    else:
+        assert name is not None  # for PyCharm, with love
+        try:
+            namespace, shortname = name.split(':')
+        except ValueError:
+            namespace, shortname = 'MMIF', name
+        try:
+            uri = f'{URI[namespace.upper()].value}/{shortname}'
+        except KeyError:
+            raise VocabularyException(f"Namespace '{namespace}' not found. "
+                                      f"If you are using a custom vocabulary, please use full URIs.")
+    try:
+        enum_class = NamespaceType[namespace.upper()].value
+        return enum_class(uri).atype
+    except KeyError:
+        return AnnotationType(namespace='custom',
+                              shortname=shortname if shortname else uri,
+                              uri=uri)
+
+
 if __name__ == '__main__':
-    x = MmifVocabulary.Span
-    y = MmifVocabulary('https://mmif.clams.ai/0.1.0/vocabulary/Annotation')
-    z = MmifVocabulary('Annotation')
-    z2 = MmifVocabulary('mmif:Annotation')
-    z3 = MmifVocabulary('lapps:Segment')
+    x = MmifVocabularyItem.Span
+    y = MmifVocabularyItem('https://mmif.clams.ai/0.1.0/vocabulary/Annotation')
+    print(get(name='Annotation'))
+    print(get(uri='https://mmif.clams.ai/0.1.0/vocabulary/Annotation'))
+    print(get(uri='https://a.com'))
+    print(get(name='mmif:BoundingBox'))
