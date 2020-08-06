@@ -26,7 +26,7 @@ class View(MmifObject):
         for anno_dict in view_dict['annotations']:
             self.add_annotation(Annotation(anno_dict))
 
-    def new_contain(self, at_type: str, contain_dict: dict = None):
+    def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
 
     def new_annotation(self, aid: str, at_type: str):
@@ -62,7 +62,7 @@ class ViewMetadata(MmifObject):
         self.__dict__ = input_dict
         self.contains = {at_type: Contain(contain_obj) for at_type, contain_obj in input_dict.get('contains', {}).items()}
 
-    def new_contain(self, at_type: str, contain_dict: dict = None):
+    def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
         if at_type not in self.contains:
             new_contain = Contain(contain_dict)
             self.contains[at_type] = new_contain
