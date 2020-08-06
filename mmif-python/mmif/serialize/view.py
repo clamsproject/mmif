@@ -26,7 +26,7 @@ class View(MmifObject):
         for anno_dict in view_dict['annotations']:
             self.add_annotation(Annotation(anno_dict))
 
-    def new_contain(self, at_type: str, contain_dict: dict):
+    def new_contain(self, at_type: str, contain_dict: dict = None):
         return self.metadata.new_contain(at_type, contain_dict)
 
     def new_annotation(self, aid: str, at_type: str):
@@ -38,6 +38,7 @@ class View(MmifObject):
     def add_annotation(self, annotation: 'Annotation') -> 'Annotation':
         self.annotations.append(annotation)
         self.anno_ids.add(annotation.id)
+        self.new_contain(annotation.at_type)
         return annotation
 
 
@@ -55,13 +56,17 @@ class ViewMetadata(MmifObject):
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
+        # TODO (angus-lherrou @ 8/4/2020): using __dict__ with potentially non-identifier
+        #  keys "works" but is not pythonic so better to wrap a dict property.
+        #  Unify implementations of this and MediumMetadata
         self.__dict__ = input_dict
-        self.contains = dict([(at_type, Contain(contain_obj)) for at_type, contain_obj in input_dict.get('contains', {}).items()])
+        self.contains = {at_type: Contain(contain_obj) for at_type, contain_obj in input_dict.get('contains', {}).items()}
 
-    def new_contain(self, at_type: str, contain_dict: dict):
-        new_contain = Contain(contain_dict)
-        self.contains[at_type] = new_contain
-        return new_contain
+    def new_contain(self, at_type: str, contain_dict: dict = None):
+        if at_type not in self.contains:
+            new_contain = Contain(contain_dict)
+            self.contains[at_type] = new_contain
+            return new_contain
 
 
 class Contain(MmifObject):

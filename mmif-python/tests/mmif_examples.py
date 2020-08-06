@@ -332,6 +332,16 @@ examples = dict(example1="""{
 }
 """)
 
+anno1 = """{
+          "@type": "Token",
+          "properties": {
+            "id": "token1",
+            "start": 0,
+            "end": 3,
+            "word": "The"
+          }
+        }"""
+
 anno2 = """{
   "@type": "TimePoint",
   "properties": {
@@ -371,4 +381,18 @@ view1 = """{
           }
         }
       ]
+    }"""
+
+medium1 = """{
+      "id": "m3",
+      "type": "video",
+      "mime": "video/mp4",
+      "location": "/var/archive/video-0012.mp4"
+    }"""
+
+medium2 = """{
+      "id": "m4",
+      "type": "text",
+      "mime": "text/plain",
+      "location": "/var/archive/video-0012-transcript.txt"
     }"""

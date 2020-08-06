@@ -1,7 +1,6 @@
-from typing import Dict, Union, Optional
+from typing import Union, Optional
 
 from .model import MmifObject
-
 
 __all__ = ['Annotation', 'AnnotationProperties']
 
@@ -9,6 +8,14 @@ __all__ = ['Annotation', 'AnnotationProperties']
 class Annotation(MmifObject):
     properties: 'AnnotationProperties'
     _type: str
+
+    @property
+    def at_type(self):
+        return self._type
+
+    @at_type.setter
+    def at_type(self, at_type: str):
+        self._type = at_type
 
     @property
     def id(self):
@@ -35,3 +42,17 @@ class AnnotationProperties(MmifObject):
     id: str
     start: Optional[int] = -1
     end: Optional[int] = -1
+    properties: dict
+
+    def _deserialize(self, input_dict: dict) -> None:
+        self.properties = input_dict
+        self.id = input_dict['id']
+
+    def _serialize(self):
+        return MmifObject(self.properties)._serialize()
+
+    def __setitem__(self, key, value):
+        self.properties[key] = value
+
+    def __getitem__(self, key):
+        return self.properties[key]
