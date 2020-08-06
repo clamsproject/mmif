@@ -1,10 +1,10 @@
-name: Codecov action for any branch 
+name: Codecov action for *any* branch 
 on: [push]
 jobs:
   run:
     runs-on: ubuntu-latest
     env:
-      OS: ${{ matrix.os }}
+      OS: linux
       PYTHON: '3.6'
     steps:
     - uses: actions/checkout@master
@@ -12,7 +12,7 @@ jobs:
       uses: actions/setup-python@master
       with:
         python-version: 3.6
-    - name: Generate coverage report on $GITHUB_REF
+    - name: Run test and generate coverage report
       working-directory: ./mmif-python
       run: |
         pip install -r requirements.txt
@@ -20,12 +20,12 @@ jobs:
         echo "codecov.dev" > VERSION
         python setup.py build
         python -m pytest --cov=mmif/ --cov-report=xml
-    - name: Upload coverage of $GITHUB_REF to Codecov
+    - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
         file: ./mmif-python/coverage.xml
         flags: unittests
         env_vars: OS,PYTHON
-        name: codecov-$GITHUB_REF
+        name: coverage
         fail_ci_if_error: true
         path_to_write_report: ./mmif-python/codecov_report.gz
