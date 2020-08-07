@@ -19,7 +19,6 @@ from tests.mmif_examples import *
 # Flags for skipping tests
 DEBUG = False
 SKIP_SCHEMA = True, "Skipping TestSchema by default"
-SKIP_FOR_56 = True, "Skipping issue #56 bug"
 NOT_MERGED_40 = True, "Skipping until #40 is merged"
 
 
@@ -28,7 +27,6 @@ class TestMmif(unittest.TestCase):
     def setUp(self) -> None:
         self.examples_json = {i: json.loads(example) for i, example in examples.items()}
 
-    @unittest.skipIf(*SKIP_FOR_56)
     def test_str_mmif_deserialize(self):
         for i, example in examples.items():
             try:
@@ -39,17 +37,6 @@ class TestMmif(unittest.TestCase):
                 self.fail("didn't swap _ and @")
             self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
 
-    @unittest.skipUnless(*SKIP_FOR_56)
-    def test_temp_str_mmif_deserialize(self):
-        try:
-            mmif_obj = Mmif(examples['example1'])
-        except ValidationError as ve:
-            self.fail("example 1")
-        except KeyError as ke:
-            self.fail("didn't swap _ and @")
-        self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
-
-    @unittest.skipIf(*SKIP_FOR_56)
     def test_json_mmif_deserialize(self):
         for i, example in self.examples_json.items():
             try:
@@ -60,28 +47,27 @@ class TestMmif(unittest.TestCase):
                 self.fail("didn't swap _ and @")
             self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())))
 
-    @unittest.skipUnless(*SKIP_FOR_56)
-    def test_temp_json_mmif_deserialize(self):
-        try:
-            mmif_obj = Mmif(json.loads(examples['example1']))
-        except ValidationError as ve:
-            self.fail("example 1")
-        except KeyError as ke:
-            self.fail("didn't swap _ and @")
-        self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
-
-    @unittest.skipIf(*SKIP_FOR_56)
     def test_str_vs_json_deserialize(self):
+        def dummy_timestamp(d: dict):
+            for view in range(len(d['views'])):
+                try:
+                    d_contains = d['views'][view]['metadata']['contains']
+                except KeyError:
+                    continue
+                for at_type, metadata in d_contains.items():
+                    try:
+                        metadata['gen_time'] = 'dummy'
+                    except KeyError:
+                        continue
+        
         for i, example in examples.items():
             str_mmif_obj = Mmif(example)
             json_mmif_obj = Mmif(json.loads(example))
-            self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
-
-    @unittest.skipUnless(*SKIP_FOR_56)
-    def test_temp_str_vs_json_deserialize(self):
-        str_mmif_obj = Mmif(examples['example1'])
-        json_mmif_obj = Mmif(json.loads(examples['example1']))
-        self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
+            first = json.loads(str_mmif_obj.serialize())
+            second = json.loads(json_mmif_obj.serialize())
+            dummy_timestamp(first)
+            dummy_timestamp(second)
+            self.assertEqual(first, second)
 
     def test_bad_mmif_deserialize_no_context(self):
         self.examples_json['example1'].pop('@context')
