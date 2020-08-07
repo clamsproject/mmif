@@ -58,6 +58,7 @@ hs_err_pid* # virtual machine crash logs, see http://www.java.com/en/download/he
 **/dist
 **/*.egg-info
 **/.pytype
+mmif-python/build
 
 # ruby (jekyll)
 Gemfile.lock
@@ -82,6 +83,10 @@ mmif-python/**/res
 
 # jekyll files 
 docs/**/_site/**
+
+# coverage files 
+mmif-python/*coverage*
+mmif-python/htmlcov
 
 # external java library
 /vocabulary/rdf/clams.vocabulary

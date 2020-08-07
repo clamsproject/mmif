@@ -46,6 +46,8 @@ class View(MmifObject):
         >>> type(obj['bb1'])
         <class 'mmif.serialize.annotation.Annotation'>
         >>> obj['asdf']
+        Traceback (most recent call last):
+            ...
         KeyError: 'Annotation ID not found: asdf'
 
         :raises KeyError: if the key is not found or if the search results are ambiguous
