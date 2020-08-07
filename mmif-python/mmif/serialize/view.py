@@ -21,6 +21,9 @@ class View(MmifObject):
         super().__init__(view_obj)
 
     def _deserialize(self, view_dict: dict):
+        _context = view_dict.get('_context')
+        if _context is not None:
+            self._context = _context
         self.id = view_dict['id']
         self.metadata = ViewMetadata(view_dict['metadata'])
         for anno_dict in view_dict['annotations']:
