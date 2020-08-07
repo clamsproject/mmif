@@ -359,14 +359,18 @@ class TestAnnotation(unittest.TestCase):
 
     def test_add_property(self):
         for i, datum in self.data.items():
-            view_id = datum['json']['views'][0]['id']
-            anno_id = datum['json']['views'][0]['annotations'][0]['properties']['id']
-            props = datum['json']['views'][0]['annotations'][0]['properties']
-            removed_prop_key, removed_prop_value = list(props.items())[-1]
-            props.pop(removed_prop_key)
-            new_mmif = Mmif(datum['json'])
-            new_mmif.get_view_by_id(view_id).annotations[0].add_property(removed_prop_key, removed_prop_value)
-            self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']), f'Failed on {i}')
+            for j in range(len(datum['json']['views'])):
+                view_id = datum['json']['views'][j]['id']
+                anno_id = datum['json']['views'][j]['annotations'][0]['properties']['id']
+                props = datum['json']['views'][j]['annotations'][0]['properties']
+                removed_prop_key, removed_prop_value = list(props.items())[-1]
+                props.pop(removed_prop_key)
+                try:
+                    new_mmif = Mmif(datum['json'])
+                    new_mmif.get_view_by_id(view_id).annotations[0].add_property(removed_prop_key, removed_prop_value)
+                    self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']), f'Failed on {i}, {view_id}')
+                except ValidationError:
+                    continue
 
 
 class TestMedium(unittest.TestCase):
