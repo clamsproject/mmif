@@ -358,7 +358,7 @@ class TestAnnotation(unittest.TestCase):
         self.assertEqual(json.loads(props_obj.serialize()), props_json)
 
     def test_add_property(self):
-        for datum in self.data.values():
+        for i, datum in self.data.items():
             view_id = datum['json']['views'][0]['id']
             anno_id = datum['json']['views'][0]['annotations'][0]['properties']['id']
             props = datum['json']['views'][0]['annotations'][0]['properties']
@@ -366,7 +366,7 @@ class TestAnnotation(unittest.TestCase):
             props.pop(removed_prop_key)
             new_mmif = Mmif(datum['json'])
             new_mmif.get_view_by_id(view_id).annotations[0].add_property(removed_prop_key, removed_prop_value)
-            self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']))
+            self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']), f'Failed on {i}')
 
 
 class TestMedium(unittest.TestCase):
