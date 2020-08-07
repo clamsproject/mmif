@@ -35,7 +35,7 @@ class TestMmif(unittest.TestCase):
                 self.fail(f"example {i}")
             except KeyError as ke:
                 self.fail("didn't swap _ and @")
-            self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
+            self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()), f'Failed on {i}')
 
     def test_json_mmif_deserialize(self):
         for i, example in self.examples_json.items():
@@ -45,7 +45,7 @@ class TestMmif(unittest.TestCase):
                 self.fail(ve.message)
             except KeyError as ke:
                 self.fail("didn't swap _ and @")
-            self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())))
+            self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())), f'Failed on {i}')
 
     def test_str_vs_json_deserialize(self):
         def dummy_timestamp(d: dict):
@@ -67,7 +67,7 @@ class TestMmif(unittest.TestCase):
             second = json.loads(json_mmif_obj.serialize())
             dummy_timestamp(first)
             dummy_timestamp(second)
-            self.assertEqual(first, second)
+            self.assertEqual(first, second, f'Failed on {i}')
 
     def test_bad_mmif_deserialize_no_context(self):
         self.examples_json['example1'].pop('@context')
