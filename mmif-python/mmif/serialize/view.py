@@ -66,7 +66,12 @@ class ViewMetadata(MmifObject):
         self.contains = {at_type: Contain(contain_obj) for at_type, contain_obj in input_dict.get('contains', {}).items()}
 
     def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
-        if at_type not in self.contains:
+        # URI comparison hotfix
+        absent = True
+        for existing_type in self.contains.keys():
+            if at_type.split('/')[-1] == existing_type.split('/')[-1]:
+                absent = False
+        if absent:
             new_contain = Contain(contain_dict)
             self.contains[at_type] = new_contain
             return new_contain
