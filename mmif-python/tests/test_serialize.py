@@ -440,14 +440,18 @@ class TestMedium(unittest.TestCase):
 
     def test_add_metadata(self):
         for i, datum in self.data.items():
-            medium_id = datum['json']['media'][0]['id']
-            metadata = datum['json']['media'][0].get('metadata')
-            if metadata:
-                removed_metadatum_key, removed_metadatum_value = list(metadata.items())[-1]
-                metadata.pop(removed_metadatum_key)
-                new_mmif = Mmif(datum['json'])
-                new_mmif[f'{medium_id}'].add_metadata(removed_metadatum_key, removed_metadatum_value)
-                self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']))
+            for j in range(len(datum['json']['media'])):
+                medium_id = datum['json']['media'][j]['id']
+                metadata = datum['json']['media'][j].get('metadata')
+                if metadata:
+                    removed_metadatum_key, removed_metadatum_value = list(metadata.items())[-1]
+                    metadata.pop(removed_metadatum_key)
+                    try:
+                        new_mmif = Mmif(datum['json'])
+                        new_mmif.get_medium_by_id(medium_id).add_metadata(removed_metadatum_key, removed_metadatum_value)
+                        self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']))
+                    except ValidationError:
+                        continue
 
 
 @unittest.skipIf(*SKIP_SCHEMA)
