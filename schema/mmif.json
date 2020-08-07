@@ -159,6 +159,10 @@
     "view": {
       "type": "object",
       "properties": {
+        "@context": {
+           "type": "string",
+           "format": "uri"
+        },
         "id": {
           "type": "string"
         },
