@@ -15,7 +15,7 @@ add_dev = $(call macro,$(1)).$(call micro,$(1)).$(call patch,$(1)).dev1
 
 .PHONY: all clean test develop publish sdist version devversion
 
-all: test build/lib/mmif
+all: VERSION test build/lib/mmif
 
 sdist: dist/$(sdistname)-*.tar.gz
 dist/$(sdistname)-*.dev*.tar.gz: devversion dist/$(sdistname)-*.tar.gz
@@ -30,18 +30,20 @@ develop: clean devversion test dist/$(sdistname)-*.dev*.tar.gz
 publish: test sdist
 	twine upload -u __token__ -p $$PYPITOKEN dist/$(sdistname)-`cat VERSION`.tar.gz
 
-build/lib/mmif: VERSION; python3 setup.py build
+build/lib/mmif: 
+	python3 setup.py build
 
-test: VERSION
+# invoking `test` without a VERSION file will generated a dev version - this ensures `make test` runs unmanned
+test: devversion build/lib/mmif
 	pytype mmif/
 	python3 -m pytest --doctest-modules
 
 devversion: VERSION.dev VERSION; cat VERSION
 version: VERSION; cat VERSION
 
-VERSION.dev: upsteamver := $(shell curl -s -X GET 'http://morbius.cs-i.brandeis.edu:8081/service/rest/v1/search?name=$(sdistname)' | jq '. | .items[].version' -r | sort | tail -n 1)
+VERSION.dev: upstreamver := $(shell curl -s -X GET 'http://morbius.cs-i.brandeis.edu:8081/service/rest/v1/search?name=$(sdistname)' | jq '. | .items[].version' -r | sort | tail -n 1)
 VERSION.dev:
-	@if [[ $(upsteamver) == *.dev* ]]; then echo $(call inc_dev,$(upsteamver)) ; else echo $(call add_dev,$(call inc_patch, $(upsteamver))); fi > VERSION.dev
+	@if [[ $(upstreamver) == *.dev* ]]; then echo $(call inc_dev,$(upstreamver)) ; else echo $(call add_dev,$(call inc_patch, $(upstreamver))); fi > VERSION.dev
 
 VERSION: version := $(shell git tag | grep py- | cut -d'-' -f 2 | sort -r | head -n 1)
 VERSION:
