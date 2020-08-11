@@ -56,18 +56,38 @@ class Mmif(MmifObject):
         self.views.append(new_view)
         return new_view
 
-    def add_media(self, medium: Medium):
-        try:
-            self.get_medium_location(medium.type)
-        # TODO (krim @ 10/7/2018): if get_m_location returns, raise "already exists" error
-        except Exception:
-            self.media.append(medium)
+    def add_medium(self, medium: Medium):
+        self.media.append(medium)
 
-    def get_medium_location(self, md_type: str) -> str:
-        for medium in self.media:
-            if medium["type"] == md_type:
-                return medium["location"]
-        raise Exception("{} type media not found".format(md_type))
+    def get_media_by_source(self, source_id: str = None) -> List[Medium]:
+        """
+        Method to get all media object queries by its originated view id.
+        Note that there are two wa
+        """
+        return [medium for medium in self.media if medium.metadata.source == source_id]
+
+    def get_media_by_app(self, app_id: str) -> List[Medium]:
+        return [medium for medium in self.media if medium.metadata.app == app_id]
+
+    def get_media_by_metadata(self, metadata_key: str, metadata_value: str):
+        """
+        Method to retrieve media by an arbitrary key-value pair in the medium metadata objects
+        """
+        return [medium for medium in self.media if medium.metadata[metadata_key] == metadata_value]
+
+
+    def get_media_locations(self, m_type: str) -> List[str]:
+        """
+        This method returns the file paths of media of given type.
+        """
+        return [medium.location for medium in self.media if medium.type == m_type and medium.location is not None]
+
+    def get_medium_location(self, m_type: str) -> str:
+        """
+        Method to get the location of *first* medium of given type.
+        """
+        # TODO (krim @ 8/10/20): Is returning the first location desirable?
+        return self.get_media_locations(m_type)[0]
 
     def get_medium_by_id(self, id: str) -> 'Medium':
         for medium in self.media:
