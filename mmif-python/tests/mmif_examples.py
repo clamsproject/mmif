@@ -380,14 +380,14 @@ view1 = """{
       ]
     }"""
 
-medium1 = """{
+ext_video_medium = """{
       "id": "m3",
       "type": "video",
       "mime": "video/mp4",
       "location": "/var/archive/video-0012.mp4"
     }"""
 
-medium2 = """{
+ext_text_medium = """{
       "id": "m4",
       "type": "text",
       "mime": "text/plain",
