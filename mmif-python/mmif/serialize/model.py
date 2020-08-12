@@ -1,4 +1,5 @@
 import json
+from deepdiff import DeepDiff as ddiff
 from typing import Union, Any, Dict
 
 
@@ -111,7 +112,7 @@ class MmifObject(object):
         return self.serialize(True)
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        return isinstance(other, type(self)) and len(ddiff(self, other, ignore_order=True, report_repetition=True)) ==0
 
     def __len__(self):
         return len(self.__dict__)

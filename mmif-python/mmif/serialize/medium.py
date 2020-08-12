@@ -83,31 +83,45 @@ class Text(MmifObject):
 
 
 class MediumMetadata(MmifObject):
-    source: Optional[str] = None
-    app: Optional[str] = None
-    metadata: dict = {}
+    source: Optional[str]
+    app: Optional[str]
+    _unnamed_attributes: dict = {}
 
     def __init__(self, mmeta_obj: Union[str, dict] = None):
+        # need to set instance variables for ``_named_attributes()`` to work
+        self.source = None
+        self.app = None
         super().__init__(mmeta_obj)
 
+    def _named_attributes(self):
+        return (n for n in self.__dict__.keys() if n != '_unnamed_attributes')
+
     def _deserialize(self, input_dict: dict) -> None:
-        self.metadata = input_dict
+        for k, v in input_dict.items():
+            self[k] = v
 
     def _serialize(self):
-        # TODO (krim @ 8/11/20): this logic can be used for other `metadata` classes that have some mandatory, some optional, and a free-for-all map
+        # TODO (krim @ 8/11/20): this logic can be used for other MMIF classes that have some mandatory, some optional, and a free-for-all map
         serializing_obj = {}
-        serializing_obj.update(self.metadata)
+        serializing_obj.update(self._unnamed_attributes)
         for k, v in self.__dict__.items():
-            if k != 'metadata' and v is not None:
+            if k != '_unnamed_attributes' and v is not None:
                 serializing_obj[k] = v
         # this will override superclasses' __len__ logic because metadata object has two-tiered attributes
+        # we can push this behavior up to the superclass.__len__ method
         return MmifObject(serializing_obj)._serialize() if len(serializing_obj) > 0 else None
 
     def __setitem__(self, key, value):
-        self.metadata[key] = value
+        if key in self._named_attributes():
+            self.__dict__[key] = value
+        else:
+            self._unnamed_attributes[key] = value
 
     def __getitem__(self, key):
-        return self.metadata[key]
+        if key in self._named_attributes():
+            return self.__dict__[key]
+        else:
+            return self._unnamed_attributes[key]
 
 
 class Submedia(MmifObject):
