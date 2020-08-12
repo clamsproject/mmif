@@ -40,8 +40,6 @@ class Annotation(MmifObject):
 
 class AnnotationProperties(MmifObject):
     id: str
-    start: Optional[int] = -1
-    end: Optional[int] = -1
     properties: dict
 
     def __init__(self, mmif_obj: Union[str, dict] = None):
