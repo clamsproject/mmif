@@ -36,8 +36,8 @@ class MmifObject(object):
     def _serialize(self) -> dict:
         d = {}
         for k, v in list(self.__dict__.items()):
-            # ignore all "null" values including empty dicts
-            if v is not None and len(v) > 0:
+            # ignore all "null" values including empty dicts and zero strings
+            if v is not None and len(v) if hasattr(v, '__len__') else len(str(v)) > 0:
                 if k.startswith('_'): # _ as a placeholder ``@`` in json-ld
                     d[f'@{k[1:]}'] = v
                 else:

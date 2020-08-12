@@ -59,12 +59,17 @@ class Mmif(MmifObject):
     def add_medium(self, medium: Medium):
         self.media.append(medium)
 
-    def get_media_by_source(self, source_id: str = None) -> List[Medium]:
+    def get_media_by_source_view_id(self, source_vid: str = None) -> List[Medium]:
         """
         Method to get all media object queries by its originated view id.
-        Note that there are two wa
+        With current specification, a *source* of a medium can be external or
+        an annotation. The *source* field gets its value only in the latter.
+        Also note that, depending on how submedia is represented, the value of
+        ``source`` field can be either ``view_id`` or ``view_id``:``annotation_id``.
+        In either case, this method will return all medium objects that generated
+        from a view.
         """
-        return [medium for medium in self.media if medium.metadata.source == source_id]
+        return [medium for medium in self.media if medium.metadata.source is not None and medium.metadata.source.split(':')[0] == source_vid]
 
     def get_media_by_app(self, app_id: str) -> List[Medium]:
         return [medium for medium in self.media if medium.metadata.app == app_id]
@@ -87,13 +92,14 @@ class Mmif(MmifObject):
         Method to get the location of *first* medium of given type.
         """
         # TODO (krim @ 8/10/20): Is returning the first location desirable?
-        return self.get_media_locations(m_type)[0]
+        locations = self.get_media_locations(m_type)
+        return locations[0] if len(locations) > 0 else None
 
     def get_medium_by_id(self, id: str) -> 'Medium':
         for medium in self.media:
             if medium.id == id:
                 return medium
-        raise Exception("{} medium not found".format(id))
+        raise KeyError("{} medium not found".format(id))
 
     def get_view_by_id(self, id: str) -> 'View':
         for view in self.views:

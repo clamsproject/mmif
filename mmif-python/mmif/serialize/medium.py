@@ -85,12 +85,13 @@ class Text(MmifObject):
 class MediumMetadata(MmifObject):
     source: Optional[str]
     app: Optional[str]
-    _unnamed_attributes: dict = {}
+    _unnamed_attributes: dict
 
     def __init__(self, mmeta_obj: Union[str, dict] = None):
         # need to set instance variables for ``_named_attributes()`` to work
         self.source = None
         self.app = None
+        self._unnamed_attributes: dict = {}
         super().__init__(mmeta_obj)
 
     def _named_attributes(self):
@@ -110,6 +111,9 @@ class MediumMetadata(MmifObject):
         # this will override superclasses' __len__ logic because metadata object has two-tiered attributes
         # we can push this behavior up to the superclass.__len__ method
         return MmifObject(serializing_obj)._serialize() if len(serializing_obj) > 0 else None
+
+    def __len__(self):
+        return sum([self[named] is not None for named in self._named_attributes()]) + len(self._unnamed_attributes)
 
     def __setitem__(self, key, value):
         if key in self._named_attributes():
