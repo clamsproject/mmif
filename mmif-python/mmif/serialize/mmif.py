@@ -71,15 +71,15 @@ class Mmif(MmifObject):
         raise Exception("{} type media not found".format(md_type))
 
     def get_medium_by_id(self, req_med_id: str) -> Medium:
-        result = self[req_med_id]
-        if not isinstance(result, Medium):
+        result = self.media.get(req_med_id)
+        if result is None:
             raise KeyError("{} medium not found".format(req_med_id))
         return result
 
     def get_view_by_id(self, req_view_id: str) -> View:
-        result = self[req_view_id]
-        if not isinstance(result, View):
-            raise KeyError("{} medium not found".format(req_view_id))
+        result = self.views.get(req_view_id)
+        if result is None:
+            raise KeyError("{} view not found".format(req_view_id))
         return result
 
     def get_all_views_contain(self, at_type: str):
