@@ -137,6 +137,34 @@ class TestMmif(unittest.TestCase):
             self.fail("failed to create new view in Mmif: "+ex.message)
         self.assertEqual(len(mmif_obj.views), old_view_count+1)
 
+    def test_medium_metadata(self):
+        text = "Karen flew to New York."
+        en = 'en'
+        medium = Medium()
+        medium.id = 'm999'
+        medium.type = "text"
+        medium.text_value = text
+        self.assertEqual(medium.text_value, text)
+        medium.text_language = en
+        medium.metadata['source'] = "v10"
+        medium.metadata['app'] = "some_sentence_splitter"
+        medium.metadata['random_key'] = "random_value"
+        serialized = medium.serialize()
+        deserialized = Medium(serialized)
+        self.assertEqual(medium, deserialized)
+        plain_json = json.loads(serialized)
+        deserialized = Medium(plain_json)
+        self.assertEqual(medium, deserialized)
+        self.assertEqual({'id', 'type', 'text', 'metadata'}, plain_json.keys())
+        self.assertEqual({'@value', '@language'}, plain_json['text'].keys())
+        self.assertEqual({'source', 'app', 'random_key'}, plain_json['metadata'].keys())
+
+    def test_medium(self):
+        medium = Medium(medium1)
+        serialized = medium.serialize()
+        plain_json = json.loads(serialized)
+        self.assertEqual({'id', 'type', 'location', 'mime'}, plain_json.keys())
+
     def test_add_media(self):
         medium_json = json.loads(medium1)
         # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
