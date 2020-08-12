@@ -11,13 +11,14 @@ class Medium(MmifObject):
     type: str
     mime: Optional[str] = None
     location: Optional[str] = None
-    text: Optional['Text'] = None
+    text_: Optional['Text'] = None # users don't need to directly access nested text object
     metadata: Optional['MediumMetadata'] = None
     submedia: Optional[List['Submedia']] = None
 
     def __init__(self, medium_obj: Union[str, dict] = None):
         self.id = ''
         self.type = ''
+        self.metadata = MediumMetadata()
         super().__init__(medium_obj)
 
     def _deserialize(self, medium_dict: dict):
@@ -30,34 +31,78 @@ class Medium(MmifObject):
         if 'location' in medium_dict:
             self.location = medium_dict['location']
         if 'text' in medium_dict:
-            self.text = Text(medium_dict['text'])
+            self.text_ = Text(medium_dict['text'])
 
     def add_metadata(self, name: str, value: str):
         self.metadata[name] = value
+
+    @property
+    def text_language(self):
+        return self.text_.lang
+
+    @text_language.setter
+    def text_language(self, l: str):
+        if self.text_ is None:
+            self.text_ = Text()
+        self.text_.lang = l
+
+    @property
+    def text(self):
+        return self.text_.value
+
+    @text.setter
+    def text(self, s: str):
+        if self.text_ is None:
+            self.text_ = Text()
+        self.text_.value = s
+
 
 
 class Text(MmifObject):
     _value: str
     _language: Optional[str]
 
-    def __init__(self, text_obj: Union[str, dict]):
+    def __init__(self, text_obj: Union[str, dict] = None):
         super().__init__(text_obj)
+
+    @property
+    def lang(self):
+        return self._language
+
+    @lang.setter
+    def lang(self, l: str):
+        # TODO (krim @ 8/11/20): add validation for language code (ISO 639)
+        self._language = l
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, s: str):
+        self._value = s
 
 
 class MediumMetadata(MmifObject):
-    source: Optional[str]
-    app: Optional[str]
-    metadata: dict
+    source: Optional[str] = None
+    app: Optional[str] = None
+    metadata: dict = {}
 
-    def __init__(self, mmeta_obj):
-        self.metadata = {}
+    def __init__(self, mmeta_obj: Union[str, dict] = None):
         super().__init__(mmeta_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
         self.metadata = input_dict
 
     def _serialize(self):
-        return MmifObject(self.metadata)._serialize()
+        # TODO (krim @ 8/11/20): this logic can be used for other `metadata` classes that have some mandatory, some optional, and a free-for-all map
+        serializing_obj = {}
+        serializing_obj.update(self.metadata)
+        for k, v in self.__dict__.items():
+            if k != 'metadata' and v is not None:
+                serializing_obj[k] = v
+        # this will override superclasses' __len__ logic because metadata object has two-tiered attributes
+        return MmifObject(serializing_obj)._serialize() if len(serializing_obj) > 0 else None
 
     def __setitem__(self, key, value):
         self.metadata[key] = value

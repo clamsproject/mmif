@@ -35,10 +35,14 @@ class MmifObject(object):
     def _serialize(self) -> dict:
         d = {}
         for k, v in list(self.__dict__.items()):
-            if k.startswith('_'):
-                d[f'@{k[1:]}'] = v
-            else:
-                d[k] = v
+            # ignore all "null" values including empty dicts
+            if v is not None and len(v) > 0:
+                if k.startswith('_'): # _ as a placeholder ``@`` in json-ld
+                    d[f'@{k[1:]}'] = v
+                elif k.endswith('_'): # _ as a "private" marker
+                    d[f'{k[:-1]}'] = v
+                else:
+                    d[k] = v
         return d
 
     @staticmethod
@@ -110,6 +114,9 @@ class MmifObject(object):
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+    def __len__(self):
+        return len(self.__dict__)
 
 
 class MmifObjectEncoder(json.JSONEncoder):
