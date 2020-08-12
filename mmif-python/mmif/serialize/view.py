@@ -3,6 +3,7 @@ from typing import Dict, List, Union, Optional
 
 from .annotation import Annotation
 from .model import MmifObject, DataList
+from mmif.vocab import AnnotationTypes
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
@@ -27,10 +28,10 @@ class View(MmifObject):
         self.metadata = ViewMetadata(view_dict['metadata'])
         self.annotations = AnnotationsList(view_dict['annotations'])
 
-    def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
+    def new_contain(self, at_type: Union[str, AnnotationTypes], contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
 
-    def new_annotation(self, aid: str, at_type: str, overwrite=False) -> 'Annotation':
+    def new_annotation(self, aid: str, at_type: Union[str, AnnotationTypes], overwrite=False) -> 'Annotation':
         new_annotation = Annotation()
         new_annotation.at_type = at_type
         new_annotation.id = aid
@@ -66,13 +67,14 @@ class View(MmifObject):
 class ViewMetadata(MmifObject):
     medium: str
     timestamp: Optional[datetime] = None
-    tool: str
+    app: str
     contains: Dict[str, 'Contain']
 
     def __init__(self, viewmetadata_obj: Union[str, dict] = None):
+        # need to set instance variables for ``_named_attributes()`` to work
         self.medium = ''
         self.timestamp = datetime.now()
-        self.tool = ''
+        self.app = ''
         self.contains = {}
         super().__init__(viewmetadata_obj)
 
@@ -80,18 +82,28 @@ class ViewMetadata(MmifObject):
         # TODO (angus-lherrou @ 8/4/2020): using __dict__ with potentially non-identifier
         #  keys "works" but is not pythonic so better to wrap a dict property.
         #  Unify implementations of this and MediumMetadata
+        # super()._deserialize(input_dict)
         self.__dict__ = input_dict
         self.contains = {at_type: Contain(contain_obj) for at_type, contain_obj in input_dict.get('contains', {}).items()}
 
-    def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
-        # URI comparison hotfix
-        absent = True
-        for existing_type in self.contains.keys():
-            if at_type.split('/')[-1] == existing_type.split('/')[-1]:
-                absent = False
-        if absent:
+    def new_contain(self, at_type: Union[str, AnnotationTypes], contain_dict: dict = None) -> Optional['Contain']:
+        def find_match_hotfix(key: str) -> bool:
+            absent = True
+            for existing_type in self.contains.keys():
+                if key.split('/')[-1] == existing_type.split('/')[-1]:
+                    absent = False
+            return absent
+
+        if isinstance(at_type, AnnotationTypes):
+            exists = find_match_hotfix(at_type.name) or find_match_hotfix(at_type.value)
+            final_key = at_type.value
+        else:
+            exists = find_match_hotfix(at_type)
+            final_key = at_type
+
+        if not exists:
             new_contain = Contain(contain_dict)
-            self.contains[at_type] = new_contain
+            self.contains[final_key] = new_contain
             return new_contain
 
 
