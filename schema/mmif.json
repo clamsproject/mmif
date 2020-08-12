@@ -74,15 +74,11 @@
         "source": {
           "type": "string"
         },
-        "tool": {
+        "app": {
           "type": "string",
           "format": "uri"
         }
-      },
-      "required": [
-        "source",
-        "tool"
-      ]
+      }
     },
     "medium": {
       "type": "object",

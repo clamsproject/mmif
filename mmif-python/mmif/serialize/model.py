@@ -1,4 +1,5 @@
 import json
+from deepdiff import DeepDiff as ddiff
 from typing import Union, Any, Dict, Optional, TypeVar, Generic
 
 
@@ -36,10 +37,12 @@ class MmifObject(object):
     def _serialize(self) -> dict:
         d = {}
         for k, v in list(self.__dict__.items()):
-            if k.startswith('_'):
-                d[f'@{k[1:]}'] = v
-            else:
-                d[k] = v
+            # ignore all "null" values including empty dicts and zero strings
+            if v is not None and len(v) if hasattr(v, '__len__') else len(str(v)) > 0:
+                if k.startswith('_'): # _ as a placeholder ``@`` in json-ld
+                    d[f'@{k[1:]}'] = v
+                else:
+                    d[k] = v
         return d
 
     @staticmethod
@@ -110,7 +113,10 @@ class MmifObject(object):
         return self.serialize(True)
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        return isinstance(other, type(self)) and len(ddiff(self, other, ignore_order=True, report_repetition=True)) ==0
+
+    def __len__(self):
+        return len(self.__dict__)
 
 
 class MmifObjectEncoder(json.JSONEncoder):

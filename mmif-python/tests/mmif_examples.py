@@ -1,10 +1,7 @@
 examples = dict(example1="""{
   "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
   "metadata": {
-    "mmif": "http://mmif.clams.ai/0.1.0",
-    "contains": {
-      "http://mmif.clams.ai/vocabulary/0.1.0/BoundingBox": ["v1"]
-    }
+    "mmif": "http://mmif.clams.ai/0.1.0"
   },
   "media": [
     {
@@ -22,7 +19,7 @@ examples = dict(example1="""{
       },
       "metadata": {
         "source": "v1:bb1",
-        "tool": "http://tools.clams.io/tesseract/1.2.1"
+        "app": "http://apps.clams.io/tesseract/1.2.1"
       }
     }
   ],
@@ -34,7 +31,7 @@ examples = dict(example1="""{
           "BoundingBox": {"unit": "pixels"}
         },
         "medium": "m1",
-        "tool": "http://tools.clams.io/east/1.0.4"
+        "app": "http://apps.clams.io/east/1.0.4"
       },
       "annotations": [
         {
@@ -81,7 +78,7 @@ examples = dict(example1="""{
       "metadata": {
         "medium": "m1",
         "timestamp": "2020-05-27T12:23:45",
-        "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
+        "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
         "contains": {
           "Segment": { "unit": "seconds" }
         }
@@ -107,7 +104,7 @@ examples = dict(example1="""{
       "metadata": {
         "medium": "m2",
         "timestamp": "2020-05-27T12:23:45",
-        "tool": "http://tools.clams.ai/lapps/stanford-ner/1.3.2",
+        "app": "http://apps.clams.ai/lapps/stanford-ner/1.3.2",
         "contains": {
           "NamedEntity": { "namedEntityCategorySet": "Stanford" }
         }
@@ -163,7 +160,7 @@ examples = dict(example1="""{
       "metadata": {
         "medium": "m1",
         "timestamp": "2020-05-27T12:23:45",
-        "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
+        "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
         "contains": {
           "Segment": { "unit": "seconds" }
         }
@@ -196,7 +193,7 @@ examples = dict(example1="""{
       "metadata": {
         "medium": "m2",
         "timestamp": "2020-05-27T12:23:45",
-        "tool": "http://tools.clams.ai/lapps/stanford-ner/1.3.2",
+        "app": "http://apps.clams.ai/lapps/stanford-ner/1.3.2",
         "contains": {
           "NamedEntity": { "namedEntityCategorySet": "Stanford" }
         }
@@ -258,7 +255,7 @@ examples = dict(example1="""{
         },
         "medium": "m1",
         "timestamp": "2020-05-27T12:23:45",
-        "tool": "http://tools.clams.ai/bars-and-tones/1.0.5"
+        "app": "http://apps.clams.ai/bars-and-tones/1.0.5"
       },
 
       "annotations": [
@@ -286,7 +283,7 @@ examples = dict(example1="""{
         },
         "medium": "m1",
         "timestamp": "2020-05-27T12:23:45",
-        "tool": "http://tools.clams.ai/slates/1.0.3"
+        "app": "http://apps.clams.ai/slates/1.0.3"
       },
 
       "annotations": [
@@ -312,7 +309,7 @@ examples = dict(example1="""{
         },
         "medium": "m2",
         "timestamp": "2020-05-27T12:25:15",
-        "tool": "http://tools.clams.ai/slates/1.0.3"
+        "app": "http://apps.clams.ai/slates/1.0.3"
       },
 
       "annotations": [
@@ -356,7 +353,7 @@ view1 = """{
       "metadata": {
         "medium": "m1",
         "timestamp": "2020-05-27T12:23:45",
-        "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
+        "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
         "contains": {
           "Segment": { "unit": "seconds" }
         }
@@ -383,14 +380,14 @@ view1 = """{
       ]
     }"""
 
-medium1 = """{
+ext_video_medium = """{
       "id": "m3",
       "type": "video",
       "mime": "video/mp4",
       "location": "/var/archive/video-0012.mp4"
     }"""
 
-medium2 = """{
+ext_text_medium = """{
       "id": "m4",
       "type": "text",
       "mime": "text/plain",
