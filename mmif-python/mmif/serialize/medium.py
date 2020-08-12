@@ -11,7 +11,7 @@ class Medium(MmifObject):
     type: str
     mime: Optional[str] = None
     location: Optional[str] = None
-    text_: Optional['Text'] = None # users don't need to directly access nested text object
+    text: Optional['Text'] = None # users don't need to directly access nested text object
     metadata: Optional['MediumMetadata'] = None
     submedia: Optional[List['Submedia']] = None
 
@@ -31,31 +31,30 @@ class Medium(MmifObject):
         if 'location' in medium_dict:
             self.location = medium_dict['location']
         if 'text' in medium_dict:
-            self.text_ = Text(medium_dict['text'])
+            self.text = Text(medium_dict['text'])
 
     def add_metadata(self, name: str, value: str):
         self.metadata[name] = value
 
     @property
     def text_language(self):
-        return self.text_.lang
+        return self.text.lang
 
     @text_language.setter
     def text_language(self, l: str):
-        if self.text_ is None:
-            self.text_ = Text()
-        self.text_.lang = l
+        if self.text is None:
+            self.text = Text()
+        self.text.lang = l
 
     @property
-    def text(self):
-        return self.text_.value
+    def text_value(self):
+        return self.text.value
 
-    @text.setter
-    def text(self, s: str):
-        if self.text_ is None:
-            self.text_ = Text()
-        self.text_.value = s
-
+    @text_value.setter
+    def text_value(self, s: str):
+        if self.text is None:
+            self.text = Text()
+        self.text.value = s
 
 
 class Text(MmifObject):

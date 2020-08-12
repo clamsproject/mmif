@@ -39,8 +39,6 @@ class MmifObject(object):
             if v is not None and len(v) > 0:
                 if k.startswith('_'): # _ as a placeholder ``@`` in json-ld
                     d[f'@{k[1:]}'] = v
-                elif k.endswith('_'): # _ as a "private" marker
-                    d[f'{k[:-1]}'] = v
                 else:
                     d[k] = v
         return d
