@@ -137,38 +137,91 @@ class TestMmif(unittest.TestCase):
             self.fail("failed to create new view in Mmif: "+ex.message)
         self.assertEqual(len(mmif_obj.views), old_view_count+1)
 
+    def test_medium_metadata(self):
+        text = "Karen flew to New York."
+        en = 'en'
+        medium = Medium()
+        medium.id = 'm999'
+        medium.type = "text"
+        medium.text_value = text
+        self.assertEqual(medium.text_value, text)
+        medium.text_language = en
+        medium.metadata['source'] = "v10"
+        medium.metadata['app'] = "some_sentence_splitter"
+        medium.metadata['random_key'] = "random_value"
+        serialized = medium.serialize()
+        deserialized = Medium(serialized)
+        self.assertEqual(medium, deserialized)
+        plain_json = json.loads(serialized)
+        deserialized = Medium(plain_json)
+        self.assertEqual(medium, deserialized)
+        self.assertEqual({'id', 'type', 'text', 'metadata'}, plain_json.keys())
+        self.assertEqual({'@value', '@language'}, plain_json['text'].keys())
+        self.assertEqual({'source', 'app', 'random_key'}, plain_json['metadata'].keys())
+
+    def test_medium(self):
+        medium = Medium(ext_video_medium)
+        serialized = medium.serialize()
+        plain_json = json.loads(serialized)
+        self.assertEqual({'id', 'type', 'location', 'mime'}, plain_json.keys())
+
     def test_add_media(self):
-        medium_json = json.loads(medium1)
+        medium_json = json.loads(ext_video_medium)
         # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
         mmif_obj = Mmif(examples['example1'])
         old_media_count = len(mmif_obj.media)
         try:
-            mmif_obj.add_media(Medium(medium_json))
+            mmif_obj.add_medium(Medium(medium_json))
         except Exception as ex:
             self.fail("failed to add medium to Mmif: "+ex.message)
         self.assertEqual(len(mmif_obj.media), old_media_count+1)
 
-    def test_fail_add_media(self):
-        medium_json = json.loads(medium2)
-        mmif_obj = Mmif(examples['example1'])
-        # TODO (angus-lherrou @ 8/5/2020): deprecated as of #41
-        try:
-            mmif_obj.add_media(Medium(medium_json))
-            self.fail("added medium of same type")
-        except:
-            pass
-
     def test_get_medium_by_id(self):
         mmif_obj = Mmif(examples['example1'])
         try:
-            medium = mmif_obj.get_medium_by_id('m1')
-        except:
+            # should succeed
+            mmif_obj.get_medium_by_id('m1')
+        except KeyError:
             self.fail("didn't get m1")
         try:
-            medium = mmif_obj.get_medium_by_id('m55')
+            # should fail
+            mmif_obj.get_medium_by_id('m55')
             self.fail("didn't raise exception on getting m55")
         except:
             pass
+
+    def test_get_media_by_view_id(self):
+        mmif_obj = Mmif(examples['example1'])
+        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 1)
+        self.assertEqual(mmif_obj.get_media_by_source_view_id('v1')[0],
+                         mmif_obj.get_medium_by_id('m2'))
+        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('xxx')), 0)
+        new_medium = Medium()
+        new_medium.metadata.source = 'v1:bb2'
+        mmif_obj.add_medium(new_medium)
+        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 2)
+
+
+    def test_get_medium_by_appid(self):
+        tesseract_appid = 'http://apps.clams.io/tesseract/1.2.1'
+        mmif_obj = Mmif(examples['example1'])
+        self.assertEqual(len(mmif_obj.get_media_by_app(tesseract_appid)), 1)
+        self.assertEqual(len(mmif_obj.get_media_by_app('xxx')), 0)
+        new_medium = Medium()
+        new_medium.metadata.source = 'v1:bb2'
+        new_medium.metadata.app = tesseract_appid
+        mmif_obj.add_medium(new_medium)
+        self.assertEqual(len(mmif_obj.get_media_by_app(tesseract_appid)), 2)
+
+    def test_get_media_locations(self):
+        mmif_obj = Mmif(examples['example1'])
+        self.assertEqual(len(mmif_obj.get_media_locations('image')), 1)
+        self.assertEqual(mmif_obj.get_medium_location('image'), "/var/archive/image-0012.jpg")
+        # text medium is there but no location is specified
+        self.assertEqual(len(mmif_obj.get_media_locations('text')), 0)
+        self.assertEqual(mmif_obj.get_medium_location('text'), None)
+        # audio medium is not there
+        self.assertEqual(len(mmif_obj.get_media_locations('audio')), 0)
 
     def test_get_view_by_id(self):
         mmif_obj = Mmif(examples['example1'])
