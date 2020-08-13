@@ -162,7 +162,8 @@ examples = dict(example1="""{
         "timestamp": "2020-05-27T12:23:45",
         "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
         "contains": {
-          "Segment": { "unit": "seconds" }
+          "Segment": { "unit": "seconds" },
+          "TimePoint": { "unit": "seconds" }
         }
       },
 

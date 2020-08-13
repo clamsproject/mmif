@@ -19,7 +19,6 @@ from tests.mmif_examples import *
 # Flags for skipping tests
 DEBUG = False
 SKIP_SCHEMA = True, "Skipping TestSchema by default"
-SKIP_FOR_56 = True, "Skipping issue #56 bug"
 
 
 class TestMmif(unittest.TestCase):
@@ -27,7 +26,6 @@ class TestMmif(unittest.TestCase):
     def setUp(self) -> None:
         self.examples_json = {i: json.loads(example) for i, example in examples.items()}
 
-    @unittest.skipIf(*SKIP_FOR_56)
     def test_str_mmif_deserialize(self):
         for i, example in examples.items():
             try:
@@ -36,19 +34,8 @@ class TestMmif(unittest.TestCase):
                 self.fail(f"example {i}")
             except KeyError as ke:
                 self.fail("didn't swap _ and @")
-            self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
+            self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()), f'Failed on {i}')
 
-    @unittest.skipUnless(*SKIP_FOR_56)
-    def test_temp_str_mmif_deserialize(self):
-        try:
-            mmif_obj = Mmif(examples['example1'])
-        except ValidationError as ve:
-            self.fail("example 1")
-        except KeyError as ke:
-            self.fail("didn't swap _ and @")
-        self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
-
-    @unittest.skipIf(*SKIP_FOR_56)
     def test_json_mmif_deserialize(self):
         for i, example in self.examples_json.items():
             try:
@@ -57,30 +44,29 @@ class TestMmif(unittest.TestCase):
                 self.fail(ve.message)
             except KeyError as ke:
                 self.fail("didn't swap _ and @")
-            self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())))
+            self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())), f'Failed on {i}')
 
-    @unittest.skipUnless(*SKIP_FOR_56)
-    def test_temp_json_mmif_deserialize(self):
-        try:
-            mmif_obj = Mmif(json.loads(examples['example1']))
-        except ValidationError as ve:
-            self.fail("example 1")
-        except KeyError as ke:
-            self.fail("didn't swap _ and @")
-        self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()))
-
-    @unittest.skipIf(*SKIP_FOR_56)
     def test_str_vs_json_deserialize(self):
+        def dummy_timestamp(d: dict):
+            for view in range(len(d['views'])):
+                try:
+                    d_contains = d['views'][view]['metadata']['contains']
+                except KeyError:
+                    continue
+                for at_type, metadata in d_contains.items():
+                    try:
+                        metadata['gen_time'] = 'dummy'
+                    except KeyError:
+                        continue
+        
         for i, example in examples.items():
             str_mmif_obj = Mmif(example)
             json_mmif_obj = Mmif(json.loads(example))
-            self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
-
-    @unittest.skipUnless(*SKIP_FOR_56)
-    def test_temp_str_vs_json_deserialize(self):
-        str_mmif_obj = Mmif(examples['example1'])
-        json_mmif_obj = Mmif(json.loads(examples['example1']))
-        self.assertEqual(json.loads(str_mmif_obj.serialize()), json.loads(json_mmif_obj.serialize()))
+            first = json.loads(str_mmif_obj.serialize())
+            second = json.loads(json_mmif_obj.serialize())
+            dummy_timestamp(first)
+            dummy_timestamp(second)
+            self.assertEqual(first, second, f'Failed on {i}')
 
     def test_bad_mmif_deserialize_no_context(self):
         self.examples_json['example1'].pop('@context')
@@ -134,7 +120,7 @@ class TestMmif(unittest.TestCase):
             mmif_obj.new_view()
         except Exception as ex:
             self.fail("failed to create new view in Mmif: "+ex.message)
-        self.assertEqual(len(mmif_obj.views), old_view_count+1)
+        self.assertEqual(old_view_count+1, len(mmif_obj.views))
 
     def test_medium_metadata(self):
         text = "Karen flew to New York."
@@ -173,7 +159,7 @@ class TestMmif(unittest.TestCase):
             mmif_obj.add_medium(Medium(medium_json))
         except Exception as ex:
             self.fail("failed to add medium to Mmif: "+ex.message)
-        self.assertEqual(len(mmif_obj.media), old_media_count+1)
+        self.assertEqual(old_media_count+1, len(mmif_obj.media))
 
     def test_get_medium_by_id(self):
         mmif_obj = Mmif(examples['example1'])
@@ -238,14 +224,14 @@ class TestMmif(unittest.TestCase):
         mmif_obj = Mmif(examples['example1'])
         views_len = len(mmif_obj.views)
         views = mmif_obj.get_all_views_contain('BoundingBox')
-        self.assertEqual(views_len, len(views))
+        self.assertEqual(len(views), views_len)
 
     def test_get_view_contains(self):
         # TODO (angus-lherrou @ 8/5/2020): expand to better examples once schema is fixed
         mmif_obj = Mmif(examples['example1'])
         view = mmif_obj.get_view_contains('BoundingBox')
         self.assertIsNotNone(view)
-        self.assertEqual(view.id, 'v1')
+        self.assertEqual('v1', view.id)
 
     def test_new_view_id(self):
         mmif_obj = Mmif(examples['example1'])
@@ -414,7 +400,7 @@ class TestView(unittest.TestCase):
             self.view_obj.add_annotation(anno_obj)
         except Exception as ex:
             self.fail('failed to add annotation to view: '+ex.message)
-        self.assertEqual(len(self.view_obj.annotations), old_len+1)
+        self.assertEqual(old_len+1, len(self.view_obj.annotations))
         self.assertIn('Token', self.view_obj.metadata.contains)
         try:
             _ = self.view_obj.serialize()
@@ -451,18 +437,26 @@ class TestAnnotation(unittest.TestCase):
     def test_annotation_properties(self):
         props_json = self.data['example1']['annotations'][0]['properties']
         props_obj = MediumMetadata(props_json)
-        self.assertEqual(json.loads(props_obj.serialize()), props_json)
+        self.assertEqual(props_json, json.loads(props_obj.serialize()))
 
     def test_add_property(self):
-        for datum in self.data.values():
-            view_id = datum['json']['views'][0]['id']
-            anno_id = datum['json']['views'][0]['annotations'][0]['properties']['id']
-            props = datum['json']['views'][0]['annotations'][0]['properties']
-            removed_prop_key, removed_prop_value = list(props.items())[-1]
-            props.pop(removed_prop_key)
-            new_mmif = Mmif(datum['json'])
-            new_mmif[f'{view_id}:{anno_id}'].add_property(removed_prop_key, removed_prop_value)
-            self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']))
+        for i, datum in self.data.items():
+            for j in range(len(datum['json']['views'])):
+                view_id = datum['json']['views'][j]['id']
+                anno_id = datum['json']['views'][j]['annotations'][0]['properties']['id']
+                props = datum['json']['views'][j]['annotations'][0]['properties']
+                removed_prop_key, removed_prop_value = list(props.items())[-1]
+                props.pop(removed_prop_key)
+                try:
+                    new_mmif = Mmif(datum['json'])
+                    annos = new_mmif.get_view_by_id(view_id).annotations
+                    some_anno = list(annos.items.keys())[0]
+                    new_mmif.get_view_by_id(view_id).annotations[some_anno].add_property(removed_prop_key, removed_prop_value)
+                    self.assertEqual(json.loads(datum['string'])['views'][j],
+                                     json.loads(new_mmif.serialize())['views'][j],
+                                     f'Failed on {i}, {view_id}')
+                except ValidationError:
+                    continue
 
     def test_id(self):
         anno_obj: Annotation = self.data['example1']['mmif']['v1:bb1']
@@ -507,12 +501,12 @@ class TestMedium(unittest.TestCase):
                 try:
                     _ = Medium(medium)
                 except Exception as ex:
-                    self.fail(f"{type(ex)}: {ex.message}: example {i}, medium {j}")
+                    self.fail(f"{type(ex)}: {ex.message}: {i} {medium['id']}")
 
     def test_medium_metadata(self):
         metadata_json = self.data['example1']['media'][1]['metadata']
         metadata_obj = MediumMetadata(metadata_json)
-        self.assertEqual(json.loads(metadata_obj.serialize()), metadata_json)
+        self.assertEqual(metadata_json, json.loads(metadata_obj.serialize()))
 
     def test_deserialize_with_whole_mmif(self):
         for i, datum in self.data.items():
@@ -546,24 +540,28 @@ class TestMedium(unittest.TestCase):
             for j, medium in enumerate(datum['media']):
                 medium_obj = Medium(medium)
                 serialized = json.loads(medium_obj.serialize())
-                self.assertEqual(medium, serialized)
+                self.assertEqual(medium, serialized, f'Failed on {i}, {medium["id"]}')
 
     def test_serialize_with_whole_mmif(self):
         for i, datum in self.data.items():
             for j, medium in enumerate(datum['media']):
                 medium_serialized = json.loads(datum['mmif'].serialize())['media'][j]
-                self.assertEqual(medium, medium_serialized)
+                self.assertEqual(medium, medium_serialized, f'Failed on {i}, {medium["id"]}')
 
     def test_add_metadata(self):
         for i, datum in self.data.items():
-            medium_id = datum['json']['media'][0]['id']
-            metadata = datum['json']['media'][0].get('metadata')
-            if metadata:
-                removed_metadatum_key, removed_metadatum_value = list(metadata.items())[-1]
-                metadata.pop(removed_metadatum_key)
-                new_mmif = Mmif(datum['json'])
-                new_mmif[f'{medium_id}'].add_metadata(removed_metadatum_key, removed_metadatum_value)
-                self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']))
+            for j in range(len(datum['json']['media'])):
+                medium_id = datum['json']['media'][j]['id']
+                metadata = datum['json']['media'][j].get('metadata')
+                if metadata:
+                    removed_metadatum_key, removed_metadatum_value = list(metadata.items())[-1]
+                    metadata.pop(removed_metadatum_key)
+                    try:
+                        new_mmif = Mmif(datum['json'])
+                        new_mmif.get_medium_by_id(medium_id).add_metadata(removed_metadatum_key, removed_metadatum_value)
+                        self.assertEqual(json.loads(datum['string']), json.loads(new_mmif.serialize()), f'Failed on {i}, {medium_id}')
+                    except ValidationError:
+                        continue
 
 
 @unittest.skipIf(*SKIP_SCHEMA)

@@ -20,6 +20,9 @@ class View(MmifObject):
         super().__init__(view_obj)
 
     def _deserialize(self, view_dict: dict) -> None:
+        _context = view_dict.get('_context')
+        if _context is not None:
+            self._context = _context
         self.id = view_dict['id']
         self.metadata = ViewMetadata(view_dict['metadata'])
         self.annotations = AnnotationsList(view_dict['annotations'])
@@ -81,7 +84,12 @@ class ViewMetadata(MmifObject):
         self.contains = {at_type: Contain(contain_obj) for at_type, contain_obj in input_dict.get('contains', {}).items()}
 
     def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
-        if at_type not in self.contains:
+        # URI comparison hotfix
+        absent = True
+        for existing_type in self.contains.keys():
+            if at_type.split('/')[-1] == existing_type.split('/')[-1]:
+                absent = False
+        if absent:
             new_contain = Contain(contain_dict)
             self.contains[at_type] = new_contain
             return new_contain
@@ -96,6 +104,10 @@ class Contain(MmifObject):
         self.gen_time = datetime.now()     # datetime.datetime
         super().__init__(contain_obj)
 
+    def _deserialize(self, input_dict: dict) -> None:
+        super()._deserialize(input_dict)
+        if 'gen_time' in self.__dict__ and isinstance(self.gen_time, str):
+            self.gen_time = datetime.fromisoformat(self.gen_time)
 
 class AnnotationsList(DataList[Annotation]):
     items: Dict[str, Annotation]
