@@ -449,7 +449,9 @@ class TestAnnotation(unittest.TestCase):
                 props.pop(removed_prop_key)
                 try:
                     new_mmif = Mmif(datum['json'])
-                    new_mmif.get_view_by_id(view_id).annotations[0].add_property(removed_prop_key, removed_prop_value)
+                    annos = new_mmif.get_view_by_id(view_id).annotations
+                    some_anno = list(annos.items.keys())[0]
+                    new_mmif.get_view_by_id(view_id).annotations[some_anno].add_property(removed_prop_key, removed_prop_value)
                     self.assertEqual(json.loads(datum['string'])['views'][j],
                                      json.loads(new_mmif.serialize())['views'][j],
                                      f'Failed on {i}, {view_id}')
