@@ -247,6 +247,40 @@ class TestMmif(unittest.TestCase):
         self.assertIsNotNone(view)
         self.assertEqual(view.id, 'v1')
 
+    def test_new_view_id(self):
+        mmif_obj = Mmif(examples['example1'])
+        mmif_obj.new_view()
+        self.assertEqual({'v1', 'v_1'}, set(mmif_obj.views.items.keys()))
+
+    def test_add_medium(self):
+        mmif_obj = Mmif(examples['example1'])
+        med_obj = Medium(ext_video_medium)
+        mmif_obj.add_medium(med_obj)
+        try:
+            mmif_obj.add_medium(med_obj)
+            self.fail("didn't raise exception on duplicate ID add")
+        except KeyError:
+            ...
+        try:
+            mmif_obj.add_medium(med_obj, overwrite=True)
+        except KeyError:
+            self.fail("raised exception on duplicate ID add when overwrite was set to True")
+
+    def test_add_view(self):
+        mmif_obj = Mmif(examples['example3'], validate=False)  # TODO: remove validate=False once 56 is done
+        view_obj = View(view1)
+        view_obj.id = 'v4'
+        mmif_obj.add_view(view_obj)
+        try:
+            mmif_obj.add_view(view_obj)
+            self.fail("didn't raise exception on duplicate ID add")
+        except KeyError:
+            ...
+        try:
+            mmif_obj.add_view(view_obj, overwrite=True)
+        except KeyError:
+            self.fail("raised exception on duplicate ID add when overwrite was set to True")
+
 
 class TestMmifObject(unittest.TestCase):
 
