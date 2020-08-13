@@ -354,10 +354,7 @@ class TestView(unittest.TestCase):
         self.maxDiff = None
 
     def test_init(self):
-        try:
-            _ = View(view1)
-        except Exception as ex:
-            self.fail(str(type(ex)) + str(ex.message))
+        _ = View(view1)  # just raise exception
 
     def test_annotation_order_preserved(self):
         view_serial = self.view_obj.serialize()
