@@ -54,11 +54,14 @@ class Mmif(MmifObject):
     def new_view(self) -> View:
         new_view = View()
         new_view.id = self.new_view_id()
-        self.views[new_view.id] = new_view
+        self.views.append(new_view)
         return new_view
 
-    def add_medium(self, medium: Medium):
-        self.media.append(medium)
+    def add_view(self, view: View, overwrite=False):
+        self.views.append(view, overwrite)
+
+    def add_medium(self, medium: Medium, overwrite=False):
+        self.media.append(medium, overwrite)
 
     def get_media_by_source_view_id(self, source_vid: str = None) -> List[Medium]:
         """
@@ -80,7 +83,6 @@ class Mmif(MmifObject):
         Method to retrieve media by an arbitrary key-value pair in the medium metadata objects
         """
         return [medium for medium in self.media if medium.metadata[metadata_key] == metadata_value]
-
 
     def get_media_locations(self, m_type: str) -> List[str]:
         """
@@ -166,8 +168,8 @@ class MediaList(DataList[Medium]):
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: Medium(item) for item in input_list}
 
-    def append(self, value: Medium):
-        super()._append_with_key(value.id, value)
+    def append(self, value: Medium, overwrite=False):
+        super()._append_with_key(value.id, value, overwrite)
 
 
 class ViewsList(DataList[View]):
@@ -175,5 +177,5 @@ class ViewsList(DataList[View]):
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: View(item) for item in input_list}
 
-    def append(self, value: View):
-        super()._append_with_key(value.id, value)
+    def append(self, value: View, overwrite=False):
+        super()._append_with_key(value.id, value, overwrite)
