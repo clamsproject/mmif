@@ -1,8 +1,10 @@
 import json
-from typing import Union, Any, Dict
+from deepdiff import DeepDiff as ddiff
+from typing import Union, Any, Dict, Optional, TypeVar, Generic
 
 
-__all__ = ['MmifObject', 'MmifObjectEncoder']
+T = TypeVar('T')
+__all__ = ['MmifObject', 'MmifObjectEncoder', 'DataList']
 
 
 class MmifObject(object):
@@ -35,14 +37,16 @@ class MmifObject(object):
     def _serialize(self) -> dict:
         d = {}
         for k, v in list(self.__dict__.items()):
-            if k.startswith('_'):
-                d[f'@{k[1:]}'] = v
-            else:
-                d[k] = v
+            # ignore all "null" values including empty dicts and zero strings
+            if v is not None and len(v) if hasattr(v, '__len__') else len(str(v)) > 0:
+                if k.startswith('_'): # _ as a placeholder ``@`` in json-ld
+                    d[f'@{k[1:]}'] = v
+                else:
+                    d[k] = v
         return d
 
     @staticmethod
-    def _load_json(json_obj: Union[dict, str]):
+    def _load_json(json_obj: Union[dict, str]) -> dict:
         """
         Maps JSON-LD-format MMIF strings and dicts into Python dicts
         with identifier-compliant keys. To do this, it replaces "@"
@@ -56,13 +60,13 @@ class MmifObject(object):
         :param json_str:
         :return:
         """
-        def to_atsign(d: Dict[str, Any]):
+        def to_atsign(d: Dict[str, Any]) -> dict:
             for k in list(d.keys()):
                 if k.startswith('@'):
                     d[f'_{k[1:]}'] = d.pop(k)
             return d
 
-        def traverse_to_atsign(d: dict):
+        def traverse_to_atsign(d: dict) -> dict:
             new_d = d.copy()
             to_atsign(new_d)
             for key, value in new_d.items():
@@ -109,7 +113,10 @@ class MmifObject(object):
         return self.serialize(True)
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        return isinstance(other, type(self)) and len(ddiff(self, other, ignore_order=True, report_repetition=True)) ==0
+
+    def __len__(self):
+        return len(self.__dict__)
 
 
 class MmifObjectEncoder(json.JSONEncoder):
@@ -130,3 +137,48 @@ class MmifObjectEncoder(json.JSONEncoder):
         else:
             return json.JSONEncoder.default(self, obj)
 
+
+class DataList(MmifObject, Generic[T]):
+    def __init__(self, mmif_obj: Union[str, list] = None):
+        self.items: Dict[str, T] = dict()
+        if mmif_obj is None:
+            mmif_obj = []
+        super().__init__(mmif_obj)
+
+    def _serialize(self) -> list:
+        return list(self.items.values())
+
+    def deserialize(self, mmif_json: Union[str, list]) -> None:
+        if isinstance(mmif_json, str):
+            mmif_json = json.loads(mmif_json)
+        self._deserialize(mmif_json)
+
+    def get(self, key: str) -> Optional[T]:
+        try:
+            return self[key]
+        except KeyError:
+            return None
+
+    def _append_with_key(self, key: str, value: T, overwrite=False) -> None:
+        if not overwrite and key in self.items:
+            raise KeyError(f"Key {key} already exists")
+        else:
+            self[key] = value
+
+    def __getitem__(self, key: str):
+        return self.items.__getitem__(key)
+
+    def __setitem__(self, key: str, value: T):
+        self.items.__setitem__(key, value)
+
+    def __iter__(self):
+        return self.items.values().__iter__()
+
+    def __len__(self):
+        return self.items.__len__()
+
+    def __reversed__(self):
+        return reversed(list(self.items.values()))
+
+    def __contains__(self, item):
+        return item in self.items

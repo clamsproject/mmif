@@ -19,7 +19,6 @@ from tests.mmif_examples import *
 # Flags for skipping tests
 DEBUG = False
 SKIP_SCHEMA = True, "Skipping TestSchema by default"
-NOT_MERGED_40 = True, "Skipping until #40 is merged"
 
 
 class TestMmif(unittest.TestCase):
@@ -123,38 +122,91 @@ class TestMmif(unittest.TestCase):
             self.fail("failed to create new view in Mmif: "+ex.message)
         self.assertEqual(old_view_count+1, len(mmif_obj.views))
 
+    def test_medium_metadata(self):
+        text = "Karen flew to New York."
+        en = 'en'
+        medium = Medium()
+        medium.id = 'm999'
+        medium.type = "text"
+        medium.text_value = text
+        self.assertEqual(medium.text_value, text)
+        medium.text_language = en
+        medium.metadata['source'] = "v10"
+        medium.metadata['app'] = "some_sentence_splitter"
+        medium.metadata['random_key'] = "random_value"
+        serialized = medium.serialize()
+        deserialized = Medium(serialized)
+        self.assertEqual(medium, deserialized)
+        plain_json = json.loads(serialized)
+        deserialized = Medium(plain_json)
+        self.assertEqual(medium, deserialized)
+        self.assertEqual({'id', 'type', 'text', 'metadata'}, plain_json.keys())
+        self.assertEqual({'@value', '@language'}, plain_json['text'].keys())
+        self.assertEqual({'source', 'app', 'random_key'}, plain_json['metadata'].keys())
+
+    def test_medium(self):
+        medium = Medium(ext_video_medium)
+        serialized = medium.serialize()
+        plain_json = json.loads(serialized)
+        self.assertEqual({'id', 'type', 'location', 'mime'}, plain_json.keys())
+
     def test_add_media(self):
-        medium_json = json.loads(medium1)
+        medium_json = json.loads(ext_video_medium)
         # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
         mmif_obj = Mmif(examples['example1'])
         old_media_count = len(mmif_obj.media)
         try:
-            mmif_obj.add_media(Medium(medium_json))
+            mmif_obj.add_medium(Medium(medium_json))
         except Exception as ex:
             self.fail("failed to add medium to Mmif: "+ex.message)
         self.assertEqual(old_media_count+1, len(mmif_obj.media))
 
-    def test_fail_add_media(self):
-        medium_json = json.loads(medium2)
-        mmif_obj = Mmif(examples['example1'])
-        # TODO (angus-lherrou @ 8/5/2020): deprecated as of #41
-        try:
-            mmif_obj.add_media(Medium(medium_json))
-            self.fail("added medium of same type")
-        except:
-            pass
-
     def test_get_medium_by_id(self):
         mmif_obj = Mmif(examples['example1'])
         try:
-            medium = mmif_obj.get_medium_by_id('m1')
-        except:
+            # should succeed
+            mmif_obj.get_medium_by_id('m1')
+        except KeyError:
             self.fail("didn't get m1")
         try:
-            medium = mmif_obj.get_medium_by_id('m55')
+            # should fail
+            mmif_obj.get_medium_by_id('m55')
             self.fail("didn't raise exception on getting m55")
         except:
             pass
+
+    def test_get_media_by_view_id(self):
+        mmif_obj = Mmif(examples['example1'])
+        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 1)
+        self.assertEqual(mmif_obj.get_media_by_source_view_id('v1')[0],
+                         mmif_obj.get_medium_by_id('m2'))
+        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('xxx')), 0)
+        new_medium = Medium()
+        new_medium.metadata.source = 'v1:bb2'
+        mmif_obj.add_medium(new_medium)
+        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 2)
+
+
+    def test_get_medium_by_appid(self):
+        tesseract_appid = 'http://apps.clams.io/tesseract/1.2.1'
+        mmif_obj = Mmif(examples['example1'])
+        self.assertEqual(len(mmif_obj.get_media_by_app(tesseract_appid)), 1)
+        self.assertEqual(len(mmif_obj.get_media_by_app('xxx')), 0)
+        new_medium = Medium()
+        new_medium.metadata.source = 'v1:bb2'
+        new_medium.metadata.app = tesseract_appid
+        mmif_obj.add_medium(new_medium)
+        self.assertEqual(len(mmif_obj.get_media_by_app(tesseract_appid)), 2)
+
+    def test_get_media_locations(self):
+        mmif_obj = Mmif(examples['example1'])
+        self.assertEqual(len(mmif_obj.get_media_locations('image')), 1)
+        self.assertEqual(mmif_obj.get_medium_location('image'), "/var/archive/image-0012.jpg")
+        # text medium is there but no location is specified
+        self.assertEqual(len(mmif_obj.get_media_locations('text')), 0)
+        self.assertEqual(mmif_obj.get_medium_location('text'), None)
+        # audio medium is not there
+        self.assertEqual(len(mmif_obj.get_media_locations('audio')), 0)
 
     def test_get_view_by_id(self):
         mmif_obj = Mmif(examples['example1'])
@@ -180,6 +232,40 @@ class TestMmif(unittest.TestCase):
         view = mmif_obj.get_view_contains('BoundingBox')
         self.assertIsNotNone(view)
         self.assertEqual('v1', view.id)
+
+    def test_new_view_id(self):
+        mmif_obj = Mmif(examples['example1'])
+        mmif_obj.new_view()
+        self.assertEqual({'v1', 'v_1'}, set(mmif_obj.views.items.keys()))
+
+    def test_add_medium(self):
+        mmif_obj = Mmif(examples['example1'])
+        med_obj = Medium(ext_video_medium)
+        mmif_obj.add_medium(med_obj)
+        try:
+            mmif_obj.add_medium(med_obj)
+            self.fail("didn't raise exception on duplicate ID add")
+        except KeyError:
+            ...
+        try:
+            mmif_obj.add_medium(med_obj, overwrite=True)
+        except KeyError:
+            self.fail("raised exception on duplicate ID add when overwrite was set to True")
+
+    def test_add_view(self):
+        mmif_obj = Mmif(examples['example3'], validate=False)  # TODO: remove validate=False once 56 is done
+        view_obj = View(view1)
+        view_obj.id = 'v4'
+        mmif_obj.add_view(view_obj)
+        try:
+            mmif_obj.add_view(view_obj)
+            self.fail("didn't raise exception on duplicate ID add")
+        except KeyError:
+            ...
+        try:
+            mmif_obj.add_view(view_obj, overwrite=True)
+        except KeyError:
+            self.fail("raised exception on duplicate ID add when overwrite was set to True")
 
 
 class TestMmifObject(unittest.TestCase):
@@ -210,7 +296,6 @@ class TestMmifObject(unittest.TestCase):
             self.assertEqual(json.loads(examples['example1']), json.loads(fake_out.getvalue()))
 
 
-@unittest.skipIf(*NOT_MERGED_40)
 class TestGetItem(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -273,12 +358,12 @@ class TestGetItem(unittest.TestCase):
 
     def test_view_getitem(self):
         try:
-            bb1 = self.view_obj['bb1']
-            self.assertIs(bb1, self.view_obj.annotations.get('bb1'))
+            s1 = self.view_obj['s1']
+            self.assertIs(s1, self.view_obj.annotations.get('s1'))
         except TypeError:
             self.fail("__getitem__ not implemented")
         except KeyError:
-            self.fail("didn't get annotation 'bb1'")
+            self.fail("didn't get annotation 's1'")
 
 
 class TestView(unittest.TestCase):
@@ -289,10 +374,7 @@ class TestView(unittest.TestCase):
         self.maxDiff = None
 
     def test_init(self):
-        try:
-            _ = View(view1)
-        except Exception as ex:
-            self.fail(str(type(ex)) + str(ex.message))
+        _ = View(view1)  # just raise exception
 
     def test_annotation_order_preserved(self):
         view_serial = self.view_obj.serialize()
@@ -373,6 +455,26 @@ class TestAnnotation(unittest.TestCase):
                                      f'Failed on {i}, {view_id}')
                 except ValidationError:
                     continue
+
+    def test_id(self):
+        anno_obj: Annotation = self.data['example1']['mmif']['v1:bb1']
+
+        old_id = anno_obj.id
+        self.assertEqual('bb1', old_id)
+
+    def test_change_id(self):
+        anno_obj: Annotation = self.data['example1']['mmif']['v1:bb1']
+
+        anno_obj.id = 'bb2'
+        self.assertEqual('bb2', anno_obj.id)
+
+        serialized = json.loads(anno_obj.serialize())
+        new_id = serialized['properties']['id']
+        self.assertEqual('bb2', new_id)
+
+        serialized_mmif = json.loads(self.data['example1']['mmif'].serialize())
+        new_id_from_mmif = serialized_mmif['views'][0]['annotations'][0]['properties']['id']
+        self.assertEqual('bb2', new_id_from_mmif)
 
 
 class TestMedium(unittest.TestCase):

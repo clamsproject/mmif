@@ -9,7 +9,7 @@
 	"metadata": "mmif:metadata",
 	"medium": "mmif:medium",
 	"timestamp": "mmif:timestamp",
-	"tool": "mmif:tool",
+	"app": "mmif:app",
 	"contains": "mmif:contains",
 	"annotations": "mmif:annotations",
 	"properties": "mmif:properties",

@@ -75,6 +75,7 @@ Includes any metadata associated with the file. Not heavily used for now, but we
 > Note that untill recently the metadata also had a *contains* property which included an overview of the data in all views. This was removed to avoid redundancies and potential conflicts.
 
 
+
 ### 1.3. The *media* property
 
 The value is a list of media specifications where each media element has an identifier, a type, a location and optional metadata. Here is an example for a video and its transcript:
@@ -160,7 +161,7 @@ Before describing the metadata and annotation we list a few general principles r
 
 #### 1.4.1. The *view's metadata* property
 
-This property contains information about the annotations in a view. Here is an example for a view over a video with medium identifier "m3" with segments added by the CLAMS bars-and-tones tool:
+This property contains information about the annotations in a view. Here is an example for a view over a video with medium identifier "m3" with segments added by the CLAMS bars-and-tones app:
 
 ```json
 {
@@ -171,17 +172,19 @@ This property contains information about the annotations in a view. Here is an e
   },
   "medium": "m3",
   "timestamp": "2020-05-27T12:23:45",
-  "tool": "http://tools.clams.ai/bars-and-tones/1.0.5"
+  "app": "http://apps.clams.ai/bars-and-tones/1.0.5"
 }
 ```
 
-The *contains* dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary or properties of those annotation objects (they can also refer to user-defined objects or properties) and they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above specifies that the view contains *Segment* annotations and the metadata property *unit* is set to "seconds". Section 2 will go into more details on how the vocabulary and the view metadata interact.
+The *contains* dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary or properties of those annotation objects (they can also refer to user-defined objects or properties) and they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above specifies that the view contains *Segment* annotations and the metadata property *unit* is set to "seconds". Note that when a metadata property is set to some value then all annotations of that type should adhere to that value, in this case the unit used to identify the start and end of a segment sould be seconds. It is technically possible to add a *unit* property to an individual annotation and overrule the metadata, but this is not to be done without really good reasons.
+
+Section 2 will go into more details on how the vocabulary and the view metadata interact.
 
 The *medium* key gives the identfier of the medium that the annotations are over.
 
-The *timestamp* key reflects when the view was created by the tool. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views which is significant because by default arrays in JSON-LD are not ordered.
+The *timestamp* key reflects when the view was created by the app. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views which is significant because by default arrays in JSON-LD are not ordered.
 
-The *tool* key contains a URL that specifies what service created the annotation data. That URL should contain all information relevant for the tool: description, tool metadata, configuration etcetera. The tool URL includes a version number for the tool. It should also contain a link to the Git repository for the tool (and that repository will actually maintain all the information in the URL).
+The *app* key contains a URL that specifies what service created the annotation data. That URL should contain all information relevant for the app, namely the app metadata that includes description, configuration and more. The app URL includes a version number for the app as well . It should also contain a link to the Git repository for the app (and that repository will actually maintain all the information in the URL).
 
 See https://github.com/clamsproject/mmif/issues/9 for a discussion on view metadata.
 
@@ -225,7 +228,7 @@ We allow arbitrary features in the properties dictionary. However, when an arbit
 
 The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside of other annotations. For example, LAPPS Constituent annotations will not contain other Constituent annotations. However, in the features dictionary annotations can refer to other annotations using the identifiers of the other annotations.
 
-Here is an other example of a view containing two bounding boxes created by the EAST text recognition tool:
+Here is an other example of a view containing two bounding boxes created by the EAST text recognition app:
 
 ```json
 {
@@ -237,7 +240,7 @@ Here is an other example of a view containing two bounding boxes created by the 
     },
     "medium": "image3",
     "timestamp": "2020-05-27T12:23:45",
-    "tool": "http://tools.clams.io/east/1.0.4"
+    "app": "http://apps.clams.io/east/1.0.4"
   },
   "annotations": [
       { "@type": "http://miff.clams.ai/0.1.0/vocabulary/BoundingBox",
@@ -261,11 +264,11 @@ Here is an other example of a view containing two bounding boxes created by the 
 
 >  NOTE: the contents here are all rather preliminary and further experimentation is needed.
 
-Media can be generated from other media and/or from information in views. Assume the Tesseract OCR tool that takes an image and the coordinates of a bounding box and generates a new text for the bounding box. That text will be stored as a text medium in the MMIF document and that text can be the starting point for chains of text processing where views over the medium are created.
+Media can be generated from other media and/or from information in views. Assume an OCR app based on Tesseract that takes an image and the coordinates of a bounding box and generates a new text for the bounding box. That text will be stored as a text medium in the MMIF document and that text can be the starting point for chains of text processing where views over the medium are created.
 
-> The alternative is to store the results in a view, but this introduces complextities when we want to run an NLP tool over the text since the text will then need to be extracted from the view first. In addition, it seemed conceptually clearer to represent text media as media, even though they may be derived.
+> The alternative is to store the results in a view, but this introduces complextities when we want to run an NLP app over the text since the text will then need to be extracted from the view first. In addition, it seemed conceptually clearer to represent text media as media, even though they may be derived.
 
-Let's use an example of an image of a barking dog where a region of the image has been recognized by the EAST tool as containing text (image taken from http://clipart-library.com/dog-barking-clipart.html): 
+Let's use an example of an image of a barking dog where a region of the image has been recognized by the EAST app (for text localization) as containing text (image taken from http://clipart-library.com/dog-barking-clipart.html): 
 
 <img src="pi78oGjdT-annotated.jpg" border="1" height="200"/>
 
@@ -287,7 +290,7 @@ In MMIF, this looks like the following (leaving out some details, coordinates so
         "contains": {
           "BoundingBox": {"unit": "pixels"}},
         "medium": "m1",
-    		"tool": "http://tools.clams.io/east/1.0.4"
+    		"app": "http://apps.clams.io/east/1.0.4"
       },
       "annotations": [
       	{
@@ -314,14 +317,16 @@ When we add results of processing as new media then those media need to assume s
   },
   "metadata": { 
     "source": "v1:bb1",
-    "tool": "http://tools.clams.io/tesseract/1.2.1" 
+    "app": "http://apps.clams.io/tesseract/1.2.1" 
   }
 }
 ```
 
 Note the use of *source*, which points to a bounding box annotation in view *v1*. Indirectly that alo represents that the bounding box was from image *m1*. Other metadata like timestamps and version information can/should be added as well.
 
-> This glances over the problem that we need some way for Tesseract to know what bounding boxes to take. Either introducing some kind of type or use the tool property in the metadata or maybe introduce a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for a tool.
+However, as we've previously seen, some media are not results of processing an existing medium, but are primary source documents that were *given* from the beginning. Hence, contents of such media are likely to be just pointers to files encoded in `location` (instead of encoded in `text`) and more importantly, metadata of them do not contain `source` and `app` fields. 
+
+> This glances over the problem that we need some way for Tesseract to know what bounding boxes to take. Either introducing some kind of type or use the app property in the metadata or maybe introduce a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for an app.
 
 Note that the image just had a bounding box for the part of the image with the word *yelp*, but there were three other image regions that could have been input to OCR as well. The representation above would be rather inefficient because it would repeat similar metadata over and over again. So we introduce a mechanism that in a way does the same as the annotations list in a view in that it allows metadata to be stored only once:
 
@@ -331,7 +336,7 @@ Note that the image just had a bounding box for the part of the image with the w
   "type": "text/plain",
   "metadata": { 
     "source": "v1",
-    "tool": "http://tools.clams.io/tesseract/1.2.1" 
+    "app": "http://apps.clams.io/tesseract/1.2.1" 
   },
   "submedia": [
     { "id": "sm1", "annotation": "bb1", "text": { "@value": "yelp" }},
@@ -376,7 +381,7 @@ The vocabulary also defines metadata properties. For example, the optional prope
 		},
 		"medium": "m12",
 		"timestamp": "2020-05-27T12:23:45",
-		"tool": "http://tools.clams.ai/some_bb_tool/1.0.3"
+		"app": "http://apps.clams.ai/some_bb_app/1.0.3"
   }
 }
 ```
@@ -395,17 +400,17 @@ The first example is at [samples/example-1.json](samples/example-1.json). It con
   - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains field has a property http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame with a dictionary as the value and that dictionary contains the metadata, in this case specifying that the unit used for annotation offsets is seconds).
   - The medium that the annotations are over.
   - A timestamp of when the view was created.
-  - The tool that created the view.
+  - The app that created the view.
 
 Note that only one annotation is shown for each view, this is to keep the file as small as possible. Of course, often the bars-and-tones and slate views often have only one annotation so it is only the tokens view where annotations were left out.
 
-As we move along with integrating new tools, other examples will be added with other kinds of annotation types like *BoundingBox* and *Alignment*. Addition to the specifications will like accompany this. One thing we will know will change is the simple universe we show in the first example, where there are two simple medium instances and no submedia and annotations on submedia. For now we can get away with using *start* and *end* as properties that anchor an annotation, but we will probably replace those with something called *anchor* which provides several ways of anchoring annotations to the source: start and end offsets, start and end offsets qualified by submedia identifiers, coordinates, etcetera.
+As we move along with integrating new apps, other examples will be added with other kinds of annotation types like *BoundingBox* and *Alignment*. Addition to the specifications will like accompany this. One thing we will know will change is the simple universe we show in the first example, where there are two simple medium instances and no submedia and annotations on submedia. For now we can get away with using *start* and *end* as properties that anchor an annotation, but we will probably replace those with something called *anchor* which provides several ways of anchoring annotations to the source: start and end offsets, start and end offsets qualified by submedia identifiers, coordinates, etcetera.
 
 
 
 ## 4. User-defined extensions
 
-The value of *@type* in an annotation is typically an element of the CLAMS or LAPPS vocabulary, but you can also enter a user-defined annotation category defined elsewhere, for example by the creator of a tool. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI because the context files will not take care of the proper term expansion. The same is true for any properties used that have meanings defined elsewhere.
+The value of *@type* in an annotation is typically an element of the CLAMS or LAPPS vocabulary, but you can also enter a user-defined annotation category defined elsewhere, for example by the creator of an app. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI because the context files will not take care of the proper term expansion. The same is true for any properties used that have meanings defined elsewhere.
 
 Take as an example the following annotations.
 
