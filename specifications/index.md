@@ -75,6 +75,7 @@ Includes any metadata associated with the file. Not heavily used for now, but we
 > Note that untill recently the metadata also had a *contains* property which included an overview of the data in all views. This was removed to avoid redundancies and potential conflicts.
 
 
+
 ### 1.3. The *media* property
 
 The value is a list of media specifications where each media element has an identifier, a type, a location and optional metadata. Here is an example for a video and its transcript:
@@ -175,7 +176,9 @@ This property contains information about the annotations in a view. Here is an e
 }
 ```
 
-The *contains* dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary or properties of those annotation objects (they can also refer to user-defined objects or properties) and they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above specifies that the view contains *Segment* annotations and the metadata property *unit* is set to "seconds". Section 2 will go into more details on how the vocabulary and the view metadata interact.
+The *contains* dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary or properties of those annotation objects (they can also refer to user-defined objects or properties) and they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above specifies that the view contains *Segment* annotations and the metadata property *unit* is set to "seconds". Note that when a metadata property is set to some value then all annotations of that type should adhere to that value, in this case the unit used to identify the start and end of a segment sould be seconds. It is technically possible to add a *unit* property to an individual annotation and overrule the metadata, but this is not to be done without really good reasons.
+
+Section 2 will go into more details on how the vocabulary and the view metadata interact.
 
 The *medium* key gives the identfier of the medium that the annotations are over.
 
