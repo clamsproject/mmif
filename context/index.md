@@ -9,7 +9,7 @@ JSON-LD context definitions can be used to help expand terms in the MMIF documen
 There are two kinds of terms that we want to expand:
 
 1. Context for MMIF Terms. Terms that are part of the structure of MMIF and that are the same for any MIFF document. These include structural properties like *metadata*, *views* and *properties*. The full URIs for these terms all include *mmif*, for example http://mmif.clams.ai/0.1.0/vocab/mmif/metadata.
-2. Vocabulary Context. Terms that are relevant only to the output of a particular tool or pipeline. These define the annotation types and their properties and include types like *TimeFrame* and *BoundingBox* and features of those terms like *frameType* and *coordinates*. The full URIs point to files directly inside *vocab*, without the *mmif* suffix, for example http://mmif.clams.ai/0.1.0/vocab/TimeFrame.
+2. Vocabulary Context. Terms that are relevant only to the output of a particular app or a pipeline. These define the annotation types and their properties and include types like *TimeFrame* and *BoundingBox* and features of those terms like *frameType* and *coordinates*. The full URIs point to files directly inside *vocab*, without the *mmif* suffix, for example http://mmif.clams.ai/0.1.0/vocab/TimeFrame.
 
 Here is a simple and somewhat simplified example that we use for further explanation:
 
@@ -37,7 +37,7 @@ Here is a simple and somewhat simplified example that we use for further explana
 	  "metadata": {
 		  "medium": "m1",
 		  "timestamp": "2020-05-27T12:23:45",
-		  "tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
+		  "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
 		  "contains": {
 		    "TimeFrame": { "unit": "seconds" }}},
 	  "annotations": [
