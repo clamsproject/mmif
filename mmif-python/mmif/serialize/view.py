@@ -86,19 +86,20 @@ class ViewMetadata(MmifObject):
         self.__dict__ = input_dict
         self.contains = {at_type: Contain(contain_obj) for at_type, contain_obj in input_dict.get('contains', {}).items()}
 
-    def new_contain(self, at_type: Union[str, AnnotationTypes], contain_dict: dict = None) -> Optional['Contain']:
-        def find_match_hotfix(key: str) -> bool:
-            absent = True
-            for existing_type in self.contains.keys():
-                if key.split('/')[-1] == existing_type.split('/')[-1]:
-                    absent = False
-            return absent
+    def find_match_hotfix(self, key: str) -> bool:
+        exists = False
+        for existing_type in self.contains.keys():
+            if key.split('/')[-1] == existing_type.split('/')[-1]:
+                exists = True
+                break
+        return exists
 
+    def new_contain(self, at_type: Union[str, AnnotationTypes], contain_dict: dict = None) -> Optional['Contain']:
         if isinstance(at_type, AnnotationTypes):
-            exists = find_match_hotfix(at_type.name) or find_match_hotfix(at_type.value)
+            exists = self.find_match_hotfix(at_type.name) or self.find_match_hotfix(at_type.value)
             final_key = at_type.value
         else:
-            exists = find_match_hotfix(at_type)
+            exists = self.find_match_hotfix(at_type)
             final_key = at_type
 
         if not exists:
