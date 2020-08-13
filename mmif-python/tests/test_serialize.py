@@ -464,6 +464,26 @@ class TestAnnotation(unittest.TestCase):
             new_mmif[f'{view_id}:{anno_id}'].add_property(removed_prop_key, removed_prop_value)
             self.assertEqual(json.loads(new_mmif.serialize()), json.loads(datum['string']))
 
+    def test_id(self):
+        anno_obj: Annotation = self.data['example1']['mmif']['v1:bb1']
+
+        old_id = anno_obj.id
+        self.assertEqual('bb1', old_id)
+
+    def test_change_id(self):
+        anno_obj: Annotation = self.data['example1']['mmif']['v1:bb1']
+
+        anno_obj.id = 'bb2'
+        self.assertEqual('bb2', anno_obj.id)
+
+        serialized = json.loads(anno_obj.serialize())
+        new_id = serialized['properties']['id']
+        self.assertEqual('bb2', new_id)
+
+        serialized_mmif = json.loads(self.data['example1']['mmif'].serialize())
+        new_id_from_mmif = serialized_mmif['views'][0]['annotations'][0]['properties']['id']
+        self.assertEqual('bb2', new_id_from_mmif)
+
 
 class TestMedium(unittest.TestCase):
 
