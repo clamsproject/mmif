@@ -287,7 +287,7 @@ In MMIF, this looks like the following (leaving out some details, coordinates so
         "contains": {
           "BoundingBox": {"unit": "pixels"}},
         "medium": "m1",
-    		"tool": "http://tools.clams.io/east/1.0.4"
+    		"app": "http://apps.clams.io/east/1.0.4"
       },
       "annotations": [
       	{
@@ -314,7 +314,7 @@ When we add results of processing as new media then those media need to assume s
   },
   "metadata": { 
     "source": "v1:bb1",
-    "app": "http://tools.clams.io/tesseract/1.2.1" 
+    "app": "http://apps.clams.io/tesseract/1.2.1" 
   }
 }
 ```
@@ -323,7 +323,7 @@ Note the use of *source*, which points to a bounding box annotation in view *v1*
 
 However, as we've previously seen, some media are not results of processing an existing medium, but are primary source documents that were *given* from the beginning. Hence, contents of such media are likely to be just pointers to files encoded in `location` (instead of encoded in `text`) and more importantly, metadata of them do not contain `source` and `app` fields. 
 
-> This glances over the problem that we need some way for Tesseract to know what bounding boxes to take. Either introducing some kind of type or use the tool property in the metadata or maybe introduce a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for a tool.
+> This glances over the problem that we need some way for Tesseract to know what bounding boxes to take. Either introducing some kind of type or use the app property in the metadata or maybe introduce a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for an app.
 
 Note that the image just had a bounding box for the part of the image with the word *yelp*, but there were three other image regions that could have been input to OCR as well. The representation above would be rather inefficient because it would repeat similar metadata over and over again. So we introduce a mechanism that in a way does the same as the annotations list in a view in that it allows metadata to be stored only once:
 
@@ -333,7 +333,7 @@ Note that the image just had a bounding box for the part of the image with the w
   "type": "text/plain",
   "metadata": { 
     "source": "v1",
-    "app": "http://tools.clams.io/tesseract/1.2.1" 
+    "app": "http://apps.clams.io/tesseract/1.2.1" 
   },
   "submedia": [
     { "id": "sm1", "annotation": "bb1", "text": { "@value": "yelp" }},
@@ -378,7 +378,7 @@ The vocabulary also defines metadata properties. For example, the optional prope
 		},
 		"medium": "m12",
 		"timestamp": "2020-05-27T12:23:45",
-		"tool": "http://tools.clams.ai/some_bb_tool/1.0.3"
+		"app": "http://apps.clams.ai/some_bb_app/1.0.3"
   }
 }
 ```
@@ -397,17 +397,17 @@ The first example is at [samples/example-1.json](samples/example-1.json). It con
   - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains field has a property http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame with a dictionary as the value and that dictionary contains the metadata, in this case specifying that the unit used for annotation offsets is seconds).
   - The medium that the annotations are over.
   - A timestamp of when the view was created.
-  - The tool that created the view.
+  - The app that created the view.
 
 Note that only one annotation is shown for each view, this is to keep the file as small as possible. Of course, often the bars-and-tones and slate views often have only one annotation so it is only the tokens view where annotations were left out.
 
-As we move along with integrating new tools, other examples will be added with other kinds of annotation types like *BoundingBox* and *Alignment*. Addition to the specifications will like accompany this. One thing we will know will change is the simple universe we show in the first example, where there are two simple medium instances and no submedia and annotations on submedia. For now we can get away with using *start* and *end* as properties that anchor an annotation, but we will probably replace those with something called *anchor* which provides several ways of anchoring annotations to the source: start and end offsets, start and end offsets qualified by submedia identifiers, coordinates, etcetera.
+As we move along with integrating new apps, other examples will be added with other kinds of annotation types like *BoundingBox* and *Alignment*. Addition to the specifications will like accompany this. One thing we will know will change is the simple universe we show in the first example, where there are two simple medium instances and no submedia and annotations on submedia. For now we can get away with using *start* and *end* as properties that anchor an annotation, but we will probably replace those with something called *anchor* which provides several ways of anchoring annotations to the source: start and end offsets, start and end offsets qualified by submedia identifiers, coordinates, etcetera.
 
 
 
 ## 4. User-defined extensions
 
-The value of *@type* in an annotation is typically an element of the CLAMS or LAPPS vocabulary, but you can also enter a user-defined annotation category defined elsewhere, for example by the creator of a tool. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI because the context files will not take care of the proper term expansion. The same is true for any properties used that have meanings defined elsewhere.
+The value of *@type* in an annotation is typically an element of the CLAMS or LAPPS vocabulary, but you can also enter a user-defined annotation category defined elsewhere, for example by the creator of an app. If a user-defined category is used then it would be defined outside of the CLAMS or LAPPS vocabulary and in that case the user should use the full URI because the context files will not take care of the proper term expansion. The same is true for any properties used that have meanings defined elsewhere.
 
 Take as an example the following annotations.
 

@@ -54,7 +54,7 @@
           "type": "string",
           "format": "date-time"
         },
-        "tool": {
+        "app": {
           "type": "string",
           "format": "uri"
         },
@@ -64,7 +64,7 @@
       },
       "required": [
         "medium",
-        "tool",
+        "app",
         "contains"
       ]
     },

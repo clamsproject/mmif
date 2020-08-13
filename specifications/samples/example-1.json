@@ -38,7 +38,7 @@
 				},
 				"medium": "m1",
 				"timestamp": "2020-05-27T12:23:45",
-				"tool": "http://tools.clams.ai/bars-and-tones/1.0.5"
+				"app": "http://apps.clams.ai/bars-and-tones/1.0.5"
 			},
 
 			"annotations": [
@@ -66,7 +66,7 @@
 				},
 				"medium": "m1",
 				"timestamp": "2020-05-27T12:23:45",
-				"tool": "http://tools.clams.ai/slates/1.0.3"
+				"app": "http://apps.clams.ai/slates/1.0.3"
 			},
 
 			"annotations": [
@@ -92,7 +92,7 @@
 				},
 				"medium": "m2",
 				"timestamp": "2020-05-27T12:25:15",
-				"tool": "http://tools.clams.ai/slates/1.0.3"
+				"app": "http://apps.clams.ai/slates/1.0.3"
 			},
 
 			"annotations": [
