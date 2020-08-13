@@ -27,14 +27,14 @@ class View(MmifObject):
     def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
 
-    def new_annotation(self, aid: str, at_type: str) -> 'Annotation':
+    def new_annotation(self, aid: str, at_type: str, overwrite=False) -> 'Annotation':
         new_annotation = Annotation()
         new_annotation.at_type = at_type
         new_annotation.id = aid
-        return self.add_annotation(new_annotation)
+        return self.add_annotation(new_annotation, overwrite)
 
-    def add_annotation(self, annotation: 'Annotation') -> 'Annotation':
-        self.annotations[annotation.id] = annotation
+    def add_annotation(self, annotation: 'Annotation', overwrite=False) -> 'Annotation':
+        self.annotations.append(annotation, overwrite)
         self.new_contain(annotation.at_type)
         return annotation
 
