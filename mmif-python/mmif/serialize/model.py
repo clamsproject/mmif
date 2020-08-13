@@ -159,6 +159,12 @@ class DataList(MmifObject, Generic[T]):
         except KeyError:
             return None
 
+    def _append_with_key(self, key: str, value: T) -> None:
+        if key in self.items:
+            raise KeyError(f"Key {key} already exists")
+        else:
+            self[key] = value
+
     def __getitem__(self, key: str):
         return self.items.__getitem__(key)
 

@@ -103,3 +103,5 @@ class AnnotationsList(DataList[Annotation]):
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['properties']['id']: Annotation(item) for item in input_list}
 
+    def append(self, value: Annotation):
+        super()._append_with_key(value.id, value)

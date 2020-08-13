@@ -166,8 +166,14 @@ class MediaList(DataList[Medium]):
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: Medium(item) for item in input_list}
 
+    def append(self, value: Medium):
+        super()._append_with_key(value.id, value)
+
 
 class ViewsList(DataList[View]):
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: View(item) for item in input_list}
+
+    def append(self, value: View):
+        super()._append_with_key(value.id, value)
