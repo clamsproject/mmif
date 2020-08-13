@@ -21,7 +21,7 @@ class Medium(MmifObject):
         self.metadata = MediumMetadata()
         super().__init__(medium_obj)
 
-    def _deserialize(self, medium_dict: dict):
+    def _deserialize(self, medium_dict: dict) -> None:
         self.id = medium_dict['id']
         self.type = medium_dict['type']
         if 'metadata' in medium_dict:
@@ -33,7 +33,7 @@ class Medium(MmifObject):
         if 'text' in medium_dict:
             self.text = Text(medium_dict['text'])
 
-    def add_metadata(self, name: str, value: str):
+    def add_metadata(self, name: str, value: str) -> None:
         self.metadata[name] = value
 
     @property

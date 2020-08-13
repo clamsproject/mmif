@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Dict, List, Union, Optional
 
 from .annotation import Annotation
-from .model import MmifObject
+from .model import MmifObject, DataList
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
@@ -11,35 +11,53 @@ __all__ = ['View', 'ViewMetadata', 'Contain']
 class View(MmifObject):
     id: str
     metadata: 'ViewMetadata'
-    annotations: List['Annotation']
-    anno_ids = set()
+    annotations: 'AnnotationsList'
 
     def __init__(self, view_obj: Union[str, dict] = None):
         self.id = ''
         self.metadata = ViewMetadata()
-        self.annotations = []
+        self.annotations = AnnotationsList()
         super().__init__(view_obj)
 
-    def _deserialize(self, view_dict: dict):
+    def _deserialize(self, view_dict: dict) -> None:
         self.id = view_dict['id']
         self.metadata = ViewMetadata(view_dict['metadata'])
-        for anno_dict in view_dict['annotations']:
-            self.add_annotation(Annotation(anno_dict))
+        self.annotations = AnnotationsList(view_dict['annotations'])
 
     def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
 
-    def new_annotation(self, aid: str, at_type: str):
+    def new_annotation(self, aid: str, at_type: str, overwrite=False) -> 'Annotation':
         new_annotation = Annotation()
         new_annotation.at_type = at_type
         new_annotation.id = aid
-        return self.add_annotation(new_annotation)
+        return self.add_annotation(new_annotation, overwrite)
 
-    def add_annotation(self, annotation: 'Annotation') -> 'Annotation':
-        self.annotations.append(annotation)
-        self.anno_ids.add(annotation.id)
+    def add_annotation(self, annotation: 'Annotation', overwrite=False) -> 'Annotation':
+        self.annotations.append(annotation, overwrite)
         self.new_contain(annotation.at_type)
         return annotation
+
+    def __getitem__(self, key: str) -> 'Annotation':
+        """
+        getitem implementation for View.
+
+        >>> obj = View('''{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"medium": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}''')
+        >>> type(obj['bb1'])
+        <class 'mmif.serialize.annotation.Annotation'>
+        >>> obj['asdf']
+        Traceback (most recent call last):
+            ...
+        KeyError: 'Annotation ID not found: asdf'
+
+        :raises KeyError: if the key is not found or if the search results are ambiguous
+        :param key: the search string.
+        :return: the object searched for
+        """
+        anno_result = self.annotations.get(key)
+        if not anno_result:
+            raise KeyError("Annotation ID not found: %s" % key)
+        return anno_result
 
 
 class ViewMetadata(MmifObject):
@@ -78,3 +96,12 @@ class Contain(MmifObject):
         self.gen_time = datetime.now()     # datetime.datetime
         super().__init__(contain_obj)
 
+
+class AnnotationsList(DataList[Annotation]):
+    items: Dict[str, Annotation]
+
+    def _deserialize(self, input_list: list) -> None:
+        self.items = {item['properties']['id']: Annotation(item) for item in input_list}
+
+    def append(self, value: Annotation, overwrite=False):
+        super()._append_with_key(value.id, value, overwrite)

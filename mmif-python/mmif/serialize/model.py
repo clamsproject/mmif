@@ -1,9 +1,10 @@
 import json
 from deepdiff import DeepDiff as ddiff
-from typing import Union, Any, Dict
+from typing import Union, Any, Dict, Optional, TypeVar, Generic
 
 
-__all__ = ['MmifObject', 'MmifObjectEncoder']
+T = TypeVar('T')
+__all__ = ['MmifObject', 'MmifObjectEncoder', 'DataList']
 
 
 class MmifObject(object):
@@ -45,7 +46,7 @@ class MmifObject(object):
         return d
 
     @staticmethod
-    def _load_json(json_obj: Union[dict, str]):
+    def _load_json(json_obj: Union[dict, str]) -> dict:
         """
         Maps JSON-LD-format MMIF strings and dicts into Python dicts
         with identifier-compliant keys. To do this, it replaces "@"
@@ -59,13 +60,13 @@ class MmifObject(object):
         :param json_str:
         :return:
         """
-        def to_atsign(d: Dict[str, Any]):
+        def to_atsign(d: Dict[str, Any]) -> dict:
             for k in list(d.keys()):
                 if k.startswith('@'):
                     d[f'_{k[1:]}'] = d.pop(k)
             return d
 
-        def traverse_to_atsign(d: dict):
+        def traverse_to_atsign(d: dict) -> dict:
             new_d = d.copy()
             to_atsign(new_d)
             for key, value in new_d.items():
@@ -136,3 +137,48 @@ class MmifObjectEncoder(json.JSONEncoder):
         else:
             return json.JSONEncoder.default(self, obj)
 
+
+class DataList(MmifObject, Generic[T]):
+    def __init__(self, mmif_obj: Union[str, list] = None):
+        self.items: Dict[str, T] = dict()
+        if mmif_obj is None:
+            mmif_obj = []
+        super().__init__(mmif_obj)
+
+    def _serialize(self) -> list:
+        return list(self.items.values())
+
+    def deserialize(self, mmif_json: Union[str, list]) -> None:
+        if isinstance(mmif_json, str):
+            mmif_json = json.loads(mmif_json)
+        self._deserialize(mmif_json)
+
+    def get(self, key: str) -> Optional[T]:
+        try:
+            return self[key]
+        except KeyError:
+            return None
+
+    def _append_with_key(self, key: str, value: T, overwrite=False) -> None:
+        if not overwrite and key in self.items:
+            raise KeyError(f"Key {key} already exists")
+        else:
+            self[key] = value
+
+    def __getitem__(self, key: str):
+        return self.items.__getitem__(key)
+
+    def __setitem__(self, key: str, value: T):
+        self.items.__setitem__(key, value)
+
+    def __iter__(self):
+        return self.items.values().__iter__()
+
+    def __len__(self):
+        return self.items.__len__()
+
+    def __reversed__(self):
+        return reversed(list(self.items.values()))
+
+    def __contains__(self, item):
+        return item in self.items
