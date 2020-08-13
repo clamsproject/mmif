@@ -44,19 +44,19 @@ class Annotation(MmifObject):
 
 
 class AnnotationProperties(MmifObject):
+    id: str
     properties: dict
 
     def __init__(self, mmif_obj: Union[str, dict] = None):
-        if mmif_obj is None:
-            mmif_obj = {}
+        self.properties = {}
         super().__init__(mmif_obj)
 
     @property
-    def id(self):
+    def id(self):  # type: ignore
         return self.properties['id']
 
     @id.setter
-    def id(self, aid: str):
+    def id(self, aid):  # type: ignore
         self.properties['id'] = aid
 
     def _deserialize(self, input_dict: dict) -> None:
