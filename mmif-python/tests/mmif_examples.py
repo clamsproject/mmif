@@ -394,3 +394,59 @@ ext_text_medium = """{
       "mime": "text/plain",
       "location": "/var/archive/video-0012-transcript.txt"
     }"""
+
+example1_modified = """{
+  "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/0.1.0"
+  },
+  "media": [
+    {
+      "id": "m1",
+      "type": "image",
+      "mime": "image/jpeg",
+      "location": "/var/archive/image-0012.jpg"
+    },
+    {
+      "id": "m2",
+      "type": "text",
+      "text": {
+        "@value": "yelp",
+        "@language": "en"
+      },
+      "metadata": {
+        "source": "v1:bb1",
+        "app": "http://apps.clams.io/tesseract/1.2.1"
+      }
+    }
+  ],
+  "views": [
+    {
+      "id": "v1",
+      "metadata": {
+        "contains": {
+          "BoundingBox": {"unit": "pixels"},
+          "http://mmif.clams.ai/0.1.0/vocabulary/Polygon": {"gen_time": "2020-05-27T12:23:45"}
+        },
+        "medium": "m1",
+        "app": "http://apps.clams.io/east/1.0.4"
+      },
+      "annotations": [
+        {
+          "@type": "BoundingBox",
+          "properties": {
+            "id": "bb1",
+            "coordinates": [[90,40], [110,40], [90,50], [110,50]] 
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/0.1.0/vocabulary/Polygon",
+          "properties": {
+            "id": "p1",
+            "coordinates": [[20, 30], [20, 40], [60, 30]]
+          }
+        }
+      ]
+    }
+  ]
+}"""
