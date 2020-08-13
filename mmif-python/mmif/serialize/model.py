@@ -179,3 +179,6 @@ class DataList(MmifObject, Generic[T]):
 
     def __reversed__(self):
         return reversed(list(self.items.values()))
+
+    def __contains__(self, item):
+        return item in self.items

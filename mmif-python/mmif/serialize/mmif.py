@@ -49,7 +49,12 @@ class Mmif(MmifObject):
         jsonschema.validate(json_str, schema)
 
     def new_view_id(self) -> str:
-        return 'v_' + str(len(self.views))
+        index = str(len(self.views))
+        new_id = 'v_' + index
+        while new_id in self.views:
+            index += 1
+            new_id = 'v_' + index
+        return new_id
 
     def new_view(self) -> View:
         new_view = View()
