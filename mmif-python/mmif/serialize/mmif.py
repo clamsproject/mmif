@@ -1,5 +1,6 @@
 import json
-from typing import Dict, List, Union, Optional
+from datetime import datetime
+from typing import List, Union, Optional
 
 import jsonschema.validators
 from pkg_resources import resource_stream
@@ -17,24 +18,23 @@ __all__ = ['Mmif']
 class Mmif(MmifObject):
     # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
     _context: str
-    metadata: Dict[str, str]
+    metadata: 'MmifMetadata'
     media: 'MediaList'
     views: 'ViewsList'
 
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
         self._context = ''
-        self.metadata = {}
+        self.metadata = MmifMetadata()
         self.media = MediaList()
         self.views = ViewsList()
         if validate:
             self.validate(mmif_obj)
+        self.disallow_additional_properties()
+        self._attribute_classes = {
+            'media': MediaList,
+            'views': ViewsList
+        }
         super().__init__(mmif_obj)
-
-    def _deserialize(self, input_dict: dict) -> None:
-        self._context = input_dict['_context']
-        self.metadata = input_dict['metadata']
-        self.media = MediaList(input_dict['media'])
-        self.views = ViewsList(input_dict['views'])
 
     @staticmethod
     def validate(json_str: Union[str, dict]) -> None:
@@ -59,6 +59,7 @@ class Mmif(MmifObject):
     def new_view(self) -> View:
         new_view = View()
         new_view.id = self.new_view_id()
+        new_view.metadata.timestamp = datetime.now()
         self.views.append(new_view)
         return new_view
 
@@ -78,7 +79,8 @@ class Mmif(MmifObject):
         In either case, this method will return all medium objects that generated
         from a view.
         """
-        return [medium for medium in self.media if medium.metadata.source is not None and medium.metadata.source.split(':')[0] == source_vid]
+        return [medium for medium in self.media
+                if medium.metadata.source is not None and medium.metadata.source.split(':')[0] == source_vid]
 
     def get_media_by_app(self, app_id: str) -> List[Medium]:
         return [medium for medium in self.media if medium.metadata.app == app_id]
@@ -93,7 +95,7 @@ class Mmif(MmifObject):
         """
         This method returns the file paths of media of given type.
         """
-        return [medium.location for medium in self.media if medium.type == m_type and medium.location is not None]
+        return [medium.location for medium in self.media if medium.type == m_type and len(medium.location) > 0]
 
     def get_medium_location(self, m_type: str) -> str:
         """
@@ -149,6 +151,8 @@ class Mmif(MmifObject):
         :param item: the search string, a medium ID, a view ID, or a view-scoped annotation ID
         :return: the object searched for
         """
+        if item in self._named_attributes():
+            return self.__dict__[item]
         split_attempt = item.split(':')
 
         medium_result = self.media.get(split_attempt[0])
@@ -166,6 +170,12 @@ class Mmif(MmifObject):
         if not (view_result or medium_result):
             raise KeyError("ID not found: %s" % item)
         return anno_result or view_result or medium_result
+
+
+class MmifMetadata(MmifObject):
+
+    def __init__(self, metadata_obj: Union[str, dict] = None):
+        super().__init__(metadata_obj)
 
 
 class MediaList(DataList[Medium]):

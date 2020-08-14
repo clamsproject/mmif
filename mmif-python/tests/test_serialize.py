@@ -35,7 +35,7 @@ class TestMmif(unittest.TestCase):
                     self.fail(f"example {i}")
                 except KeyError:
                     self.fail("didn't swap _ and @")
-                self.assertEqual(mmif_obj, Mmif(mmif_obj.serialize()), f'Failed on {i}')
+                self.assertEqual(mmif_obj.serialize(True), Mmif(mmif_obj.serialize()).serialize(True), f'Failed on {i}')
 
     def test_json_mmif_deserialize(self):
         for i, example in self.examples_json.items():
@@ -45,31 +45,17 @@ class TestMmif(unittest.TestCase):
                 self.fail(ve.message)
             except KeyError:
                 self.fail("didn't swap _ and @")
-            self.assertEqual(mmif_obj, Mmif(json.loads(mmif_obj.serialize())), f'Failed on {i}')
+            roundtrip = Mmif(mmif_obj.serialize())
+            self.assertEqual(mmif_obj.serialize(True), roundtrip.serialize(True), f'Failed on {i}')
 
     def test_str_vs_json_deserialize(self):
-        def dummy_timestamp(d: dict):
-            for view in range(len(d['views'])):
-                try:
-                    d_contains = d['views'][view]['metadata']['contains']
-                except KeyError:
-                    continue
-                for at_type, metadata in d_contains.items():
-                    try:
-                        metadata['gen_time'] = 'dummy'
-                    except KeyError:
-                        continue
-        
+
         for i, example in examples.items():
             if not i.startswith('mmif_'):
                 continue
             str_mmif_obj = Mmif(example)
             json_mmif_obj = Mmif(json.loads(example))
-            first = json.loads(str_mmif_obj.serialize())
-            second = json.loads(json_mmif_obj.serialize())
-            dummy_timestamp(first)
-            dummy_timestamp(second)
-            self.assertEqual(first, second, f'Failed on {i}')
+            self.assertEqual(str_mmif_obj.serialize(True), json_mmif_obj.serialize(True), f'Failed on {i}')
 
     def test_bad_mmif_deserialize_no_context(self):
         self.examples_json['mmif_example1'].pop('@context')
@@ -371,8 +357,18 @@ class TestView(unittest.TestCase):
         view_serial = self.view_obj.serialize()
         for original, new in zip(self.view_json['annotations'],
                                  json.loads(view_serial)['annotations']):
-            assert original['properties']['id'] == new['properties']['id'], \
-                f"{original['properties']['id']} is not {new['properties']['id']}"
+
+            o = original['properties']['id']
+            n = new['properties']['id']
+            assert o == n, f"{o} is not {n}"
+
+    def test_view_metadata(self):
+        vmeta = ViewMetadata()
+        vmeta['tool'] = 'fdsa'
+        vmeta['random_key'] = 'random_value'
+        serialized = vmeta.serialize()
+        deserialized = ViewMetadata(serialized)
+        self.assertEqual(vmeta, deserialized)
 
     def test_props_preserved(self):
         view_serial = self.view_obj.serialize()
@@ -485,7 +481,7 @@ class TestMedium(unittest.TestCase):
                 try:
                     _ = Medium(medium)
                 except Exception as ex:
-                    self.fail(f"{type(ex)}: {ex.message}: {i} {medium['id']}")
+                    self.fail(f"{type(ex)}: {str(ex)}: {i} {medium['id']}")
 
     def test_medium_metadata(self):
         metadata_json = self.data['mmif_example1']['media'][1]['metadata']

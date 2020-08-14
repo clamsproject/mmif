@@ -1,7 +1,8 @@
 import json
-from deepdiff import DeepDiff as ddiff
-from typing import Union, Any, Dict, Optional, TypeVar, Generic
+from datetime import datetime
 
+from deepdiff import DeepDiff
+from typing import Union, Any, Dict, Optional, TypeVar, Generic, Type
 
 T = TypeVar('T')
 __all__ = ['MmifObject', 'MmifObjectEncoder', 'DataList']
@@ -11,6 +12,9 @@ class MmifObject(object):
     """
     Abstract superclass for MMIF related key-value pair objects.
     """
+    reversed_names = ['_unnamed_attributes', '_attribute_classes']
+    _unnamed_attributes: Optional[dict]
+    _attribute_classes: Dict[str, Type] = {}
 
     def __init__(self, mmif_obj: Union[str, dict] = None):
         """
@@ -18,12 +22,42 @@ class MmifObject(object):
         an actual representation with a JSON formatted string or equivalent
         `dict` object argument.
 
+        This superclass has two specially designed instance variables, and these
+        variable names cannot be used as attribute names for MMIF objects.
+        1. _unnamed_attributes
+          only can be either None or an empty dictionary. If it's set to None,
+          it means the class won't take any ``Additional Attributes`` in the JSON
+           schema sense. If it's a dict, users can throw any k-v pairs to the
+           class, EXCEPT for the reserved two key names.
+        2. _attribute_classes:
+          this is a dict from a key name to a specific python class to use for
+          deserialize the value. Note that a key name in this dict does NOT
+          have to be a *named* attribute, but is recommended to be one.
+        # TODO (krim @ 8/17/20): this dict is however, a duplicate with the type hints in the class definition.
+        Maybe there is a better way to utilize type hints (e.g. getting them as a programmatically), but for now
+        developers should be careful to add types to hints as well as to this dict.
+
+        Also note that those two special attributes MUST be set in the __init__()
+        before calling super method, otherwise deserialization will not work.
+
         :param mmif_obj: JSON string or `dict` to initialize an object.
          If not given, an empty object will be initialized, sometimes with
          an ID value automatically generated, based on its parent object.
         """
+        if not hasattr(self, '_unnamed_attributes'):
+            self._unnamed_attributes = {}
         if mmif_obj is not None:
             self.deserialize(mmif_obj)
+
+    def disallow_additional_properties(self):
+        self._unnamed_attributes = None
+
+    def _named_attributes(self):
+        return (n for n in self.__dict__.keys() if n not in self.reversed_names)
+
+    def _named_attribute_class(self, attribute_name: str):
+
+        return self._attribute_classes[attribute_name]
 
     def serialize(self, pretty: bool = False) -> str:
         """
@@ -34,16 +68,38 @@ class MmifObject(object):
         """
         return json.dumps(self._serialize(), indent=2 if pretty else None, cls=MmifObjectEncoder)
 
-    def _serialize(self) -> dict:
-        d = {}
-        for k, v in list(self.__dict__.items()):
-            # ignore all "null" values including empty dicts and zero strings
-            if v is not None and len(v) if hasattr(v, '__len__') else len(str(v)) > 0:
-                if k.startswith('_'): # _ as a placeholder ``@`` in json-ld
-                    d[f'@{k[1:]}'] = v
-                else:
-                    d[k] = v
-        return d
+    def _serialize(self) -> Union[None, dict]:
+        serializing_obj = {}
+        try:
+            for k, v in self._unnamed_attributes.items():   # pytype: disable=attribute-error
+                if v is None:
+                    continue
+                if k.startswith('_'):   # _ as a placeholder ``@`` in json-ld
+                    k = f'@{k[1:]}'
+                serializing_obj[k] = v
+        except AttributeError as e:
+            # means _unnamed_attributes is None, so nothing unnamed would be serialized
+            pass
+        for k, v in self.__dict__.items():
+            if k in self.reversed_names or self.is_empty(v):
+                continue
+            if k.startswith('_'):       # _ as a placeholder ``@`` in json-ld
+                k = f'@{k[1:]}'
+            serializing_obj[k] = v
+        return serializing_obj
+
+    @staticmethod
+    def is_empty(obj):
+        """
+        return True if the obj is None or "emtpy". The emptiness first defined as
+        having zero length. But for objects that lack __len__ method, we need
+        additional check.
+        """
+        if obj is None:
+            return True
+        if hasattr(obj, '__len__') and len(obj) == 0:
+            return True
+        return False
 
     @staticmethod
     def _load_json(json_obj: Union[dict, str]) -> dict:
@@ -60,24 +116,24 @@ class MmifObject(object):
         :param json_str:
         :return:
         """
-        def to_atsign(d: Dict[str, Any]) -> dict:
+        def from_atsign(d: Dict[str, Any]) -> dict:
             for k in list(d.keys()):
                 if k.startswith('@'):
                     d[f'_{k[1:]}'] = d.pop(k)
             return d
 
-        def traverse_to_atsign(d: dict) -> dict:
+        def deep_from_atsign(d: dict) -> dict:
             new_d = d.copy()
-            to_atsign(new_d)
+            from_atsign(new_d)
             for key, value in new_d.items():
                 if type(value) is dict:
-                    new_d[key] = traverse_to_atsign(value)
+                    new_d[key] = deep_from_atsign(value)
             return new_d
 
         if type(json_obj) is dict:
-            return traverse_to_atsign(json_obj)
+            return deep_from_atsign(json_obj)
         elif type(json_obj) is str:
-            return json.loads(json_obj, object_hook=to_atsign)
+            return json.loads(json_obj, object_hook=from_atsign)
         else:
             raise TypeError("tried to load MMIF JSON in a format other than str or dict")
 
@@ -98,10 +154,16 @@ class MmifObject(object):
         Maps a plain python dict object to a MMIF object.
         If a subclass needs special treatment during the mapping, it needs to
         override this method.
-        :param input_dict:
-        :return:
+        This defalt method won't work for generic types (e.g. List[X], Dict[X, Y]).
+        For now, lists are abstracted as DataList and dicts are abstracted as XXXMedata classes.
+        However, if an attribute uses a generic type (e.g. view_metadata.contains: Dict[str, Contain])
+        that class should override _deserialize of its own.
         """
-        self.__dict__ = input_dict
+        for k, v in input_dict.items():
+            if self._attribute_classes and k in self._attribute_classes:
+                self[k] = self._attribute_classes[k](v)
+            else:
+                self[k] = v
 
     def __str__(self):
         return self.serialize(False)
@@ -113,10 +175,23 @@ class MmifObject(object):
         return self.serialize(True)
 
     def __eq__(self, other):
-        return isinstance(other, type(self)) and len(ddiff(self, other, ignore_order=True, report_repetition=True)) ==0
+        return isinstance(other, type(self)) and \
+               len(DeepDiff(self, other, ignore_order=True, report_repetition=True, exclude_types=[datetime])) == 0
 
     def __len__(self):
-        return len(self.__dict__)
+        return sum([not self.is_empty(self[named]) for named in self._named_attributes()]) \
+               + (len(self._unnamed_attributes) if self._unnamed_attributes else 0)
+
+    def __setitem__(self, key, value):
+        if key in self._named_attributes():
+            self.__dict__[key] = value
+        else:
+            self._unnamed_attributes[key] = value   # pytype: disable=unsupported-operands
+
+    def __getitem__(self, key):
+        if key in self._named_attributes():
+            return self.__dict__[key]
+        return self._unnamed_attributes[key]
 
 
 class MmifObjectEncoder(json.JSONEncoder):
@@ -130,7 +205,7 @@ class MmifObjectEncoder(json.JSONEncoder):
         """
         if hasattr(obj, '_serialize'):
             return obj._serialize()
-        elif hasattr(obj, 'isoformat'): # for datetime objects
+        elif hasattr(obj, 'isoformat'):         # for datetime objects
             return obj.isoformat()
         elif hasattr(obj, '__str__'):
             return str(obj)
