@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Dict, List, Union, Optional
+import dateutil.parser
 
 from .annotation import Annotation
 from .model import MmifObject, DataList
@@ -120,7 +121,8 @@ class Contain(MmifObject):
     def _deserialize(self, input_dict: dict) -> None:
         super()._deserialize(input_dict)
         if 'gen_time' in self.__dict__ and isinstance(self.gen_time, str):
-            self.gen_time = datetime.fromisoformat(self.gen_time)
+            self.gen_time = dateutil.parser.isoparse(self.gen_time)
+
 
 class AnnotationsList(DataList[Annotation]):
     items: Dict[str, Annotation]
