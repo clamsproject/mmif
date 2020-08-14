@@ -55,16 +55,8 @@ def write_res_file(res_dir: str, res_name: str, res_data: Union[bytes, str]):
 if os.path.exists(version_fname):
     with open(version_fname, 'r') as version_f:
         version = version_f.read().strip()
-        print(version)
 else:
     raise ValueError(f"Cannot find {version_fname} file. Use `make version` to generate one.")
-
-# the above will generate a new version value based on VERSION file
-# but as `mmif` package is already imported at the top,
-# mmif.__version__ is not updated, and that's why we use the value of
-# `version` instead of `mmif.__version__` in the below when calling `setuptools.setup`
-generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"')
-
 
 def prep_ext_files(setuptools_cmd):
     ori_run = setuptools_cmd.run
@@ -73,8 +65,16 @@ def prep_ext_files(setuptools_cmd):
         # assuming build only happens inside the `mmif` git repository
         # also, NOTE that when in `make develop`, it will use resource files in the same branch
         gittag = get_matching_gittag(version) if '.dev' not in version else "HEAD"
+        spec_version = gittag.split('-')[-1]
         # making resources into a python package so that `pkg_resources` can access resource files
         res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
+
+        # the above will generate a new version value based on VERSION file
+        # but as `mmif` package is already imported at the top,
+        # mmif.__version__ is not updated, and that's why we use the value of
+        # `version` instead of `mmif.__version__` in the below when calling `setuptools.setup`
+        generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"\n__specver__ = "{spec_version}"')
+
         # and write resource files
         write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
         write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
