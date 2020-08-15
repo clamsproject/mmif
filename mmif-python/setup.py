@@ -31,6 +31,16 @@ def generate_subpack(parpack_name, subpack_name, init_contents=""):
     return subpack_dir
 
 
+def generate_vocabulary():
+    types = {'annotation_types.py': 'AnnotationTypes'}
+    vocabulary_dir = generate_subpack(mmif.__name__, mmif._vocabulary_pkg,
+                                      '\n'.join(f"from .{fname.split('.')[0]} import {cname}" for fname, cname in types.items()))
+    # TODO (krim @ 8/15/20): actual generation happens here
+    for fname, cname in types.items():
+        with open(pjoin(vocabulary_dir, fname), 'w') as type_f:
+            type_f.write(f'class {cname}:\n    pass')
+
+
 def get_matching_gittag(version: str):
     vmaj, vmin, vpat = version.split('.')[0:3]
     tags = subprocess.check_output(['git', 'tag']).decode().split('\n')
@@ -78,6 +88,8 @@ def prep_ext_files(setuptools_cmd):
         # and write resource files
         write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
         write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+
+        generate_vocabulary()
         ori_run(self)
 
     setuptools_cmd.run = mod_run
