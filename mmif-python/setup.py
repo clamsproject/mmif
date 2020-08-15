@@ -49,12 +49,14 @@ def generate_vocab_enum(spec_version, clams_types, source_path) -> str:
 
 
 def generate_vocabulary(spec_version, clams_types, source_path):
-    types = {'annotation_types.py': ['AnnotationTypesBase', 'AnnotationTypes']}
+    types = {'annotation_types.py': ['AnnotationTypesBase', 'AnnotationTypes'],
+             'media_types.py': ['MediaTypes']}
     vocabulary_dir = generate_subpack(mmif.__name__, mmif._vocabulary_pkg,
-                                      '\n'.join(f"from .{fname.split('.')[0]} import {cname}" for fname, cnames in types.items() for cname in cnames))
+                                      '\n'.join(f"from .{fname.split('.')[0]} import {cname}" for fname, cnames in types.items() for cname in cnames)+'\n')
 
     vocab_enum = generate_vocab_enum(spec_version, clams_types, source_path)
     write_res_file(vocabulary_dir, 'annotation_types.py', vocab_enum)
+    return vocabulary_dir
 
 
 def get_matching_gittag(version: str):
@@ -109,7 +111,9 @@ def prep_ext_files(setuptools_cmd):
         # write vocabulary enum
         yaml_file = io.BytesIO(get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
         clams_types = [t['name'] for t in list(yaml.safe_load_all(yaml_file.read()))]
-        generate_vocabulary(spec_version, clams_types, 'annotation_types.txt')
+        vocabulary_dir = generate_vocabulary(spec_version, clams_types, os.path.join('vocabulary_files', 'annotation_types.txt'))
+        with open(os.path.join('vocabulary_files', 'media_types.txt')) as media_types_file:
+            write_res_file(vocabulary_dir, 'media_types.py', media_types_file.read())
 
         ori_run(self)
 
