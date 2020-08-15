@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+import io
 import os
 import shutil
 import subprocess
@@ -9,6 +10,7 @@ import setuptools.command.build_py
 import setuptools.command.develop
 
 import mmif  # this imports `mmif` directory as a sibling, not `mmif` site-package
+import yaml
 
 name = "mmif-python"
 version_fname = "VERSION"
@@ -31,14 +33,28 @@ def generate_subpack(parpack_name, subpack_name, init_contents=""):
     return subpack_dir
 
 
-def generate_vocabulary():
-    types = {'annotation_types.py': 'AnnotationTypes'}
+def generate_vocab_enum(spec_version, clams_types, source_path) -> str:
+    vocab_url = 'http://mmif.clams.ai/%s/vocabulary' % spec_version
+
+    file_out = io.StringIO()
+    with open(source_path, 'r') as file_in:
+        for line in file_in.readlines():
+            file_out.write(line.replace('<VERSION>', spec_version))
+        for type_name in clams_types:
+            file_out.write(f"    {type_name} = '{vocab_url}/{type_name}'\n")
+
+    string_out = file_out.getvalue()
+    file_out.close()
+    return string_out
+
+
+def generate_vocabulary(spec_version, clams_types, source_path):
+    types = {'annotation_types.py': ['AnnotationTypesBase', 'AnnotationTypes']}
     vocabulary_dir = generate_subpack(mmif.__name__, mmif._vocabulary_pkg,
-                                      '\n'.join(f"from .{fname.split('.')[0]} import {cname}" for fname, cname in types.items()))
-    # TODO (krim @ 8/15/20): actual generation happens here
-    for fname, cname in types.items():
-        with open(pjoin(vocabulary_dir, fname), 'w') as type_f:
-            type_f.write(f'class {cname}:\n    pass')
+                                      '\n'.join(f"from .{fname.split('.')[0]} import {cname}" for fname, cnames in types.items() for cname in cnames))
+
+    vocab_enum = generate_vocab_enum(spec_version, clams_types, source_path)
+    write_res_file(vocabulary_dir, 'annotation_types.py', vocab_enum)
 
 
 def get_matching_gittag(version: str):
@@ -68,6 +84,7 @@ if os.path.exists(version_fname):
 else:
     raise ValueError(f"Cannot find {version_fname} file. Use `make version` to generate one.")
 
+
 def prep_ext_files(setuptools_cmd):
     ori_run = setuptools_cmd.run
 
@@ -89,7 +106,11 @@ def prep_ext_files(setuptools_cmd):
         write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
         write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
 
-        generate_vocabulary()
+        # write vocabulary enum
+        yaml_file = io.BytesIO(get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+        clams_types = [t['name'] for t in list(yaml.safe_load_all(yaml_file.read()))]
+        generate_vocabulary(spec_version, clams_types, 'annotation_types.txt')
+
         ori_run(self)
 
     setuptools_cmd.run = mod_run

@@ -132,11 +132,6 @@ class Tree(object):
         for child in node['childNodes']:
             self.print_tree(child, level + 1)
 
-    def traverse(self, node: dict, level=0):
-        yield node, level
-        for child in node['childNodes']:
-            yield from self.traverse(child, level + 1)
-
 
 def write_hierarchy(tree, outdir, version):
     IndexPage(tree, outdir, version).write()
@@ -377,19 +372,6 @@ class TypePage(Page):
             self.main_content.append(table)
 
 
-def write_vocab_enum(vocab_tree, source_path, target_path, version):
-    all_names = []
-    for subtype, _ in vocab_tree.traverse(vocab_tree.find_root()):
-        all_names.append(subtype['name'])
-
-    with open(source_path, 'r') as file_in, \
-            open(target_path, 'w') as file_out:
-        for line in file_in.readlines():
-            file_out.write(line.replace('<VERSION>', version))
-        for name in all_names:
-            file_out.write(f"    {name} = '{VOCABULARY_URL}/{name}'\n")
-
-
 def increase_leading_space(text):
     """Hack to double the indentation since I didn't like the single character
     indent in bs4 and there is apparently no way to change that."""
@@ -450,6 +432,3 @@ if __name__ == '__main__':
     tree = Tree(clams_types)
     write_hierarchy(tree, vocab_dir, VERSION)
     write_pages(tree, vocab_dir, VERSION)
-    py_src = os.path.join('.', 'annotation_types.txt')  # current directory
-    py_tgt = os.path.join('..', 'mmif-python', 'mmif', 'vocab', 'annotation_types.py')
-    write_vocab_enum(tree, py_src, py_tgt, VERSION)
