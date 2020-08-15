@@ -4,7 +4,7 @@ import dateutil.parser
 
 from .annotation import Annotation
 from .model import MmifObject, DataList
-from mmif.vocab import AnnotationTypes
+from mmif.vocabulary import AnnotationTypesBase
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
@@ -29,10 +29,10 @@ class View(MmifObject):
         self.metadata = ViewMetadata(view_dict['metadata'])
         self.annotations = AnnotationsList(view_dict['annotations'])
 
-    def new_contain(self, at_type: Union[str, AnnotationTypes], contain_dict: dict = None) -> Optional['Contain']:
+    def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
 
-    def new_annotation(self, aid: str, at_type: Union[str, AnnotationTypes], overwrite=False) -> 'Annotation':
+    def new_annotation(self, aid: str, at_type: Union[str, AnnotationTypesBase], overwrite=False) -> 'Annotation':
         new_annotation = Annotation()
         new_annotation.at_type = at_type
         new_annotation.id = aid
@@ -95,8 +95,8 @@ class ViewMetadata(MmifObject):
                 break
         return exists
 
-    def new_contain(self, at_type: Union[str, AnnotationTypes], contain_dict: dict = None) -> Optional['Contain']:
-        if isinstance(at_type, AnnotationTypes):
+    def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
+        if isinstance(at_type, AnnotationTypesBase):
             exists = self.find_match_hotfix(at_type.name) or self.find_match_hotfix(at_type.value)
             final_key = at_type.value
         else:
