@@ -1,6 +1,7 @@
 import unittest
 import json
-from mmif import Mmif, View, Annotation, AnnotationTypes
+from mmif import Mmif, View, Annotation
+from mmif.vocabulary import AnnotationTypes
 from mmif.serialize.model import MmifObjectEncoder
 from tests.mmif_examples import *
 

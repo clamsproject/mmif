@@ -1,6 +1,6 @@
 _res_pkg = 'res'
 _ver_pkg = 'ver'
-_vocabulary_pkg = 'vocab'
+_vocabulary_pkg = 'vocabulary'
 __version__ = 'UNK'
 __specver__ = 'UNK'
 _schema_res_oriname = 'schema/mmif.json'
