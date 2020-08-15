@@ -69,6 +69,7 @@ tags
 # auto-generated files
 mmif-python/**/ver
 mmif-python/**/res
+mmif-python/**/vocabulary
 mmif-python/VERSION*
 .hypothesis
 
