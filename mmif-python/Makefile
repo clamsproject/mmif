@@ -12,10 +12,11 @@ inc_patch = $(call macro,$(1)).$(call micro,$(1)).$$(($(call patch,$(1))+1))
 splt_dev = $(word 2,$(subst .dev,$(space),$(1)))
 inc_dev = $(call macro,$(1)).$(call micro,$(1)).$(call patch,$(1)).dev$$(($(call splt_dev,$(1))+1))
 add_dev = $(call macro,$(1)).$(call micro,$(1)).$(call patch,$(1)).dev1
+artifact = build/lib/mmif
 
 .PHONY: all clean test develop publish sdist version devversion
 
-all: VERSION test build/lib/mmif
+all: VERSION test build
 
 sdist: dist/$(sdistname)-*.tar.gz
 dist/$(sdistname)-*.dev*.tar.gz: devversion dist/$(sdistname)-*.tar.gz
@@ -30,11 +31,13 @@ develop: clean devversion test dist/$(sdistname)-*.dev*.tar.gz
 publish: test sdist
 	twine upload -u __token__ -p $$PYPITOKEN dist/$(sdistname)-`cat VERSION`.tar.gz
 
-build/lib/mmif: 
+build: $(artifact)
+
+$(artifact):
 	python3 setup.py build
 
 # invoking `test` without a VERSION file will generated a dev version - this ensures `make test` runs unmanned
-test: devversion build/lib/mmif
+test: devversion build
 	pytype mmif/
 	python3 -m pytest --doctest-modules
 
@@ -54,4 +57,4 @@ VERSION:
 	fi
 
 clean: 
-	@rm -rf VERSION VERSION.dev build dist $(bdistname).egg-info mmif/res mmif/ver
+	@rm -rf VERSION VERSION.dev $(artifact) dist $(bdistname).egg-info mmif/res mmif/ver mmif/vocabulary
