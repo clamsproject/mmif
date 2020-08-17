@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import Dict, List, Union, Optional
+import dateutil.parser
 
 from .annotation import Annotation
 from .model import MmifObject, DataList
+from mmif.vocabulary import AnnotationTypesBase
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
@@ -27,10 +29,10 @@ class View(MmifObject):
         self.metadata = ViewMetadata(view_dict['metadata'])
         self.annotations = AnnotationsList(view_dict['annotations'])
 
-    def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
+    def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
 
-    def new_annotation(self, aid: str, at_type: str, overwrite=False) -> 'Annotation':
+    def new_annotation(self, aid: str, at_type: Union[str, AnnotationTypesBase], overwrite=False) -> 'Annotation':
         new_annotation = Annotation()
         new_annotation.at_type = at_type
         new_annotation.id = aid
@@ -66,13 +68,14 @@ class View(MmifObject):
 class ViewMetadata(MmifObject):
     medium: str
     timestamp: Optional[datetime] = None
-    tool: str
+    app: str
     contains: Dict[str, 'Contain']
 
     def __init__(self, viewmetadata_obj: Union[str, dict] = None):
+        # need to set instance variables for ``_named_attributes()`` to work
         self.medium = ''
         self.timestamp = datetime.now()
-        self.tool = ''
+        self.app = ''
         self.contains = {}
         super().__init__(viewmetadata_obj)
 
@@ -80,18 +83,29 @@ class ViewMetadata(MmifObject):
         # TODO (angus-lherrou @ 8/4/2020): using __dict__ with potentially non-identifier
         #  keys "works" but is not pythonic so better to wrap a dict property.
         #  Unify implementations of this and MediumMetadata
+        # super()._deserialize(input_dict)
         self.__dict__ = input_dict
         self.contains = {at_type: Contain(contain_obj) for at_type, contain_obj in input_dict.get('contains', {}).items()}
 
-    def new_contain(self, at_type: str, contain_dict: dict = None) -> Optional['Contain']:
-        # URI comparison hotfix
-        absent = True
+    def find_match_hotfix(self, key: str) -> bool:
+        exists = False
         for existing_type in self.contains.keys():
-            if at_type.split('/')[-1] == existing_type.split('/')[-1]:
-                absent = False
-        if absent:
+            if key.split('/')[-1] == existing_type.split('/')[-1]:
+                exists = True
+                break
+        return exists
+
+    def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
+        if isinstance(at_type, AnnotationTypesBase):
+            exists = self.find_match_hotfix(at_type.name) or self.find_match_hotfix(at_type.value)
+            final_key = at_type.value
+        else:
+            exists = self.find_match_hotfix(at_type)
+            final_key = at_type
+
+        if not exists:
             new_contain = Contain(contain_dict)
-            self.contains[at_type] = new_contain
+            self.contains[final_key] = new_contain
             return new_contain
 
 
@@ -107,7 +121,8 @@ class Contain(MmifObject):
     def _deserialize(self, input_dict: dict) -> None:
         super()._deserialize(input_dict)
         if 'gen_time' in self.__dict__ and isinstance(self.gen_time, str):
-            self.gen_time = datetime.fromisoformat(self.gen_time)
+            self.gen_time = dateutil.parser.isoparse(self.gen_time)
+
 
 class AnnotationsList(DataList[Annotation]):
     items: Dict[str, Annotation]

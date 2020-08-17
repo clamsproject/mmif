@@ -1,7 +1,11 @@
-examples = dict(example1="""{
-  "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+from mmif import __specver__
+from string import Template
+
+example_templates = dict(
+    mmif_example1="""{
+  "@context": "http://mmif.clams.ai/${specver}/context/mmif.json",
   "metadata": {
-    "mmif": "http://mmif.clams.ai/0.1.0"
+    "mmif": "http://mmif.clams.ai/${specver}"
   },
   "media": [
     {
@@ -44,12 +48,11 @@ examples = dict(example1="""{
     }
   ]
 }""",
-
-                example2="""{
-  "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+    mmif_example2="""{
+  "@context": "http://mmif.clams.ai/${specver}/context/mmif.json",
 
   "metadata": {
-    "mmif": "http://mmif.clams.ai/0.1.0",
+    "mmif": "http://mmif.clams.ai/${specver}",
     "contains": {
       "http://mmif.clams.ai/1.0/vocabulary/Segment": ["v1"],
       "http://vocab.lappsgrid.org/NamedEntity": ["v2"]
@@ -73,7 +76,7 @@ examples = dict(example1="""{
 
   "views": [
     {
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+      "@context": "http://mmif.clams.ai/${specver}/context/vocab-clams.json",
       "id": "v1",
       "metadata": {
         "medium": "m1",
@@ -99,7 +102,7 @@ examples = dict(example1="""{
     },
 
     {
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-lapps.json",
+      "@context": "http://mmif.clams.ai/${specver}/context/vocab-lapps.json",
       "id": "v2",
       "metadata": {
         "medium": "m2",
@@ -125,15 +128,14 @@ examples = dict(example1="""{
   ]
 }
 """,
-
-                example3="""{
-  "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+    mmif_example3="""{
+  "@context": "http://mmif.clams.ai/${specver}/context/mmif.json",
 
   "metadata": {
-    "mmif": "http://mmif.clams.ai/0.1.0",
+    "mmif": "http://mmif.clams.ai/${specver}",
     "contains": {
       "http://mmif.clams.ai/1.0/vocabulary/Segment": ["v1"],
-      "http://mmif.clams.ai/0.1.0/vocabulary/TimePoint": ["v1"],
+      "http://mmif.clams.ai/${specver}/vocabulary/TimePoint": ["v1"],
       "http://vocab.lappsgrid.org/NamedEntity": ["v2"]
     }
   },
@@ -155,7 +157,7 @@ examples = dict(example1="""{
 
   "views": [
     {
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+      "@context": "http://mmif.clams.ai/${specver}/context/vocab-clams.json",
       "id": "v1",
       "metadata": {
         "medium": "m1",
@@ -189,7 +191,7 @@ examples = dict(example1="""{
     },
 
     {
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-lapps.json",
+      "@context": "http://mmif.clams.ai/${specver}/context/vocab-lapps.json",
       "id": "v2",
       "metadata": {
         "medium": "m2",
@@ -215,14 +217,13 @@ examples = dict(example1="""{
   ]
 }
 """,
-
-                example4="""{
-  "@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
+    mmif_example4="""{
+  "@context": "http://mmif.clams.ai/${specver}/context/miff.json",
 
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.1.0",
+    "mmif": "http://miff.clams.ai/${specver}",
     "contains": {
-      "http://mmif.clams.ai/vocabulary/0.1.0/TimeFrame": ["v1", "v2"],
+      "http://mmif.clams.ai/vocabulary/${specver}/TimeFrame": ["v1", "v2"],
       "http://vocab.lappsgrid.org/Token": ["v3"]
     }
   },
@@ -246,11 +247,11 @@ examples = dict(example1="""{
 
     {
       "id": "v1",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+      "@context": "http://mmif.clams.ai/${specver}/context/vocab-clams.json",
 
       "metadata": {
         "contains": {
-          "http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame": {
+          "http://mmif.clams.ai/${specver}/vocabulary/TimeFrame": {
             "unit": "seconds"
           }
         },
@@ -274,11 +275,11 @@ examples = dict(example1="""{
 
     {
       "id": "v2",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+      "@context": "http://mmif.clams.ai/${specver}/context/vocab-clams.json",
 
       "metadata": {
         "contains": {
-          "http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame": {
+          "http://mmif.clams.ai/${specver}/vocabulary/TimeFrame": {
             "unit": "seconds"
           }
         },
@@ -302,7 +303,7 @@ examples = dict(example1="""{
 
     {
       "id": "v3",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-lapps.json",
+      "@context": "http://mmif.clams.ai/${specver}/context/vocab-lapps.json",
 
       "metadata": {
         "contains": {
@@ -328,9 +329,8 @@ examples = dict(example1="""{
 
   ]
 }
-""")
-
-anno1 = """{
+""",
+    annotation_example1 = """{
           "@type": "Token",
           "properties": {
             "id": "token1",
@@ -338,18 +338,16 @@ anno1 = """{
             "end": 3,
             "word": "The"
           }
-        }"""
-
-anno2 = """{
+        }""",
+    annotation_example2 = """{
   "@type": "TimePoint",
   "properties": {
     "id": "t1",
     "point": 5
   }
-}"""
-
-view1 = """{
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
+}""",
+    view_example1 = """{
+      "@context": "http://mmif.clams.ai/${specver}/context/vocab-clams.json",
       "id": "v1",
       "metadata": {
         "medium": "m1",
@@ -379,18 +377,73 @@ view1 = """{
           }
         }
       ]
-    }"""
-
-ext_video_medium = """{
+    }""",
+    medium_ext_video_example = """{
       "id": "m3",
       "type": "video",
       "mime": "video/mp4",
       "location": "/var/archive/video-0012.mp4"
-    }"""
-
-ext_text_medium = """{
+    }""",
+    medium_text_medium_example = """{
       "id": "m4",
       "type": "text",
       "mime": "text/plain",
       "location": "/var/archive/video-0012-transcript.txt"
-    }"""
+    }""",
+    mmif_example1_modified = """{
+  "@context": "http://mmif.clams.ai/${specver}/context/mmif.json",
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/${specver}"
+  },
+  "media": [
+    {
+      "id": "m1",
+      "type": "image",
+      "mime": "image/jpeg",
+      "location": "/var/archive/image-0012.jpg"
+    },
+    {
+      "id": "m2",
+      "type": "text",
+      "text": {
+        "@value": "yelp",
+        "@language": "en"
+      },
+      "metadata": {
+        "source": "v1:bb1",
+        "app": "http://apps.clams.io/tesseract/1.2.1"
+      }
+    }
+  ],
+  "views": [
+    {
+      "id": "v1",
+      "metadata": {
+        "contains": {
+          "BoundingBox": {"unit": "pixels"},
+          "http://mmif.clams.ai/${specver}/vocabulary/Polygon": {"gen_time": "2020-05-27T12:23:45"}
+        },
+        "medium": "m1",
+        "app": "http://apps.clams.io/east/1.0.4"
+      },
+      "annotations": [
+        {
+          "@type": "BoundingBox",
+          "properties": {
+            "id": "bb1",
+            "coordinates": [[90,40], [110,40], [90,50], [110,50]] 
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/${specver}/vocabulary/Polygon",
+          "properties": {
+            "id": "p1",
+            "coordinates": [[20, 30], [20, 40], [60, 30]]
+          }
+        }
+      ]
+    }
+  ]
+}""")
+
+examples = dict((k, Template(v).substitute(specver=__specver__)) for k, v in example_templates.items())

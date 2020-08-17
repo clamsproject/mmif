@@ -1,13 +1,14 @@
 from typing import Union, Optional
 
 from .model import MmifObject
+from mmif.vocabulary import AnnotationTypesBase
 
 __all__ = ['Annotation', 'AnnotationProperties']
 
 
 class Annotation(MmifObject):
     properties: 'AnnotationProperties'
-    _type: str
+    _type: Union[str, AnnotationTypesBase]
 
     def __init__(self, anno_obj: Union[str, dict] = None):
         self._type = ''
@@ -19,7 +20,7 @@ class Annotation(MmifObject):
         return self._type
 
     @at_type.setter
-    def at_type(self, at_type: str):
+    def at_type(self, at_type: Union[str, AnnotationTypesBase]):
         self._type = at_type
 
     @property
