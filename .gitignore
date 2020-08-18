@@ -57,6 +57,10 @@ hs_err_pid* # virtual machine crash logs, see http://www.java.com/en/download/he
 **/dist
 **/*.egg-info
 **/.pytype
+mmif-python/build/**
+mmif-python/.coverage
+mmif-python/coverage.xml
+mmif-python/htmlcov
 
 # ruby and jekyll files 
 Gemfile.lock

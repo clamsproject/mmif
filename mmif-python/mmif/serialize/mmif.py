@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict
 
 import jsonschema.validators
 from pkg_resources import resource_stream
@@ -16,17 +16,13 @@ __all__ = ['Mmif']
 
 
 class Mmif(MmifObject):
-    # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
-    _context: str
-    metadata: 'MmifMetadata'
-    media: 'MediaList'
-    views: 'ViewsList'
 
-    def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True):
-        self._context = ''
-        self.metadata = MmifMetadata()
-        self.media = MediaList()
-        self.views = ViewsList()
+    def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True) -> None:
+        # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
+        self._context: str = ''
+        self.metadata: MmifMetadata = MmifMetadata()
+        self.media: MediaList = MediaList()
+        self.views: ViewsList = ViewsList()
         if validate:
             self.validate(mmif_obj)
         self.disallow_additional_properties()
@@ -63,10 +59,10 @@ class Mmif(MmifObject):
         self.views.append(new_view)
         return new_view
 
-    def add_view(self, view: View, overwrite=False):
+    def add_view(self, view: View, overwrite=False) -> None:
         self.views.append(view, overwrite)
 
-    def add_medium(self, medium: Medium, overwrite=False):
+    def add_medium(self, medium: Medium, overwrite=False) -> None:
         self.media.append(medium, overwrite)
 
     def get_media_by_source_view_id(self, source_vid: str = None) -> List[Medium]:
@@ -85,7 +81,7 @@ class Mmif(MmifObject):
     def get_media_by_app(self, app_id: str) -> List[Medium]:
         return [medium for medium in self.media if medium.metadata.app == app_id]
 
-    def get_media_by_metadata(self, metadata_key: str, metadata_value: str):
+    def get_media_by_metadata(self, metadata_key: str, metadata_value: str) -> List[Medium]:
         """
         Method to retrieve media by an arbitrary key-value pair in the medium metadata objects
         """
@@ -117,7 +113,7 @@ class Mmif(MmifObject):
             raise KeyError("{} view not found".format(req_view_id))
         return result
 
-    def get_all_views_contain(self, at_type: str):
+    def get_all_views_contain(self, at_type: str) -> List[View]:
         return [view for view in self.views if at_type in view.metadata.contains]
 
     def get_view_contains(self, at_type: str) -> Optional[View]:
@@ -174,23 +170,25 @@ class Mmif(MmifObject):
 
 class MmifMetadata(MmifObject):
 
-    def __init__(self, metadata_obj: Union[str, dict] = None):
+    def __init__(self, metadata_obj: Union[str, dict] = None) -> None:
         super().__init__(metadata_obj)
 
 
 class MediaList(DataList[Medium]):
+    items: Dict[str, Medium]
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: Medium(item) for item in input_list}
 
-    def append(self, value: Medium, overwrite=False):
+    def append(self, value: Medium, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)
 
 
 class ViewsList(DataList[View]):
+    items: Dict[str, View]
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['id']: View(item) for item in input_list}
 
-    def append(self, value: View, overwrite=False):
+    def append(self, value: View, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)

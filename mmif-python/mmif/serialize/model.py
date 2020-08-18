@@ -16,7 +16,7 @@ class MmifObject(object):
     _unnamed_attributes: Optional[dict]
     _attribute_classes: Dict[str, Type] = {}
 
-    def __init__(self, mmif_obj: Union[str, dict] = None):
+    def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
         """
         Any MMIF object can be initialized as an empty placeholder or
         an actual representation with a JSON formatted string or equivalent
@@ -40,6 +40,13 @@ class MmifObject(object):
         Also note that those two special attributes MUST be set in the __init__()
         before calling super method, otherwise deserialization will not work.
 
+        And also, a subclass that has one or more *named* attributes, it must
+        set those attributes in the __init__() before calling super method. When
+        serializing a MmifObject, all *empty* attributes will be ignored, so for
+        optional named attributes, you must leave leave the values empty, but
+        NOT None. Any None-valued named attributes will cause issues with current
+        implementation.
+
         :param mmif_obj: JSON string or `dict` to initialize an object.
          If not given, an empty object will be initialized, sometimes with
          an ID value automatically generated, based on its parent object.
@@ -49,7 +56,7 @@ class MmifObject(object):
         if mmif_obj is not None:
             self.deserialize(mmif_obj)
 
-    def disallow_additional_properties(self):
+    def disallow_additional_properties(self) -> None:
         self._unnamed_attributes = None
 
     def _named_attributes(self):
@@ -89,7 +96,7 @@ class MmifObject(object):
         return serializing_obj
 
     @staticmethod
-    def is_empty(obj):
+    def is_empty(obj) -> bool:
         """
         return True if the obj is None or "emtpy". The emptiness first defined as
         having zero length. But for objects that lack __len__ method, we need
@@ -165,7 +172,7 @@ class MmifObject(object):
             else:
                 self[k] = v
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.serialize(False)
 
     def pretty(self) -> str:
@@ -174,21 +181,21 @@ class MmifObject(object):
         """
         return self.serialize(True)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return isinstance(other, type(self)) and \
                len(DeepDiff(self, other, ignore_order=True, report_repetition=True, exclude_types=[datetime])) == 0
 
-    def __len__(self):
+    def __len__(self) -> int:
         return sum([not self.is_empty(self[named]) for named in self._named_attributes()]) \
                + (len(self._unnamed_attributes) if self._unnamed_attributes else 0)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         if key in self._named_attributes():
             self.__dict__[key] = value
         else:
             self._unnamed_attributes[key] = value   # pytype: disable=unsupported-operands
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Union['MmifObject', str, datetime]:
         if key in self._named_attributes():
             return self.__dict__[key]
         return self._unnamed_attributes[key]

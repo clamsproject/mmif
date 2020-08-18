@@ -11,16 +11,12 @@ __all__ = ['View', 'ViewMetadata', 'Contain']
 
 
 class View(MmifObject):
-    _context: str
-    id: str
-    metadata: 'ViewMetadata'
-    annotations: 'AnnotationsList'
 
-    def __init__(self, view_obj: Union[str, dict] = None):
-        self._context = ''
-        self.id = ''
-        self.metadata = ViewMetadata()
-        self.annotations = AnnotationsList()
+    def __init__(self, view_obj: Union[str, dict] = None) -> None:
+        self._context: str = ''
+        self.id: str = ''
+        self.metadata: ViewMetadata = ViewMetadata()
+        self.annotations: AnnotationsList = AnnotationsList()
         self.disallow_additional_properties()
         self._attribute_classes = {
             'metadata': ViewMetadata,
@@ -67,17 +63,12 @@ class View(MmifObject):
 
 
 class ViewMetadata(MmifObject):
-    medium: str
-    timestamp: Optional[datetime] = None
-    app: str
-    contains: Dict[str, 'Contain']
 
-    def __init__(self, viewmetadata_obj: Union[str, dict] = None):
-        # need to set instance variables for ``_named_attributes()`` to work
-        self.medium = ''
-        self.timestamp = None
-        self.app = ''
-        self.contains = {}
+    def __init__(self, viewmetadata_obj: Union[str, dict] = None) -> None:
+        self.medium: str = ''
+        self.timestamp: Optional[datetime] = None
+        self.app: str = ''
+        self.contains: Dict[str, Contain] = {}
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
@@ -113,12 +104,11 @@ class ViewMetadata(MmifObject):
 
 
 class Contain(MmifObject):
-    producer: str
-    gen_time: Optional[datetime] = None
 
-    def __init__(self, contain_obj: Union[str, dict] = None):
-        self.producer = ''
-        self.gen_time = None
+    def __init__(self, contain_obj: Union[str, dict] = None) -> None:
+        # TODO (krim @ 8/19/20): rename `producer` to `app` maybe?
+        self.producer: str = ''
+        self.gen_time: Optional[datetime] = None
         super().__init__(contain_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
@@ -133,5 +123,5 @@ class AnnotationsList(DataList[Annotation]):
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['properties']['id']: Annotation(item) for item in input_list}
 
-    def append(self, value: Annotation, overwrite=False):
+    def append(self, value: Annotation, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)
