@@ -62,10 +62,6 @@ class MmifObject(object):
     def _named_attributes(self):
         return (n for n in self.__dict__.keys() if n not in self.reversed_names)
 
-    def _named_attribute_class(self, attribute_name: str):
-
-        return self._attribute_classes[attribute_name]
-
     def serialize(self, pretty: bool = False) -> str:
         """
         Generates JSON-LD representation of an object.
@@ -174,12 +170,6 @@ class MmifObject(object):
 
     def __str__(self) -> str:
         return self.serialize(False)
-
-    def pretty(self) -> str:
-        """
-        Call :func: .serialize() with indentation.
-        """
-        return self.serialize(True)
 
     def __eq__(self, other) -> bool:
         return isinstance(other, type(self)) and \

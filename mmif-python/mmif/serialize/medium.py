@@ -3,7 +3,7 @@ from typing import Union, Optional, List
 from .model import MmifObject
 
 
-__all__ = ['Medium', 'MediumMetadata', 'Submedia']
+__all__ = ['Medium', 'MediumMetadata', 'Submedia', 'Text']
 
 
 class Medium(MmifObject):
@@ -33,8 +33,6 @@ class Medium(MmifObject):
 
     @text_language.setter
     def text_language(self, lang_code: str) -> None:
-        if self.text is None:
-            self.text = Text()
         self.text.lang = lang_code
 
     @property
@@ -43,8 +41,6 @@ class Medium(MmifObject):
 
     @text_value.setter
     def text_value(self, s: str) -> None:
-        if self.text is None:
-            self.text = Text()
         self.text.value = s
 
 

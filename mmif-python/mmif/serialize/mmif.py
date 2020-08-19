@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Union, Optional, Dict
+from typing import List, Union, Optional, Dict, ClassVar
 
 import jsonschema.validators
 from pkg_resources import resource_stream
@@ -16,6 +16,7 @@ __all__ = ['Mmif']
 
 
 class Mmif(MmifObject):
+    view_prefix: ClassVar[str] = 'v_'
 
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True) -> None:
         # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
@@ -45,11 +46,11 @@ class Mmif(MmifObject):
         jsonschema.validate(json_str, schema)
 
     def new_view_id(self) -> str:
-        index = str(len(self.views))
-        new_id = 'v_' + index
+        index = len(self.views)
+        new_id = self.view_prefix + str(index)
         while new_id in self.views:
             index += 1
-            new_id = 'v_' + index
+            new_id = self.view_prefix + str(index)
         return new_id
 
     def new_view(self) -> View:
@@ -118,10 +119,7 @@ class Mmif(MmifObject):
 
     def get_view_contains(self, at_type: str) -> Optional[View]:
         # will return the *latest* view
-        # works as of python 3.6+ because dicts are deterministically ordered by insertion order
-        from sys import version_info
-        if version_info < (3, 6):
-            print("Warning: get_view_contains requires Python 3.6+ for correct behavior")
+        # works as of python 3.6+ (checked by setup.py) because dicts are deterministically ordered by insertion order
         for view in reversed(self.views):
             if at_type in view.metadata.contains:
                 return view

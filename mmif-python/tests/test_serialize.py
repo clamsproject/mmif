@@ -109,14 +109,10 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(old_view_count+1, len(mmif_obj.views))
 
     def test_medium_metadata(self):
-        text = "Karen flew to New York."
-        en = 'en'
         medium = Medium()
         medium.id = 'm999'
         medium.type = "text"
-        medium.text_value = text
-        self.assertEqual(medium.text_value, text)
-        medium.text_language = en
+        medium.location = "random_location"
         medium.metadata['source'] = "v10"
         medium.metadata['app'] = "some_sentence_splitter"
         medium.metadata['random_key'] = "random_value"
@@ -126,9 +122,33 @@ class TestMmif(unittest.TestCase):
         plain_json = json.loads(serialized)
         deserialized = Medium(plain_json)
         self.assertEqual(medium, deserialized)
-        self.assertEqual({'id', 'type', 'text', 'metadata'}, plain_json.keys())
-        self.assertEqual({'@value', '@language'}, plain_json['text'].keys())
+        self.assertEqual({'id', 'type', 'location', 'metadata'}, plain_json.keys())
         self.assertEqual({'source', 'app', 'random_key'}, plain_json['metadata'].keys())
+
+    def test_medium_text(self):
+        text = "Karen flew to New York."
+        en = 'en'
+        medium = Medium()
+        medium.id = 'm998'
+        medium.type = "text"
+        medium.text_value = text
+        self.assertEqual(medium.text_value, text)
+        medium.text_language = en
+        serialized = medium.serialize()
+        plain_json = json.loads(serialized)
+        deserialized = Medium(serialized)
+        self.assertEqual(deserialized.text_value, text)
+        self.assertEqual(deserialized.text_language, en)
+        self.assertEqual({'@value', '@language'}, plain_json['text'].keys())
+
+    def test_medium_empty_text(self):
+        medium = Medium()
+        medium.id = 'm997'
+        medium.type = "text"
+        serialized = medium.serialize()
+        deserialized = Medium(serialized)
+        self.assertEqual(deserialized.text_value, '')
+        self.assertEqual(deserialized.text_language, '')
 
     def test_medium(self):
         medium = Medium(examples['medium_ext_video_example'])
@@ -168,6 +188,11 @@ class TestMmif(unittest.TestCase):
         new_medium.metadata.source = 'v1:bb2'
         mmif_obj.add_medium(new_medium)
         self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 2)
+
+    def test_get_medium_by_metadata(self):
+        mmif_obj = Mmif(examples['mmif_example1'])
+        self.assertEqual(len(mmif_obj.get_media_by_metadata("source", "v1:bb1")), 1)
+        self.assertEqual(len(mmif_obj.get_media_by_metadata("source", "v3")), 0)
 
     def test_get_medium_by_appid(self):
         tesseract_appid = 'http://apps.clams.io/tesseract/1.2.1'
@@ -210,16 +235,30 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(len(views), views_len)
 
     def test_get_view_contains(self):
-        # TODO (angus-lherrou @ 8/5/2020): expand to better examples once schema is fixed
         mmif_obj = Mmif(examples['mmif_example1'])
         view = mmif_obj.get_view_contains('BoundingBox')
         self.assertIsNotNone(view)
         self.assertEqual('v1', view.id)
+        view = mmif_obj.get_view_contains('NonExistingType')
+        self.assertIsNone(view)
 
     def test_new_view_id(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
-        mmif_obj.new_view()
-        self.assertEqual({'v1', 'v_1'}, set(mmif_obj.views.items.keys()))
+        p = Mmif.view_prefix
+        mmif_obj = Mmif(validate=False)
+        a_view = mmif_obj.new_view()
+        self.assertEqual(a_view.id, f'{p}0')
+        b_view = View()
+        b_view.id = f'{p}2'
+        mmif_obj.add_view(b_view)
+        self.assertEqual({f'{p}0', f'{p}2'}, set(mmif_obj.views.items.keys()))
+        c_view = mmif_obj.new_view()
+        self.assertEqual(c_view.id, f'{p}3')
+        d_view = View()
+        d_view.id = 'v4'
+        mmif_obj.add_view(d_view)
+        e_view = mmif_obj.new_view()
+        self.assertEqual(e_view.id, f'{p}4')
+        self.assertEqual(len(mmif_obj.views), 5)
 
     def test_add_medium(self):
         mmif_obj = Mmif(examples['mmif_example1'])
@@ -250,6 +289,22 @@ class TestMmif(unittest.TestCase):
         except KeyError:
             self.fail("raised exception on duplicate ID add when overwrite was set to True")
 
+    def test___getitem__(self):
+        mmif_obj = Mmif(examples['mmif_example1'])
+        self.assertIsInstance(mmif_obj['m1'], Medium)
+        self.assertIsInstance(mmif_obj['v1'], View)
+        self.assertIsInstance(mmif_obj['v1:bb1'], Annotation)
+        with self.assertRaises(KeyError):
+            mmif_obj['asdf']
+        a_view = View()
+        a_view.id = 'm1'
+        mmif_obj.add_view(a_view)
+        with self.assertRaises(KeyError):
+            mmif_obj['m1']
+        medium = Medium()
+        medium.add_metadata('random_key', 'random_value')
+        self.assertEqual(medium.metadata['random_key'], 'random_value')
+
 
 class TestMmifObject(unittest.TestCase):
 
@@ -271,6 +326,16 @@ class TestMmifObject(unittest.TestCase):
             self.fail()
         except TypeError:
             pass
+
+    def test_under_at_swap(self):
+        text = Text()
+        text.value = "asdf"
+        text.lang = "en"
+        self.assertTrue(hasattr(text, '_value'))
+        self.assertTrue(hasattr(text, '_language'))
+        plain_json = json.loads(text.serialize())
+        self.assertIn('@value', plain_json.keys())
+        self.assertIn('@language', plain_json.keys())
 
     def test_print_mmif(self):
         with patch('sys.stdout', new=StringIO()) as fake_out:
