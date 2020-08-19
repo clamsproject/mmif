@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Union, Optional
+from typing import Dict, Union, Optional
 import dateutil.parser
 
 from .annotation import Annotation
@@ -11,23 +11,18 @@ __all__ = ['View', 'ViewMetadata', 'Contain']
 
 
 class View(MmifObject):
-    id: str
-    metadata: 'ViewMetadata'
-    annotations: 'AnnotationsList'
 
-    def __init__(self, view_obj: Union[str, dict] = None):
-        self.id = ''
-        self.metadata = ViewMetadata()
-        self.annotations = AnnotationsList()
+    def __init__(self, view_obj: Union[str, dict] = None) -> None:
+        self._context: str = ''
+        self.id: str = ''
+        self.metadata: ViewMetadata = ViewMetadata()
+        self.annotations: AnnotationsList = AnnotationsList()
+        self.disallow_additional_properties()
+        self._attribute_classes = {
+            'metadata': ViewMetadata,
+            'annotations': AnnotationsList
+        }
         super().__init__(view_obj)
-
-    def _deserialize(self, view_dict: dict) -> None:
-        _context = view_dict.get('_context')
-        if _context is not None:
-            self._context = _context
-        self.id = view_dict['id']
-        self.metadata = ViewMetadata(view_dict['metadata'])
-        self.annotations = AnnotationsList(view_dict['annotations'])
 
     def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         return self.metadata.new_contain(at_type, contain_dict)
@@ -59,6 +54,8 @@ class View(MmifObject):
         :param key: the search string.
         :return: the object searched for
         """
+        if key in self._named_attributes():
+            return self.__dict__[key]
         anno_result = self.annotations.get(key)
         if not anno_result:
             raise KeyError("Annotation ID not found: %s" % key)
@@ -66,26 +63,22 @@ class View(MmifObject):
 
 
 class ViewMetadata(MmifObject):
-    medium: str
-    timestamp: Optional[datetime] = None
-    app: str
-    contains: Dict[str, 'Contain']
 
-    def __init__(self, viewmetadata_obj: Union[str, dict] = None):
-        # need to set instance variables for ``_named_attributes()`` to work
-        self.medium = ''
-        self.timestamp = datetime.now()
-        self.app = ''
-        self.contains = {}
+    def __init__(self, viewmetadata_obj: Union[str, dict] = None) -> None:
+        self.medium: str = ''
+        self.timestamp: Optional[datetime] = None
+        self.app: str = ''
+        self.contains: Dict[str, Contain] = {}
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
-        # TODO (angus-lherrou @ 8/4/2020): using __dict__ with potentially non-identifier
-        #  keys "works" but is not pythonic so better to wrap a dict property.
-        #  Unify implementations of this and MediumMetadata
-        # super()._deserialize(input_dict)
-        self.__dict__ = input_dict
-        self.contains = {at_type: Contain(contain_obj) for at_type, contain_obj in input_dict.get('contains', {}).items()}
+        try:
+            self.contains = {at_type: Contain(contain_obj)
+                             for at_type, contain_obj in input_dict.pop('contains').items()}
+        except KeyError:
+            # means input_dict don't have `contains`, so we'll leave it empty
+            pass
+        super()._deserialize(input_dict)
 
     def find_match_hotfix(self, key: str) -> bool:
         exists = False
@@ -105,17 +98,17 @@ class ViewMetadata(MmifObject):
 
         if not exists:
             new_contain = Contain(contain_dict)
+            new_contain.gen_time = datetime.now()
             self.contains[final_key] = new_contain
             return new_contain
 
 
 class Contain(MmifObject):
-    producer: str
-    gen_time: datetime
 
-    def __init__(self, contain_obj: Union[str, dict] = None):
-        self.producer = ''
-        self.gen_time = datetime.now()     # datetime.datetime
+    def __init__(self, contain_obj: Union[str, dict] = None) -> None:
+        # TODO (krim @ 8/19/20): rename `producer` to `app` maybe?
+        self.producer: str = ''
+        self.gen_time: Optional[datetime] = None
         super().__init__(contain_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
@@ -130,5 +123,5 @@ class AnnotationsList(DataList[Annotation]):
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['properties']['id']: Annotation(item) for item in input_list}
 
-    def append(self, value: Annotation, overwrite=False):
+    def append(self, value: Annotation, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)

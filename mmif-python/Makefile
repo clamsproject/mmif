@@ -39,7 +39,7 @@ $(artifact):
 # invoking `test` without a VERSION file will generated a dev version - this ensures `make test` runs unmanned
 test: devversion build
 	pytype mmif/
-	python3 -m pytest --doctest-modules
+	python3 -m pytest --doctest-modules --cov=mmif
 
 devversion: VERSION.dev VERSION; cat VERSION
 version: VERSION; cat VERSION
