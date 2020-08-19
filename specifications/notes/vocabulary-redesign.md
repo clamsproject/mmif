@@ -43,7 +43,9 @@ I now think there is a somewhat principled way of doing this, and it takes in pa
 
 We are also considering Keigh's suggestion for a redesigned vocabulary (https://github.com/clamsproject/mmif/tree/59-alignment), and see if it has anything to offer on this issue.
 
-<img src="vocab-new.jpg" height=400 align="left"/>
+<img src="vocab-new.jpg" height=400 />
+
+<p/>
 
 This suggestion introduced two main changes:
 
