@@ -52,7 +52,8 @@ Notice how the view created by Tesseract contains a text document.
       "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
-          "http://mmif.clams.ai/0.1.0/TextDocument": {} },
+          "http://mmif.clams.ai/0.1.0/TextDocument": {},
+          "http://mmif.clams.ai/0.1.0/Alignment": {} },
         "tool": "http://mmif.clams.ai/apps/tessearct/0.2.1"
       },
       "annotations": [
@@ -61,8 +62,14 @@ Notice how the view created by Tesseract contains a text document.
           "properties": {
             "id": "td1",
             "text": {
-              "@value": "Fido barks" },
-            "textSource": "v1:bb1" }
+              "@value": "Fido barks" } }
+        },
+        {
+          "@type": "http://mmif.clams.ai/0.1.0/Alignment",
+          "properties": {
+            "id": "a1",
+            "source": "v1:bb1",
+            "target": "td1" }
         }
       ]
     }

@@ -46,7 +46,6 @@ We are also considering Keigh's suggestion for a redesigned vocabulary (https://
 <img src="vocab-new.jpg" height=400 />
 
 <p/>
-
 This suggestion introduced two main changes:
 
 - Add Document and subtypes for video et al to the hierarchy
@@ -448,7 +447,7 @@ What I do not like about this is that every single token needs to define what do
 >
 > Instead of *medium* we could have something like *anchorTarget*.
 >
-> Weare now mixing LAPPS and CLAMS types and therefore we get into trouble with the context file set up that we currently have which was to have a LAPPS or CLAMS context with each view. Should think through whether it is possible to keep the two vocabularies separate.
+> We are now mixing LAPPS and CLAMS types and therefore we get into trouble with the context file set up that we currently have which was to have a LAPPS or CLAMS context with each view. Should think through whether it is possible to keep the two vocabularies separate.
 
 Finallly, **NER** runs over all the text documents that the CLAMS platform hands over to it and creates a new view with all named entities.
 
