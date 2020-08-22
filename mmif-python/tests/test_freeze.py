@@ -145,3 +145,34 @@ class TestFreezeSubmediaList(unittest.TestCase):
             raise
         except Exception as ex:
             self.assertEqual("frozen FreezableMmifObject should be immutable", ex.args[0])
+
+
+class TestFreezeMmif(unittest.TestCase):
+    def setUp(self) -> None:
+        self.mmif_obj_unfrozen = Mmif(examples['mmif_example1'], frozen=False)
+        self.mmif_obj_frozen = Mmif(examples['mmif_example1'], frozen=True)
+        self.mmif_obj_default = Mmif(examples['mmif_example1'])
+
+    def test_freeze_mmif(self):
+        self.assertFalse(self.mmif_obj_unfrozen.media.is_frozen())
+        self.mmif_obj_unfrozen.freeze_media()
+        self.assertTrue(self.mmif_obj_unfrozen.media.is_frozen())
+
+    def test_default_behavior_is_frozen(self):
+        self.assertTrue(self.mmif_obj_default.media.is_frozen())
+
+    def test_kwarg(self):
+        self.assertFalse(self.mmif_obj_unfrozen.media.is_frozen())
+        self.assertTrue(self.mmif_obj_frozen.media.is_frozen())
+
+    def test_try_frozen_add_medium(self):
+        try:
+            self.mmif_obj_frozen.add_medium(Medium())
+        except TypeError as te:
+            self.assertEqual("MMIF object is frozen", te.args[0])
+
+        self.mmif_obj_unfrozen.freeze_media()
+        try:
+            self.mmif_obj_unfrozen.add_medium(Medium())
+        except TypeError as te:
+            self.assertEqual("MMIF object is frozen", te.args[0])
