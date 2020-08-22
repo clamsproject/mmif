@@ -9,8 +9,7 @@ import mmif
 from .view import View
 from .medium import Medium
 from .annotation import Annotation
-from .model import MmifObject, DataList
-
+from .model import MmifObject, DataList, FreezableMmifObject
 
 __all__ = ['Mmif']
 
@@ -65,6 +64,9 @@ class Mmif(MmifObject):
 
     def add_medium(self, medium: Medium, overwrite=False) -> None:
         self.media.append(medium, overwrite)
+
+    def freeze_media(self) -> bool:
+        return self.media.deep_freeze()
 
     def get_media_by_source_view_id(self, source_vid: str = None) -> List[Medium]:
         """
@@ -172,7 +174,7 @@ class MmifMetadata(MmifObject):
         super().__init__(metadata_obj)
 
 
-class MediaList(DataList[Medium]):
+class MediaList(FreezableMmifObject, DataList[Medium]):
     items: Dict[str, Medium]
 
     def _deserialize(self, input_list: list) -> None:
