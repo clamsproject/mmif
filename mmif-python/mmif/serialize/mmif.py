@@ -17,7 +17,7 @@ __all__ = ['Mmif']
 class Mmif(MmifObject):
     view_prefix: ClassVar[str] = 'v_'
 
-    def __init__(self, mmif_obj: Union[str, dict] = None, /, validate: bool = True, frozen: bool = True) -> None:
+    def __init__(self, mmif_obj: Union[str, dict] = None, *, validate: bool = True, frozen: bool = True) -> None:
         # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
         self._context: str = ''
         self.metadata: MmifMetadata = MmifMetadata()
