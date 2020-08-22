@@ -566,7 +566,7 @@ class TestMedium(unittest.TestCase):
                 if 'submedia' in medium:
                     self.assertIsInstance(medium_obj.submedia, list)
                     for submedium in medium_obj.submedia:
-                        self.assertIsInstance(submedium, Submedia)
+                        self.assertIsInstance(submedium, Submedium)
 
     def test_deserialize_with_medium_str(self):
         for i, datum in self.data.items():
@@ -578,7 +578,7 @@ class TestMedium(unittest.TestCase):
                 if 'submedia' in medium:
                     self.assertIsInstance(medium_obj.submedia, list)
                     for submedium in medium_obj.submedia:
-                        self.assertIsInstance(submedium, Submedia)
+                        self.assertIsInstance(submedium, Submedium)
 
     def test_serialize_to_medium_str(self):
         for i, datum in self.data.items():
