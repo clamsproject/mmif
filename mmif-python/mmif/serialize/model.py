@@ -1,3 +1,4 @@
+import logging
 import json
 from datetime import datetime
 
@@ -5,7 +6,7 @@ from deepdiff import DeepDiff
 from typing import Union, Any, Dict, Optional, TypeVar, Generic, Type
 
 T = TypeVar('T')
-__all__ = ['MmifObject', 'MmifObjectEncoder', 'DataList']
+__all__ = ['MmifObject', 'FreezableMmifObject', 'MmifObjectEncoder', 'DataList']
 
 
 class MmifObject(object):
@@ -189,6 +190,91 @@ class MmifObject(object):
         if key in self._named_attributes():
             return self.__dict__[key]
         return self._unnamed_attributes[key]
+
+
+class FreezableMmifObject(MmifObject):
+    reversed_names = MmifObject.reversed_names + ['_frozen']
+
+    def __init__(self, *args, **kwargs) -> None:
+        self._frozen = False
+        super().__init__(*args, **kwargs)
+
+    def freeze(self) -> None:
+        """
+        Shallowly freezes this FreezableMmifObject, preventing attribute assignments with `=`.
+        Makes no promises about the mutability of state within the object, only the references
+        to that state.
+
+        :return: asdf
+        """
+        self._frozen = True
+
+    def deep_freeze(self) -> bool:
+        """
+        Deeply freezes this FreezableMmifObject, calling deep_freeze on all FreezableMmifObjects
+        contained as attributes or members of iterable attributes.
+
+        Note: in general, this makes no promises about the mutability of non-FreezableMmifObject
+        state within the object. However, if all attributes and members of iterable attributes
+        are either Freezable or hashable, this method will return True. Note that whether an object
+        is hashable is not a contract of immutability but merely a suggestion, as anyone can
+        implement __hash__.
+
+        :return: True if all state is either Freezable or Hashable
+        """
+        self.freeze()
+        fully_frozen = True
+
+        def _freeze(attribute):
+            """
+            Freezes an attribute if it is Freezable; else, sets fully_frozen to False if it is mutable.
+            :param attribute: the attribute to freeze
+            """
+            nonlocal fully_frozen
+            if isinstance(attribute, FreezableMmifObject):
+                attribute.deep_freeze()
+            elif not hasattr(attribute, '__hash__') or attribute.__hash__ is object.__hash__:
+                fully_frozen = False
+
+        for name, attr in self.__dict__.items():
+            if name not in self.reversed_names:
+                _freeze(attr)
+        for name in self.reversed_names:
+            item = getattr(self, name)
+            if isinstance(item, (dict, list, DataList)):
+                for attr in item:
+                    _freeze(attr)
+        return fully_frozen
+
+    def __setattr__(self, name, value) -> None:
+        """
+        Overrides object.__setattr__(self, name, value) to prevent
+        attribute assignment if the object has been frozen.
+
+        :param name: the attribute name
+        :param value: the desired value
+        """
+        if '_frozen' not in self.__dict__ or not self._frozen:
+            object.__setattr__(self, name, value)
+        else:
+            raise TypeError("frozen FreezableMmifObject should be immutable")
+
+    def __setitem__(self, key, value):
+        """
+        Overrides the __setitem__ method of  to
+        prevent item assignment if the object has been frozen.
+
+        :param key: t
+        :param value:
+        :return:
+        """
+        if '_frozen' not in self.__dict__ or not self._frozen:
+            setitem = super().__setitem__
+            if logging.getLogger().level == logging.DEBUG:
+                logging.debug(setitem)
+            setitem(key, value)
+        else:
+            raise TypeError("frozen FreezableMmifObject should be immutable")
 
 
 class MmifObjectEncoder(json.JSONEncoder):
