@@ -199,6 +199,9 @@ class FreezableMmifObject(MmifObject):
         self._frozen = False
         super().__init__(*args, **kwargs)
 
+    def is_frozen(self):
+        return self._frozen
+
     def freeze(self) -> None:
         """
         Shallowly freezes this FreezableMmifObject, preventing attribute assignments with `=`.

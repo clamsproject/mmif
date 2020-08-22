@@ -159,7 +159,7 @@ class TestMmif(unittest.TestCase):
     def test_add_media(self):
         medium_json = json.loads(examples['medium_ext_video_example'])
         # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         old_media_count = len(mmif_obj.media)
         mmif_obj.add_medium(Medium(medium_json))  # just raise exception if this fails
         self.assertEqual(old_media_count+1, len(mmif_obj.media))
@@ -179,7 +179,7 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_get_media_by_view_id(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 1)
         self.assertEqual(mmif_obj.get_media_by_source_view_id('v1')[0],
                          mmif_obj.get_medium_by_id('m2'))
@@ -196,7 +196,7 @@ class TestMmif(unittest.TestCase):
 
     def test_get_medium_by_appid(self):
         tesseract_appid = 'http://apps.clams.io/tesseract/1.2.1'
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_media_by_app(tesseract_appid)), 1)
         self.assertEqual(len(mmif_obj.get_media_by_app('xxx')), 0)
         new_medium = Medium()
@@ -261,7 +261,7 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(len(mmif_obj.views), 5)
 
     def test_add_medium(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         med_obj = Medium(examples['medium_ext_video_example'])
         mmif_obj.add_medium(med_obj)
         try:

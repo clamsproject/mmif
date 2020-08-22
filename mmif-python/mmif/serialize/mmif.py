@@ -17,7 +17,7 @@ __all__ = ['Mmif']
 class Mmif(MmifObject):
     view_prefix: ClassVar[str] = 'v_'
 
-    def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True) -> None:
+    def __init__(self, mmif_obj: Union[str, dict] = None, /, validate: bool = True, frozen: bool = True) -> None:
         # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
         self._context: str = ''
         self.metadata: MmifMetadata = MmifMetadata()
@@ -31,6 +31,8 @@ class Mmif(MmifObject):
             'views': ViewsList
         }
         super().__init__(mmif_obj)
+        if frozen:
+            self.freeze_media()
 
     @staticmethod
     def validate(json_str: Union[str, dict]) -> None:
@@ -63,7 +65,10 @@ class Mmif(MmifObject):
         self.views.append(view, overwrite)
 
     def add_medium(self, medium: Medium, overwrite=False) -> None:
-        self.media.append(medium, overwrite)
+        if not self.media.is_frozen():
+            self.media.append(medium, overwrite)
+        else:
+            raise TypeError("MMIF object is frozen")
 
     def freeze_media(self) -> bool:
         return self.media.deep_freeze()
