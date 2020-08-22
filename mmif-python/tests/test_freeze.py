@@ -1,0 +1,147 @@
+import logging
+import unittest
+from io import StringIO
+from unittest.mock import patch
+import json
+
+from mmif.serialize import *
+from mmif.serialize.medium import SubmediaList
+from tests.mmif_examples import *
+
+
+class TestFreezeMedium(unittest.TestCase):
+    def setUp(self) -> None:
+        self.mmif_obj = Mmif(examples['mmif_example1'])
+
+        self.m2: Medium = self.mmif_obj['m2']
+
+    def test_freeze(self):
+        self.m2.freeze()
+
+        try:
+            self.m2.id = 'm3'
+            self.fail()
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+    def test_deep_freeze(self):
+        self.m2.deep_freeze()
+
+        try:
+            self.m2.id = 'm3'
+            self.fail("able to set top-level attribute")
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+        try:
+            self.m2.metadata.source = 'm1'
+            self.fail("able to set lower-level attribute")
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+        try:
+            self.m2.text.lang = 'spanish'
+            self.fail('able to bypass immutability with @property setter')
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+        try:
+            self.m2.submedia.append(Submedium())
+            self.fail('able to append to submedia list after deep freeze')
+        except AssertionError:
+            raise
+        except Exception as ex:
+            print(ex.args[0])
+
+    def test_bool_deep_freeze(self):
+        fully_frozen = self.m2.deep_freeze()
+
+        self.assertTrue(fully_frozen)
+
+    def test_invariance_after_freeze(self):
+        before = json.loads(self.mmif_obj.serialize())
+
+        self.mmif_obj['m2'].freeze()
+
+        after = json.loads(self.mmif_obj.serialize())
+
+        self.assertEqual(before, after)
+
+    def test_invariance_after_deep_freeze(self):
+        before = json.loads(self.mmif_obj.serialize())
+
+        self.mmif_obj['m2'].deep_freeze()
+
+        after = json.loads(self.mmif_obj.serialize())
+
+        self.assertEqual(before, after)
+
+    def test_proper_setitem_called_for_non_datalist(self):
+        logger = logging.getLogger()
+        old_level = logger.level
+        logger.setLevel(logging.DEBUG)
+        with patch('sys.stdout', new=StringIO()) as fake_out:
+            logger.addHandler(logging.StreamHandler(fake_out))
+            self.m2['id'] = 'm3'
+        logger.setLevel(old_level)
+        self.assertEqual('MmifObject.__setitem__', fake_out.getvalue().split()[2])
+
+
+class TestFreezeSubmediaList(unittest.TestCase):
+    def setUp(self) -> None:
+        self.mmif_obj = Mmif(examples['mmif_example1'])
+        self.submedia: SubmediaList = self.mmif_obj['m2'].submedia
+
+    def test_deep_freeze(self):
+        self.submedia['sm1'] = Submedium({ "id": "sm1", "annotation": "bb1", "text": { "@value": "yelp" }})
+        self.submedia.deep_freeze()
+        try:
+            self.submedia['sm1']['annotation'] = 'bb2'
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+    def test_invariance_after_freeze(self):
+        before = json.loads(self.submedia.serialize())
+
+        self.submedia.freeze()
+
+        after = json.loads(self.submedia.serialize())
+
+        self.assertEqual(before, after)
+
+    def test_invariance_after_deep_freeze(self):
+        before = json.loads(self.submedia.serialize())
+
+        self.submedia.deep_freeze()
+
+        after = json.loads(self.submedia.serialize())
+
+        self.assertEqual(before, after)
+
+    def test_proper_setitem_called_for_datalist(self):
+        logger = logging.getLogger()
+        old_level = logger.level
+        logger.setLevel(logging.DEBUG)
+        with patch('sys.stdout', new=StringIO()) as fake_out:
+            logger.addHandler(logging.StreamHandler(fake_out))
+            self.submedia['sub1'] = Submedium()
+        logger.setLevel(old_level)
+        self.assertEqual('DataList.__setitem__', fake_out.getvalue().split()[2])
+
+    def test_freezing_works_for_setitem(self):
+        self.submedia.freeze()
+        try:
+            self.submedia['sub1'] = Submedium()
+            self.fail("was able to setitem")
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+    def test_freezing_works_for_append(self):
+        self.submedia.freeze()
+        try:
+            self.submedia.append(Submedium())
+            self.fail('able to append to submedia after freeze')
+        except AssertionError:
+            raise
+        except Exception as ex:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", ex.args[0])
