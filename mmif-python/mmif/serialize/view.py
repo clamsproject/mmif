@@ -1,5 +1,5 @@
 """
-The ``view`` module contains the classes used to represent a MMIF view
+The :mod:`view` module contains the classes used to represent a MMIF view
 as a live Python object.
 
 In MMIF, views are created by apps in a pipeline that are annotating
