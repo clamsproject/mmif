@@ -9,7 +9,7 @@
 	"metadata": "mmif:metadata",
 	"medium": "mmif:medium",
 	"timestamp": "mmif:timestamp",
-	"tool": "mmif:tool",
+	"app": "mmif:app",
 	"contains": "mmif:contains",
 	"annotations": "mmif:annotations",
 	"properties": "mmif:properties",
@@ -24,12 +24,12 @@
 
 	"point": "TimePoint#point",
 
-	"segmentType": "Segment#segmentType",
+	"frameType": "TimeFrame#frameType",
 
 	"title": "Chapter#title",
 
-	"coordinates": "BoundingBox#coordinates",
-	"timePoint": "BoundingBox#timePoint",
+	"coordinates": "Polygon#coordinates",
+	"timePoint": "Polygon#timePoint",
 
 	"boundingBoxes": "VideoObject#boundingBoxes",
 

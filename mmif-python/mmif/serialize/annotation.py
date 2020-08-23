@@ -1,6 +1,9 @@
-from typing import Dict, Union, Optional
+from typing import Union
 
 from .model import MmifObject
+from mmif.vocabulary import AnnotationTypesBase
+
+__all__ = ['Annotation', 'AnnotationProperties']
 
 
 class Annotation(MmifObject):
@@ -8,38 +11,30 @@ class Annotation(MmifObject):
     MmifObject that represents an annotation in a MMIF view.
     """
 
-    properties: 'AnnotationProperties'
-    _type: str
+    def __init__(self, anno_obj: Union[str, dict] = None) -> None:
+        self._type: Union[str, AnnotationTypesBase] = ''
+        self.properties: AnnotationProperties = AnnotationProperties()
+        self.disallow_additional_properties()
+        self._attribute_classes = {'properties': AnnotationProperties}
+        super().__init__(anno_obj)
 
     @property
-    def id(self):
+    def at_type(self) -> Union[str, AnnotationTypesBase]:
+        # TODO (krim @ 8/19/20): should we always return string? leaving this to return
+        # different types can be confusing for sdk users.
+        return self._type
+
+    @at_type.setter
+    def at_type(self, at_type: Union[str, AnnotationTypesBase]) -> None:
+        self._type = at_type
+
+    @property
+    def id(self) -> str:
         return self.properties.id
 
     @id.setter
-    def id(self, aid):
+    def id(self, aid: str) -> None:
         self.properties.id = aid
-
-    def _deserialize(self, input_dict: dict) -> None:
-        """
-        Maps a plain python dict object to an Annotation object.
-
-        Represents the "properties" sub-dictionary with an
-        AnnotationProperties object.
-
-        :param input_dict: an annotation dict from a MMIF file
-        :return: None
-        """
-        self._type = input_dict['_type']
-        self.properties = AnnotationProperties(input_dict['properties'])
-
-    def __init__(self, anno_obj: Union[str, dict] = None):
-        """
-        Constructs a MMIF Annotation object.
-        :param anno_obj: the JSON-LD data
-        """
-        self._type = ''
-        self.properties = AnnotationProperties()
-        super().__init__(anno_obj)
 
     def add_property(self, name: str, value: str) -> None:
         """
@@ -52,6 +47,7 @@ class Annotation(MmifObject):
 
 
 class AnnotationProperties(MmifObject):
-    id: str
-    start: Optional[int] = -1
-    end: Optional[int] = -1
+
+    def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
+        self.id: str = ''
+        super().__init__(mmif_obj)

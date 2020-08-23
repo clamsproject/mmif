@@ -54,7 +54,7 @@
           "type": "string",
           "format": "date-time"
         },
-        "tool": {
+        "app": {
           "type": "string",
           "format": "uri"
         },
@@ -64,7 +64,7 @@
       },
       "required": [
         "medium",
-        "tool",
+        "app",
         "contains"
       ]
     },
@@ -74,15 +74,11 @@
         "source": {
           "type": "string"
         },
-        "tool": {
+        "app": {
           "type": "string",
           "format": "uri"
         }
-      },
-      "required": [
-        "source",
-        "tool"
-      ]
+      }
     },
     "medium": {
       "type": "object",
@@ -159,6 +155,10 @@
     "view": {
       "type": "object",
       "properties": {
+        "@context": {
+           "type": "string",
+           "format": "uri"
+        },
         "id": {
           "type": "string"
         },

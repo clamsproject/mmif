@@ -1,9 +1,8 @@
 #! /usr/bin/env python3
+import io
 import os
 import shutil
 import subprocess
-import importlib
-import sys
 from os.path import join as pjoin
 from typing import Union
 
@@ -11,6 +10,10 @@ import setuptools.command.build_py
 import setuptools.command.develop
 
 import mmif  # this imports `mmif` directory as a sibling, not `mmif` site-package
+import yaml
+
+name = "mmif-python"
+version_fname = "VERSION"
 
 # this is only necessary when not using setuptools/distribute
 from sphinx.setup_command import BuildDoc
@@ -22,15 +25,41 @@ def do_not_edit_warning(dirname):
         warning.write("Any manual changes will be wiped at next build time.\n")
 
 
-def generate_subpack(pack_name, mod_name, init_contents=""):
-    mod_dir = pjoin(pack_name, mod_name)
-    shutil.rmtree(mod_dir, ignore_errors=True)
-    os.makedirs(mod_dir, exist_ok=True)
-    do_not_edit_warning(mod_dir)
-    mod_init = open(pjoin(mod_dir, '__init__.py'), 'w')
-    mod_init.write(init_contents)
-    mod_init.close()
-    return mod_dir
+def generate_subpack(parpack_name, subpack_name, init_contents=""):
+    subpack_dir = pjoin(parpack_name, subpack_name)
+    shutil.rmtree(subpack_dir, ignore_errors=True)
+    os.makedirs(subpack_dir, exist_ok=True)
+    do_not_edit_warning(subpack_dir)
+    init_mod = open(pjoin(subpack_dir, '__init__.py'), 'w')
+    init_mod.write(init_contents)
+    init_mod.close()
+    return subpack_dir
+
+
+def generate_vocab_enum(spec_version, clams_types, source_path) -> str:
+    vocab_url = 'http://mmif.clams.ai/%s/vocabulary' % spec_version
+
+    file_out = io.StringIO()
+    with open(source_path, 'r') as file_in:
+        for line in file_in.readlines():
+            file_out.write(line.replace('<VERSION>', spec_version))
+        for type_name in clams_types:
+            file_out.write(f"    {type_name} = '{vocab_url}/{type_name}'\n")
+
+    string_out = file_out.getvalue()
+    file_out.close()
+    return string_out
+
+
+def generate_vocabulary(spec_version, clams_types, source_path):
+    types = {'annotation_types.py': ['AnnotationTypesBase', 'AnnotationTypes'],
+             'media_types.py': ['MediaTypes']}
+    vocabulary_dir = generate_subpack(mmif.__name__, mmif._vocabulary_pkg,
+                                      '\n'.join(f"from .{fname.split('.')[0]} import {cname}" for fname, cnames in types.items() for cname in cnames)+'\n')
+
+    vocab_enum = generate_vocab_enum(spec_version, clams_types, source_path)
+    write_res_file(vocabulary_dir, 'annotation_types.py', vocab_enum)
+    return vocabulary_dir
 
 
 def get_matching_gittag(version: str):
@@ -38,7 +67,7 @@ def get_matching_gittag(version: str):
     tags = subprocess.check_output(['git', 'tag']).decode().split('\n')
     # sort and return highest version
     return \
-        sorted([tag for tag in tags if f'{vmaj}.{vmin}.' in tag],
+        sorted([tag for tag in tags if f'spec-{vmaj}.{vmin}.' in tag],
                key=lambda x: int(x.split('.')[-1]))[-1]
 
 
@@ -52,42 +81,43 @@ def write_res_file(res_dir: str, res_name: str, res_data: Union[bytes, str]):
     res_file.write(res_data)
     res_file.close()
 
-def dev_ver(ver, devver=1):
-    vmaj, vmac, vpat = map(int, ver.split('.'))
-    return '.'.join(map(str, [vmaj, vmac, vpat+1, f'dev{devver}']))
 
-def bump_ver(ver):
-    new_ver = input(f"Current version is {ver}, please enter new version (default: increase *patch* level by 1): ")
-    if len(new_ver) == 0:
-        vmaj, vmac, vpat = map(int, ver.split('.'))
-        new_ver = '.'.join(map(str, [vmaj, vmac, vpat+1]))
-    return new_ver
+# note that `VERSION` file will not included in bdist - bdist should already have `mmif._ver_pkg` properly set
+if os.path.exists(version_fname):
+    with open(version_fname, 'r') as version_f:
+        version = version_f.read().strip()
+else:
+    raise ValueError(f"Cannot find {version_fname} file. Use `make version` to generate one.")
 
-# note that `VERSION` file is not included in bdist - bdist should alreay have `mmif._ver_pkg` properly set
-with open('VERSION', 'r') as version_f:
-    version = version_f.read().strip()
-    if 'develop' in sys.argv:
-        version = dev_ver(version)
-    elif 'bump' in sys.argv:
-        version = bump_ver(version)
-        sys.argv.remove('bump')
-# the above will generate a new __version__ value based on VERSION file
-# but as `mmif` package is already imported at the top,
-# mmif.__version__ is not updated, so we need to reload the package
-generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"')
-importlib.reload(mmif)
 
 def prep_ext_files(setuptools_cmd):
     ori_run = setuptools_cmd.run
 
     def mod_run(self):
         # assuming build only happens inside the `mmif` git repository
-        gittag = get_matching_gittag(version)
+        # also, NOTE that when in `make develop`, it will use resource files in the same branch
+        gittag = get_matching_gittag(version) if '.dev' not in version else "HEAD"
+        spec_version = gittag.split('-')[-1]
         # making resources into a python package so that `pkg_resources` can access resource files
         res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
+
+        # the above will generate a new version value based on VERSION file
+        # but as `mmif` package is already imported at the top,
+        # mmif.__version__ is not updated, and that's why we use the value of
+        # `version` instead of `mmif.__version__` in the below when calling `setuptools.setup`
+        generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"\n__specver__ = "{spec_version}"')
+
         # and write resource files
         write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
         write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+
+        # write vocabulary enum
+        yaml_file = io.BytesIO(get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+        clams_types = [t['name'] for t in list(yaml.safe_load_all(yaml_file.read()))]
+        vocabulary_dir = generate_vocabulary(spec_version, clams_types, os.path.join('vocabulary_files', 'annotation_types.txt'))
+        with open(os.path.join('vocabulary_files', 'media_types.txt')) as media_types_file:
+            write_res_file(vocabulary_dir, 'media_types.py', media_types_file.read())
+
         ori_run(self)
 
     setuptools_cmd.run = mod_run
@@ -103,6 +133,7 @@ class SdistCommand(setuptools.command.sdist.sdist):
 class BuildCommand(setuptools.command.build_py.build_py):
     pass
 
+
 @prep_ext_files
 class DevelopCommand(setuptools.command.develop.develop):
     pass
@@ -116,7 +147,7 @@ with open('requirements.txt') as requirements:
 
 setuptools.setup(
     name=name,
-    version=mmif.__version__,
+    version=version,
     author="Brandeis Lab for Linguistics and Computation",
     author_email="admin@clams.ai",
     description="Python implementation of MultiMedia Interchange Format specification. (https://mmif.clams.ai)",

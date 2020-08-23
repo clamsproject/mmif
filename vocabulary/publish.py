@@ -152,10 +152,10 @@ class Page(object):
         self.container = None
         self.intro = None
         self.main_content = None
-        self._add_stylesheet('css/lappsstyle.css')
+        self._add_stylesheet()
 
-    def _add_stylesheet(self, stylesheet):
-        add_stylesheet(self.soup, stylesheet)
+    def _add_stylesheet(self):
+        add_stylesheet(self.soup, self.stylesheet)
 
     def _add_title(self, title):
         self.soup.head.append(tag('title', text=title))
@@ -187,6 +187,8 @@ class Page(object):
         self.main_content.append(tag('br'))
 
     def write(self):
+        if not os.path.exists(self.fpath):
+            os.mkdir(self.fpath)
         with open(self.fname, 'w') as fh:
             fh.write(increase_leading_space(self.soup.prettify()))
 
@@ -194,7 +196,9 @@ class Page(object):
 class IndexPage(Page):
 
     def __init__(self, tree, outdir, version):
+        self.stylesheet = 'css/lappsstyle.css'
         super().__init__(outdir, version)
+        self.fpath = outdir
         self.fname = os.path.join(outdir, 'index.html')
         self.tree = tree
         self._add_title('CLAMS Vocabulary')
@@ -226,7 +230,7 @@ class IndexPage(Page):
 
     def _add_tree(self, clams_type, soup_node):
         type_name = clams_type['name']
-        fname = '%s.html' % type_name
+        fname = '%s' % type_name
         link = HREF(fname, type_name)
         name_cell = tag('td', {'class': 'tc', 'colspan': 4})
         name_cell.append(link)
@@ -272,13 +276,15 @@ class IndexPage(Page):
 class TypePage(Page):
 
     def __init__(self, clams_type, outdir, version):
+        self.stylesheet = '../css/lappsstyle.css'
         super().__init__(outdir, version)
         self.clams_type = clams_type
         self.name = clams_type['name']
         self.description = clams_type['description']
         self.metadata = clams_type.get('metadata', [])
         self.properties = clams_type.get('properties', [])
-        self.fname = os.path.join(outdir, '%s.html' % self.name)
+        self.fpath = os.path.join(outdir, self.name)
+        self.fname = os.path.join(outdir, self.name, 'index.html')
         self._add_title(self.name)
         self._add_main_structure()
         self._add_header()
@@ -301,13 +307,13 @@ class TypePage(Page):
     def _add_home_button(self):
         self.main_content.append(
             DIV({'id': 'sectionbar'},
-                dtrs=[tag('p', dtrs=[HREF('index.html', 'Home')])]))
+                dtrs=[tag('p', dtrs=[HREF('../index.html', 'Home')])]))
 
     def _add_head(self):
         chain = reversed(self._chain_to_top())
         dtrs = []
         for n in chain:
-            dtrs.append(HREF("%s.html" % n['name'], n['name']))
+            dtrs.append(HREF("../%s" % n['name'], n['name']))
             dtrs.append(SPAN('>'))
         dtrs.append(SPAN(self.name))
         p = tag('p', {'class': 'head'}, dtrs=dtrs)
@@ -315,7 +321,7 @@ class TypePage(Page):
         self._add_space()
 
     def _add_definition(self):
-        url = '%s/%s.html' % (VOCABULARY_URL, self.name)
+        url = '%s/%s' % (VOCABULARY_URL, self.name)
         table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
                                            dtrs=[tag('b', text='Definition')]),
                                        tag('td', text=self.description)]),
@@ -367,7 +373,7 @@ class TypePage(Page):
 
 
 def increase_leading_space(text):
-    """Hack to double the indentation since didn't like the single character
+    """Hack to double the indentation since I didn't like the single character
     indent in bs4 and there is apparently no way to change that."""
     # TODO: there are other minor problems with the bs4 pretty print
     # TODO: find another way to take that string and pretty print it
@@ -380,21 +386,49 @@ def increase_leading_space(text):
                 break
     return '\n'.join(new_lines)
 
+def compile_index_md(source_md, target_dir):
+    from string import Template
+    source_md_f = open(source_md, 'r')
+    #  print(source_md_f.read())
+    tmpl_to_compile = Template(source_md_f.read())
+    compiled = tmpl_to_compile.substitute(VERSION=VERSION)
+    source_md_f.close()
+    compiled_md_f = open(os.path.join(target_dir, 'index.md'), 'w') 
+    compiled_md_f.write(compiled)
+    compiled_md_f.close()
 
-def setup(outdir):
-    css_dir = os.path.join(outdir, 'css')
+def setup(out_dir, vocab_dir, schema_dir, context_dir):
+    css_dir = os.path.join(vocab_dir, 'css')
     if not os.path.exists(css_dir):
         os.makedirs(css_dir)
     shutil.copy('lappsstyle.css', css_dir)
+    compile_index_md('../specifications/index.md', out_dir)
+    shutil.copy('../specifications/pi78oGjdT-annotated.jpg', out_dir)
+    shutil.copytree('../specifications/samples', os.path.join(out_dir, 'samples'))
+    if not os.path.exists(schema_dir):
+        os.makedirs(schema_dir)
+    shutil.copy('../schema/lif.json', schema_dir)
+    shutil.copy('../schema/mmif.json', schema_dir)
+    if not os.path.exists(context_dir):
+        os.makedirs(context_dir)
+    shutil.copy('../context/mmif.json', context_dir)
+    shutil.copy('../context/vocab-clams.json', context_dir)
+    shutil.copy('../context/vocab-lapps.json', context_dir)
+    compile_index_md('../context/index.md', context_dir)
 
 
 if __name__ == '__main__':
-    outdir = os.path.join('..', 'docs', VERSION, 'vocabulary')
+    out_dir =  os.path.join('..', 'docs', VERSION)
     if len(sys.argv) > 1 and sys.argv[1] == '--test':
-        outdir = 'www'
-    setup(outdir)
-    print("Creating webpages in '%s'" % outdir)
+        out_dir = 'www'
+    shutil.rmtree(out_dir, ignore_errors=True)
+    os.mkdir(out_dir)
+    vocab_dir = os.path.join(out_dir, 'vocabulary')
+    schema_dir = os.path.join(out_dir, 'schema')
+    context_dir = os.path.join(out_dir, 'context')
+    setup(out_dir, vocab_dir, schema_dir, context_dir)
+    print(">>> Creating specifications in '%s'\n" % out_dir)
     clams_types = read_yaml("clams.vocabulary.yaml")
     tree = Tree(clams_types)
-    write_hierarchy(tree, outdir, VERSION)
-    write_pages(tree, outdir, VERSION)
+    write_hierarchy(tree, vocab_dir, VERSION)
+    write_pages(tree, vocab_dir, VERSION)

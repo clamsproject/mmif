@@ -162,13 +162,14 @@ name: VideoObject
 parent: Region
 
 description: >-
-  A sequence of BoundingBoxes, where each BoundingBox is associated with a
-  TimePoint.
+  A sequence of Polygons, where each Polygon is associated with a
+  TimePoint. So a VideoObject is in effect a sequence of image objects at
+  certain time points.
   
 properties:
-  boundingBoxes:
+  polygons:
     type: List of IDs
-    description: The BoundingBoxes that make up the object.
+    description: The Polygons that make up the object.
     required: true
 
 ---

@@ -42,7 +42,6 @@ gen
 *.db
 *.sqlite3
 
-
 # java
 *.class
 .mtj.tmp/ # Mobile Tools for Java (J2ME)
@@ -58,15 +57,14 @@ hs_err_pid* # virtual machine crash logs, see http://www.java.com/en/download/he
 **/dist
 **/*.egg-info
 **/.pytype
+mmif-python/build/**
+mmif-python/.coverage
+mmif-python/coverage.xml
+mmif-python/htmlcov
 
-# shared folders
-dropbox_shared*/
-github_shared*/
-gdrive_shared*/
-
-# external references
-\!rel_*/
-\!ref_*/
+# ruby and jekyll files 
+Gemfile.lock
+docs/**/_site/**
 
 # ctag generated file
 tags
@@ -75,7 +73,13 @@ tags
 # auto-generated files
 mmif-python/**/ver
 mmif-python/**/res
-/vocabulary/rdf/clams.vocabulary
+mmif-python/**/vocabulary
+mmif-python/VERSION*
+.hypothesis
 
+# temporary vocab test files 
+/vocabulary/www/*
+# external java library
+/vocabulary/rdf/clams.vocabulary
 # re-includes
 !vocabulary/rdf/bin/*.jar
