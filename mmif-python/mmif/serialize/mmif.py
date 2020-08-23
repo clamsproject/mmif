@@ -140,6 +140,7 @@ class Mmif(MmifObject):
 
     def get_media_by_metadata(self, metadata_key: str, metadata_value: str) -> List[Medium]:
         """
+        Method to retrieve media by an arbitrary key-value pair in the medium metadata objects.
 
         :param metadata_key:
         :param metadata_value:
@@ -158,7 +159,7 @@ class Mmif(MmifObject):
 
     def get_medium_location(self, m_type: str) -> str:
         """
-        Finds the location of the medium in the MMIF object of the given type.
+        Method to get the location of *first* medium of given type.
 
         :param m_type: the type to search for
         :return: the value of the location field in the corresponding medium
