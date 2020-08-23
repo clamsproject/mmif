@@ -3,4 +3,5 @@ hypothesis-jsonschema
 pytest>=6
 pytest-cov
 pytype
-
+bs4
+lxml
