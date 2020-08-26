@@ -72,9 +72,7 @@ Notice how the entity recognizer ran over the documents in the Kaldi view.
           "http://mmif.clams.ai/0.1.0/TimeFrame": {
             "unit": "milliseconds",
             "document": "m1" },
-          "http://mmif.clams.ai/0.1.0/Alignment": {
-            "sourceType": "http://mmif.clams.ai/0.1.0/TimeFrame",
-            "targetType": "http://vocab.lappsgrid.org/Token" } },
+          "http://mmif.clams.ai/0.1.0/Alignment": {} },
         "app": "http://mmif.clams.ai/apps/kaldi/0.2.1"
       },
       "annotations": [

@@ -148,7 +148,7 @@ Let's take Tesseract as an example and let's say that it takes an image and a bo
         "contains": {
           "http://mmif.clams.ai/0.1.0/BoundingBox": {
             "document": "m1" } },
-        "tool": "http://mmif.clams.ai/apps/east/0.2.1",
+        "app": "http://mmif.clams.ai/apps/east/0.2.1",
       },
       "annotations": [
         { 
@@ -176,10 +176,8 @@ We discussed creating a new view with bounding boxes annotation types with a *te
   "metadata": {
     "contains": {
       "http://mmif.clams.ai/0.1.0/TextDocument": {} },
-      "http://mmif.clams.ai/0.1.0/Alignment": {
-        "sourceType": "http://mmif.clams.ai/0.1.0/BoundingBox",
-        "targetType": "http://mmif.clams.ai/0.1.0/TextDocument" },
-    "tool": "http://mmif.clams.ai/apps/tessearct/0.2.1"
+      "http://mmif.clams.ai/0.1.0/Alignment": {} },
+    "app": "http://mmif.clams.ai/apps/tessearct/0.2.1"
   },
   "annotations": [
     { 
@@ -253,7 +251,7 @@ The **segmenter** takes the audio and creates a new view with time frames:
       "http://mmif.clams.ai/0.1.0/TimeFrame": {
         "unit": "milliseconds",
         "document": "m1" } },
-    "tool": "http://mmif.clams.ai/apps/segmenter/0.2.1",
+    "app": "http://mmif.clams.ai/apps/segmenter/0.2.1",
 	},
   "annotations": [
     {
@@ -296,7 +294,7 @@ The **segmenter** takes the audio and creates a new view with time frames:
   "metadata": {
     "contains": {
       "http://mmif.clams.ai/0.1.0/TextDocument": {} },
-    "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1"
+    "app": "http://mmif.clams.ai/apps/kaldi/0.2.1"
 	},
   "annotations": [
     {
@@ -343,10 +341,8 @@ However, the above is not the full result of Kaldi since it will also create fur
       "http://mmif.clams.ai/0.1.0/TimeFrame": {
         "unit": "milliseconds",
         "document": "m1" },
-      "http://mmif.clams.ai/0.1.0/Alignment": {
-        "sourceType": "http://mmif.clams.ai/0.1.0/TimeFrame",
-        "targetType": "http://vocab.lappsgrid.org/Token" } },
-    "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1"
+      "http://mmif.clams.ai/0.1.0/Alignment": {} },
+    "app": "http://mmif.clams.ai/apps/kaldi/0.2.1"
 	},
   "annotations": [
     {
@@ -402,10 +398,8 @@ Let's take this step by step.
     "http://mmif.clams.ai/0.1.0/TimeFrame": {
       "unit": "milliseconds",
       "document": "m1" },
-    "http://mmif.clams.ai/0.1.0/Alignment": {
-      "sourceType": "http://mmif.clams.ai/0.1.0/TimeFrame",
-      "targetType": "http://vocab.lappsgrid.org/Token" } },
-  "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1"
+    "http://mmif.clams.ai/0.1.0/Alignment": {} },
+  "app": "http://mmif.clams.ai/apps/kaldi/0.2.1"
 }
 ```
 
@@ -494,7 +488,7 @@ Finallly, **NER** runs over all the text documents that the CLAMS platform hands
   "metadata": {
     "contains": {
       "http://vocab.lappsgrid.org/NamedEntity": {} },
-    "tool": "http://mmif.clams.ai/apps/stanford-ner/0.2.1"
+    "app": "http://mmif.clams.ai/apps/stanford-ner/0.2.1"
   },
   "annotations": [
     {
