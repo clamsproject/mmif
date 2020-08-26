@@ -4,57 +4,23 @@ This example contains:
 
 -  one audio medium
 - one view created by the audio segmenter
-- two text media created by Kaldi, grouped together
 - one view created by Kaldi
 - one view created by a named entity recognizer
 
-Notice that there still is an issue with the context in the Kaldi view since it only deals with the CLAMS types and not the LAPPS types.
-
-We chose to not take this option, this file will be deprecated.
+Notice how the entity recognizer ran over the documents in the Kaldi view.
 
 ```json
 {
   "metadata": {
     "mmif": "http://miff.clams.ai/0.1.0" },
 
-  "media": [
+  "documents": [
     {
       "@type": "http://mmif.clams.ai/0.1.0/AudioDocument",
       "properties": {
         "id": "m1",
         "mime": "audio/mp3",
         "location": "/var/archive/audio-002.mp3" }
-    },
-    {
-      "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
-      "metadata": {
-        "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1",
-        "textSource": "v1:tf1"
-      },
-      "properties": {
-        "id": "m2" },
-      "submedia": [
-        {
-          "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
-          "metadata": {
-            "textSource": "v1:tf1" 
-          },
-          "properties": {
-            "id": "sub1",
-            "text": {
-              "@value": "Fido barks" }}
-        },
-        {
-          "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
-          "metadata": {
-            "textSource": "v1:tf3" 
-          },
-          "properties": {
-            "id": "sub2",
-            "text": {
-              "@value": "Fluffy sleeps" }}
-        }
-      ], 
     }
   ],
 
@@ -65,9 +31,9 @@ We chose to not take this option, this file will be deprecated.
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/TimeFrame": {
-            "unit": "milliseconds" } },
-        "medium": "m1",
-        "tool": "http://mmif.clams.ai/apps/segmenter/0.2.1",
+            "unit": "milliseconds",
+            "document": "m1" } },
+        "app": "http://mmif.clams.ai/apps/segmenter/0.2.1",
       },
       "annotations": [
         {
@@ -104,19 +70,33 @@ We chose to not take this option, this file will be deprecated.
           "http://mmif.clams.ai/0.1.0/TextDocument": {},
           "http://vocab.lappsgrid.org/Token": {},
           "http://mmif.clams.ai/0.1.0/TimeFrame": {
-            "unit": "milliseconds" },
+            "unit": "milliseconds",
+            "document": "m1" },
           "http://mmif.clams.ai/0.1.0/Alignment": {
             "sourceType": "http://mmif.clams.ai/0.1.0/TimeFrame",
             "targetType": "http://vocab.lappsgrid.org/Token" } },
-        "medium": "m1",
-        "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1"
+        "app": "http://mmif.clams.ai/apps/kaldi/0.2.1"
       },
       "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
+          "properties": {
+            "id": "td1",
+            "text": {
+              "@value": "Fido barks" } }
+        },
+        {
+          "@type": "http://mmif.clams.ai/0.1.0/Alignment",
+          "properties": {
+            "id": "a1",
+            "source": "v1:tf1",
+            "target": "td1" }
+        },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
           "id": "t1",
           "properties": {
-            "document": "m2:sub1",
+            "document": "v2:td1",
             "start": 0,
             "end": 4,
             "text": "Fido" }
@@ -125,7 +105,7 @@ We chose to not take this option, this file will be deprecated.
           "@type": "http://vocab.lappsgrid.org/Token",
           "id": "t2",
           "properties": {
-            "document": "m2:sub1",
+            "document": "v2:td1",
             "start": 5,
             "end": 10,
             "text": "barks" }
@@ -146,23 +126,39 @@ We chose to not take this option, this file will be deprecated.
         },
         {
           "@type": "http://mmif.clams.ai/0.1.0/Alignment",
-          "id": "a1",
+          "id": "a2",
           "properties": {
             "source": "tf1",
             "target": "t1" }
         },
         {
           "@type": "http://mmif.clams.ai/0.1.0/Alignment",
-          "id": "a2",
+          "id": "a3",
           "properties": {
             "source": "tf2",
             "target": "t2" }
+        },
+
+        {
+          "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
+          "properties": {
+            "id": "td2",
+            "textSource": "v1:tf3",
+            "text": {
+              "@value": "Fluffy sleeps" } }
+        },
+        {
+          "@type": "http://mmif.clams.ai/0.1.0/Alignment",
+          "properties": {
+            "id": "a4",
+            "source": "v1:tf3",
+            "target": "td2" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
           "id": "t3",
           "properties": {
-            "document": "m2:sub2",
+            "document": "v2:td2",
             "start": 0,
             "end": 6,
             "text": "Fluffy" }
@@ -171,7 +167,7 @@ We chose to not take this option, this file will be deprecated.
           "@type": "http://vocab.lappsgrid.org/Token",
           "id": "t4",
           "properties": {
-            "document": "m2:sub2",
+            "document": "v2:td2",
             "start": 7,
             "end": 13,
             "text": "sleeps" }
@@ -192,14 +188,14 @@ We chose to not take this option, this file will be deprecated.
         },
         {
           "@type": "http://mmif.clams.ai/0.1.0/Alignment",
-          "id": "a3",
+          "id": "a5",
           "properties": {
             "source": "tf3",
             "target": "t3" }
         },
         {
           "@type": "http://mmif.clams.ai/0.1.0/Alignment",
-          "id": "a4",
+          "id": "a5",
           "properties": {
             "source": "tf4",
             "target": "t4" }
@@ -212,14 +208,14 @@ We chose to not take this option, this file will be deprecated.
       "metadata": {
         "contains": {
           "http://vocab.lappsgrid.org/NamedEntity": {} },
-        "tool": "http://mmif.clams.ai/apps/stanford-ner/0.2.1"
+        "app": "http://mmif.clams.ai/apps/stanford-ner/0.2.1"
       },
       "annotations": [
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
           "properties": {
             "id": "ne1",
-            "document": "m2:sub1",
+            "document": "v2:td1",
             "start": 0,
             "end": 4,
             "category": "Person",
@@ -229,7 +225,7 @@ We chose to not take this option, this file will be deprecated.
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
           "properties": {
             "id": "ne2",
-            "document": "m2:sub2",
+            "document": "v2:td2",
             "start": 0,
             "end": 6,
             "category": "Person",

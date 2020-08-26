@@ -9,16 +9,12 @@ This example contains:
 
 Notice how the entity recognizer ran over the documents in the Kaldi view.
 
-Also notice how there is an issue with the context in the Kaldi view since it only deals with the CLAMS types and not the LAPPS types.
-
 ```json
 {
-	"@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
-
   "metadata": {
     "mmif": "http://miff.clams.ai/0.1.0" },
 
-  "media": [
+  "documents": [
     {
       "@type": "http://mmif.clams.ai/0.1.0/AudioDocument",
       "properties": {
@@ -32,13 +28,12 @@ Also notice how there is an issue with the context in the Kaldi view since it on
 
     {
       "id": "v1",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/TimeFrame": {
-            "unit": "milliseconds" } },
-        "medium": "m1",
-        "tool": "http://mmif.clams.ai/apps/segmenter/0.2.1",
+            "unit": "milliseconds",
+            "document": "m1" } },
+        "app": "http://mmif.clams.ai/apps/segmenter/0.2.1",
       },
       "annotations": [
         {
@@ -70,18 +65,17 @@ Also notice how there is an issue with the context in the Kaldi view since it on
 
     {  
       "id": "v2",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/TextDocument": {},
           "http://vocab.lappsgrid.org/Token": {},
           "http://mmif.clams.ai/0.1.0/TimeFrame": {
-            "unit": "milliseconds" },
+            "unit": "milliseconds",
+            "document": "m1" },
           "http://mmif.clams.ai/0.1.0/Alignment": {
             "sourceType": "http://mmif.clams.ai/0.1.0/TimeFrame",
             "targetType": "http://vocab.lappsgrid.org/Token" } },
-        "medium": "m1",
-        "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1"
+        "app": "http://mmif.clams.ai/apps/kaldi/0.2.1"
       },
       "annotations": [
         {
@@ -198,11 +192,10 @@ Also notice how there is an issue with the context in the Kaldi view since it on
 
     {
       "id": "v3",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://vocab.lappsgrid.org/NamedEntity": {} },
-        "tool": "http://mmif.clams.ai/apps/stanford-ner/0.2.1"
+        "app": "http://mmif.clams.ai/apps/stanford-ner/0.2.1"
       },
       "annotations": [
         {
@@ -227,13 +220,6 @@ Also notice how there is an issue with the context in the Kaldi view since it on
         }
       ]
     }
-
-  ]
-}
-
-
-
-
 
   ]
 }

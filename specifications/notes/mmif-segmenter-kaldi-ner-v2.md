@@ -10,10 +10,10 @@ This example contains:
 
 Notice that there still is an issue with the context in the Kaldi view since it only deals with the CLAMS types and not the LAPPS types.
 
+We chose to not take this option and this file will be deprecated.
+
 ```json
 {
-	"@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
-
   "metadata": {
     "mmif": "http://miff.clams.ai/0.1.0" },
 
@@ -53,7 +53,6 @@ Notice that there still is an issue with the context in the Kaldi view since it 
 
     {
       "id": "v1",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/TimeFrame": {
@@ -91,7 +90,6 @@ Notice that there still is an issue with the context in the Kaldi view since it 
 
     {  
       "id": "v2",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/TextDocument": {},
@@ -202,7 +200,6 @@ Notice that there still is an issue with the context in the Kaldi view since it 
 
     {
       "id": "v3",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://vocab.lappsgrid.org/NamedEntity": {} },

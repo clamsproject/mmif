@@ -65,7 +65,7 @@ My suggestion now is to
 
 
 
-## What if we do not add media?
+## 1.  What if we do not add media?
 
 So the list of media is read only and the media are really primary in that we consider them as data handed to us before any of *our* processing. The data themselves may of course have been created by some previous processing, manual or automatic, but we don't care and MMIF will not attempt to keep track of where those data came from, that would be the responsibility of some external application or database.
 
@@ -75,7 +75,7 @@ Applications do not take media as input but instead take a particular kind of th
 
 Here is how this can work. 
 
-### Representing media
+### 1.1.  Representing media
 
 The current specifications has media represented as follows:
 
@@ -88,7 +88,7 @@ The current specifications has media represented as follows:
 }
 ```
 
-My suggestion is to use something slightely different, here shown for an image and a text:
+My suggestion is to use something slightly differentand represent them as two documents, here shown for an image and a text:
 
 ```json
 {
@@ -116,18 +116,23 @@ My suggestion is to use something slightely different, here shown for an image a
 This goes along naturally with having document types added to the vocabulary, as proposed by Keigh. Media types and their properties are now defined in the vocabulary and look like annotation types. A detail is that the *id* property would have to be pushed up to *Thing*.  Note that nothing can stop us from adding properties that describe where those data came from, but our specifications will not require that.
 
 > Not sure how this should work with contexts. We would need to have the top-level context in [http://mmif.clams.ai/0.1.0/context/mmif.json](https://mmif.clams.ai/0.1.0/context/mmif.json) include the proper expansions, but that does not smell right. Simplest might be to require that `@type` in a media list is always a full URI. 
+>
+> <u>Update</u>: since we are removing contexts alltogether this will not be an issue and we will require full URIs for the `@type` property, which we have done for as long as we remember anyway. Removing contexts while still using properties with short names like *views* and *coordinates* means that those properties will not be expanded to full URIs and they will therefore not be linked data. That is acceptable for us since we are not creating web content and all we want is for the `@type` properties in our representation to link to a URL.
 
-Keigh had also proposed to rename *media* into *documents* which would fit naturally with this, but *media* is a natural fit too because it is used in the MMIF acronym. On the other hand, there is another argument down below that does favor using *documents*.
+Keigh has proposed to rename *media* into *documents* which would fit naturally with this, but *media* is a natural fit too because it is used in the MMIF acronym. On the other hand, there is another argument down below that does favor using *documents*.
 
-### Applications that create text from audiovisual data
+> <u>Update</u>: we decided to use *documents*.
 
-They do not create media, they create new views, as any application. And while they may create tokens or sentences or who knows what, they are special because they add text documents to the view. 
+
+### 1.2.  Applications that create text from audiovisual data
+
+They do not create media, they create new views, like any application. And while they may create tokens or sentences or who knows what, they are special because they add text documents to the view. 
 
 Let's take Tesseract as an example and let's say that it takes an image and a bounding box in that image that is supposed to contain text. So it requires a MMIF document with an image medium and a view associated with that image and the view contains BoundingBox annotation types where each bounding box has the *boxType* property set to "text" (we could also introduce *TextBox* as a sub type of *BoundingBox*) .
 
 ```json
 {
-  "media": [
+  "documents": [
     {
       "@type": "http://mmif.clams.ai/0.1.0/ImageDocument",
       "properties": {
@@ -141,9 +146,9 @@ Let's take Tesseract as an example and let's say that it takes an image and a bo
       "id": "v1",
       "metadata": {
         "contains": {
-          "http://mmif.clams.ai/0.1.0/BoundingBox": {} },
+          "http://mmif.clams.ai/0.1.0/BoundingBox": {
+            "document": "m1" } },
         "tool": "http://mmif.clams.ai/apps/east/0.2.1",
-        "medium": "m1"
       },
       "annotations": [
         { 
@@ -159,9 +164,11 @@ Let's take Tesseract as an example and let's say that it takes an image and a bo
 }
 ```
 
-Because the value of *medium* in the view's metadata is "m1" the coordinates in the bounding box annotation are evaluated relative to the "m1" image.
+Because the value of *document* in the view's metadata is "m1" the coordinates in the bounding box annotation are evaluated relative to the "m1" image.
 
-We discussed creating a new view with bounding boxes annotation types with a *text* property added, but ended with preferring a generic text type or a document-like type. What is proposed here is that Tesseract creates a view with *TextDocument* elements. These elements would be able to refer to  a source of the document:
+> Note that *medium* was renamed into *document* and that it is now within the *contains* section. This is to streamline naming and to allow for different annotation types to refer to different documents.
+
+We discussed creating a new view with bounding boxes annotation types with a *text* property added, but ended up preferring a generic text type or a document-like type. What is proposed here is that Tesseract creates a view with *TextDocument* elements. These elements would be able to refer to  a source of the document:
 
 ```json
 {
@@ -169,6 +176,9 @@ We discussed creating a new view with bounding boxes annotation types with a *te
   "metadata": {
     "contains": {
       "http://mmif.clams.ai/0.1.0/TextDocument": {} },
+      "http://mmif.clams.ai/0.1.0/Alignment": {
+        "sourceType": "http://mmif.clams.ai/0.1.0/BoundingBox",
+        "targetType": "http://mmif.clams.ai/0.1.0/TextDocument" },
     "tool": "http://mmif.clams.ai/apps/tessearct/0.2.1"
   },
   "annotations": [
@@ -177,22 +187,29 @@ We discussed creating a new view with bounding boxes annotation types with a *te
       "properties": {
         "id": "td1",
         "text": {
-          "@value": "Fido barks",
-          "textSource": "v1:bb1" } }
-		}
+          "@value": "Fido barks" } }
+    },
+    {
+      "@type": "http://mmif.clams.ai/0.1.0/Alignment",
+      "properties": {
+        "source": "v1:bb1",
+        "target": "td1" }
+    }
   ]
 }
 ```
 
-The metadata of the view spells that the view contains *TextDocument* types and what application created them. The *textSource* property is like the *target* property and it is used within MMIF to track where a text document in a view came from and it allows you to trace the text back to the part in the image or video that it occurred. Notice the absence of a *medium* metadata property. A text document is not referring to primary data and therefore does not need to be anchored to those data, they were generated from some annotation object.
+The metadata of the view spells out that the view contains *TextDocument* types and what application created them. Notice the absence of a *document* metadata property. A text document is not referring to primary data and therefore does not need to be anchored to those data, they were generated from some annotation object. The *Alignment* type links the text document to the bounding box that it was created from, text documents in views always need to be aligned to the speech segment or image box that they were created from.
+
+> Adding an alignment is new. Previously, we had a *textSource* property which was like the *target* property and it was used to track where a text document in a view came from (thereby allowing you to trace the text back to the part in the image or video that it occurred). We figured that with alignments we already had a mechanism for that so we threw out *textSource*, using an alignment is more verbose though.
 
 One thing that the above representation does, and this was also done with the *coordinates* property slightly further above, is that we now have properties whose values are complex elements themselves instead of strings. With LIF we never allowed that (except for lists of identifiers). Another thing is that *annotations* does not sound like such a great name since we have *TextDocument* in the vocabulary as something that is not an annotation. Maybe we should rename it into *elements* or *content*.
 
 This can also work the other way around in case we ever need it. For example, some application could technically take text and create an image from it. The image would be put in a view as an *ImageDocument* type and its *source* attribute would point at the text span it was created from.
 
-### What do applications take as input?
+### 1.3.  What do applications take as input?
 
-Copied from above:
+Copied from the intro of section 1:
 
 >  Applications do not take media as input but instead take a particular kind of thingie as input and that thingie could be a medium.
 
@@ -207,9 +224,9 @@ We also need to acknowledge that applications may take documents and associated 
 
 In the example in the previous section, Tesseract would run on all *BoundingBox* annotations where the *boxType* property is set to "text".
 
-And we also need to acknowledge that some tools may be running on text documents, but that they may choose to completely ignore the document if all the data it needs are in annoations that were also required by the application.
+We also need to acknowledge that some tools may be running on text documents, but that they may choose to completely ignore the document if all the data it needs are in annoations that were also required by the application.
 
-### A more complicated example
+### 1.4.  A more complicated example
 
 We have an audio stream, run a segmenter on that stream, run Kaldi over the language segments in the stream and then run NER on the Kaldi output.
 
@@ -232,12 +249,10 @@ The **segmenter** takes the audio and creates a new view with time frames:
 {
   "id": "v1",
   "metadata": {
-  	"contains": {
+    "contains": {
       "http://mmif.clams.ai/0.1.0/TimeFrame": {
-        "unit": "milliseconds"
-      }
-    },
-    "medium": "m1",
+        "unit": "milliseconds",
+        "document": "m1" } },
     "tool": "http://mmif.clams.ai/apps/segmenter/0.2.1",
 	},
   "annotations": [
@@ -279,7 +294,7 @@ The **segmenter** takes the audio and creates a new view with time frames:
 {
   "id": "v2",
   "metadata": {
-  	"contains": {
+    "contains": {
       "http://mmif.clams.ai/0.1.0/TextDocument": {} },
     "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1"
 	},
@@ -288,9 +303,14 @@ The **segmenter** takes the audio and creates a new view with time frames:
       "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
       "id": "td1",
       "properties": {
-        "textSource": "v1:tf1",
         "text": {
           "@value": "Fido barks" } }
+    },
+    {
+      "@type": "http://mmif.clams.ai/0.1.0/Alignment",
+      "properties": {
+        "source": "v1:tf1",
+        "target": "td1" }
     },
     {
       "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
@@ -299,27 +319,33 @@ The **segmenter** takes the audio and creates a new view with time frames:
         "textSource": "v1:tf3",
         "text": {
           "@value": "Fluffy sleeps" } }
+    },
+    {
+      "@type": "http://mmif.clams.ai/0.1.0/Alignment",
+      "properties": {
+        "source": "v1:tf3",
+        "target": "td2" }
     }
   ]
 }
 ```
 
-However, the above is not the full result of Kaldi since it will also create an alignment by linking tokens in text documents to timeframes in the audio. With these extra annotation types it gets a bit tricky. Here is the above again, but now, for space reasons, only including the first document and the alignment of the first token.
+However, the above is not the full result of Kaldi since it will also create further alignments by linking tokens in text documents to time frames in the audio. With these extra annotation types it gets a bit tricky. Here is the above again, but now, for space reasons, only including the first document and the alignment of the first token.
 
 
 ```json
 {
   "id": "v2",
   "metadata": {
-  	"contains": {
+    "contains": {
       "http://mmif.clams.ai/0.1.0/TextDocument": {},
       "http://vocab.lappsgrid.org/Token": {},
       "http://mmif.clams.ai/0.1.0/TimeFrame": {
-        "unit": "milliseconds" },
+        "unit": "milliseconds",
+        "document": "m1" },
       "http://mmif.clams.ai/0.1.0/Alignment": {
         "sourceType": "http://mmif.clams.ai/0.1.0/TimeFrame",
         "targetType": "http://vocab.lappsgrid.org/Token" } },
-    "medium": "m1",
     "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1"
 	},
   "annotations": [
@@ -327,15 +353,20 @@ However, the above is not the full result of Kaldi since it will also create an 
       "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
       "properties": {
         "id": "td1",
-        "textSource": "v1:tf1",
         "text": {
           "@value": "Fido barks" } }
+    },
+    {
+      "@type": "http://mmif.clams.ai/0.1.0/Alignment",
+      "properties": {
+        "source": "v1:tf1",
+        "target": "td1" }
     },
     {
       "@type": "http://vocab.lappsgrid.org/Token",
       "id": "t1",
       "properties": {
-        "document": "v2:td1",
+        "document": "td1",
         "start": 0,
         "end": 4,
         "text": "Fido"
@@ -369,28 +400,36 @@ Let's take this step by step.
     "http://mmif.clams.ai/0.1.0/TextDocument": {},
     "http://vocab.lappsgrid.org/Token": {},
     "http://mmif.clams.ai/0.1.0/TimeFrame": {
-      "unit": "milliseconds" },
+      "unit": "milliseconds",
+      "document": "m1" },
     "http://mmif.clams.ai/0.1.0/Alignment": {
       "sourceType": "http://mmif.clams.ai/0.1.0/TimeFrame",
       "targetType": "http://vocab.lappsgrid.org/Token" } },
-  "medium": "m1",
   "tool": "http://mmif.clams.ai/apps/kaldi/0.2.1"
 }
 ```
 
-Kaldi add four different types to the view, each come with their own metadata (if any). The most interesting part here is the *medium* which points at the audio file and which is used to determine what medium properties like *start* and *end* anchor to.
+Kaldi adds four different types to the view, each come with their own metadata (if any). The most interesting part here is the *document* property which points at the audio file and which is used to determine what medium properties like *start* and *end* anchor to.
 
-(2) The text document:
+(2) The text document and its alignment:
 
 ```json
 {
   "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
   "properties": {
     "id": "td1",
-    "textSource": "v1:tf1",
     "text": {
       "@value": "Fido barks" } }
 }
+```
+
+```json
+{
+  "@type": "http://mmif.clams.ai/0.1.0/Alignment",
+  "properties": {
+    "source": "v1:tf1",
+    "target": "td1" }
+},
 ```
 
 Kaldi created the text from the TImeFrame with id=tf1 in the view with id=v1. Recall that that time frame was created by the segment. The document has the id "td1" and is accessable from anywhere by using the full id "v2:td1" (with the view identifier as a prefix).
@@ -409,7 +448,7 @@ Kaldi created the text from the TImeFrame with id=tf1 in the view with id=v1. Re
 }
 ```
 
-This is the most intersting one. Kaldi creates tokens and it links them to time segments. We define the token by creating a *Token* annotation which anchor to the text document. Since the *medium* was set to "m1" any anchor property like *start* or *end* will by default anchor to the audio medium, which is wrong here. We use the *document* property to make sure that *anchor* properties point to "v2:td1" which is the text document in the view. 
+This is the most interesting one. Kaldi creates tokens and links them to time segments. We define the token by creating a *Token* annotation which anchor to the text document. No *document* metadata was set for tokens because there are more than one text documents, so we do not know what anchor properties like *start* or *end* will anchor to. We use the *document* property to make sure that *anchor* properties point to "v2:td1" which is the text document in the view. If we only had one text document in the view that tokens anchor to we could have put that in the metadata.
 
 (4) The time frame:
 
@@ -437,17 +476,15 @@ SImply refers to anchors in the audio stream defined by the *medium* metadata pr
 }
 ```
 
-Finally, the alignment simply connects two annotations.
+Finally, this alignment simply connects the token and time frame annotations.
 
 What I do not like about this is that every single token needs to define what document it is anchored to. This does however seem to be a necessary result from having more than one text document. The only other option I see is to embed views inside the text document, but that brings its own complexities.
 
-> Above, we were trying to put all elements in the same view. Things may be a bit simpler if we put each type in its own view. One problem above is that *medium* was used so we know what the timeframe refers to. But we only could use one so we needed to add something called *document* to anchor the token. 
->
-> Maybe put medium back were it was before (in the *contains* section, where it went with a particular annotation type), but we still need something like *document*  as a non-metadata property for when we refer to multiple text documents from a view, unless we say that a view has to be on one document. That would be nice, but we would have to live with tools like Tessearct creating many many views.
->
-> Instead of *medium* we could have something like *anchorTarget*.
+> Note we introcuded *document*  as a non-metadata property for when we refer to multiple text documents from a view. We could avoid this if we require that a view has to be on one document. That may be nice, but we would then have to live with tools like Tessearct creating many many views.
 >
 > We are now mixing LAPPS and CLAMS types and therefore we get into trouble with the context file set up that we currently have which was to have a LAPPS or CLAMS context with each view. Should think through whether it is possible to keep the two vocabularies separate.
+>
+> <u>Update</u>: we thought about adding LAPPS types to the CLAMS vocabulary to deal with this mix, but now we have done away with contexts we can keep the two separate for now.
 
 Finallly, **NER** runs over all the text documents that the CLAMS platform hands over to it and creates a new view with all named entities.
 
@@ -486,7 +523,7 @@ Finallly, **NER** runs over all the text documents that the CLAMS platform hands
 
 We again need to spell out a *document* property for each annotation because we have more than one text document.
 
-### A note on pipelining
+### 1.5.  A note on pipelining
 
 There is something interesting about our pipelining that is worth pointing out. We may set up an explicit pipeline as above with Kaldi feeding into NER, but we do not explicitly feed the output of one application into the other. Rather, applications add to a common datastructure and downstream applications just look for everything that fits their input requirements. So we can have an MMIF file with a manual trascript and then run Kaldi and then NER, and NER will run on both the Kaldi output and the manual transcript.
 
@@ -494,7 +531,7 @@ If we want to do more restrictive pipelining we would need the platform to speci
 
 
 
-## Finally
+## 2.  Finally
 
 I think this works. But I think we can also make it work when we have media and submedia as we had before. Pretty much all the mechanics on refering to text documents from views will work for media as well:
 
@@ -509,3 +546,4 @@ Maybe it all comes down to what of the following we prefer:
 - all media that are input to processing are in the media list versus only media that we were given originally are in the media list
 - we process media versus we process documents (for the former we can still type media as some kind of document)
 
+<u>Update</u>: we all seem to prefer using text documents in views as thew slightly cleaner option.

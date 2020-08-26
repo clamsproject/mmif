@@ -8,10 +8,10 @@ This example contains
 
 Notice how the medium created by Tesseract has metadata similar to what views have, albeit without the contains section. We may consider making media lists even more like views with a *contains* dictionary (which allows specification of *TextDocument* metadata if there are any) and a list of documents.
 
+We chose not to follow this option.
+
 ```json
 {
-	"@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
-
   "metadata": {
     "mmif": "http://miff.clams.ai/0.1.0" },
 
@@ -40,7 +40,6 @@ Notice how the medium created by Tesseract has metadata similar to what views ha
 
     {
       "id": "v1",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/BoundingBox": {} },

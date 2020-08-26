@@ -6,12 +6,10 @@ This example contains:
 - one view created by EAST
 - one view created by Tesseract
 
-Notice how the view created by Tesseract contains a text document.
+Notice how the view created by Tesseract contains a text document. The *textSource* property from "mmif-east-tesseract-v1.md" is replaced by an *Alignment* type.
 
 ```json
 {
-  "@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
-
   "metadata": {
     "mmif": "http://miff.clams.ai/0.1.0" },
 
@@ -29,12 +27,11 @@ Notice how the view created by Tesseract contains a text document.
 
     {
       "id": "v1",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
-          "http://mmif.clams.ai/0.1.0/BoundingBox": {} },
-        "tool": "http://mmif.clams.ai/apps/east/0.2.1",
-        "medium": "m1"
+          "http://mmif.clams.ai/0.1.0/BoundingBox": {
+            "document": "m1" } },
+        "app": "http://mmif.clams.ai/apps/east/0.2.1"
       },
       "annotations": [
         { 
@@ -49,12 +46,11 @@ Notice how the view created by Tesseract contains a text document.
     
     {
       "id": "v2",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/TextDocument": {},
           "http://mmif.clams.ai/0.1.0/Alignment": {} },
-        "tool": "http://mmif.clams.ai/apps/tessearct/0.2.1"
+        "app": "http://mmif.clams.ai/apps/tessearct/0.2.1"
       },
       "annotations": [
         { 

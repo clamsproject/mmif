@@ -10,8 +10,6 @@ Notice how the view created by Tesseract contains a text document.
 
 ```json
 {
-  "@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
-
   "metadata": {
     "mmif": "http://miff.clams.ai/0.1.0" },
 
@@ -29,12 +27,11 @@ Notice how the view created by Tesseract contains a text document.
 
     {
       "id": "v1",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
-          "http://mmif.clams.ai/0.1.0/BoundingBox": {} },
-        "tool": "http://mmif.clams.ai/apps/east/0.2.1",
-        "medium": "m1"
+          "http://mmif.clams.ai/0.1.0/BoundingBox": {
+            "document": "m1" } },
+        "app": "http://mmif.clams.ai/apps/east/0.2.1",
       },
       "annotations": [
         { 
@@ -49,11 +46,10 @@ Notice how the view created by Tesseract contains a text document.
     
     {
       "id": "v2",
-      "@context": "http://mmif.clams.ai/0.1.0/context/vocab-clams.json",
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/TextDocument": {} },
-        "tool": "http://mmif.clams.ai/apps/tessearct/0.2.1"
+        "app": "http://mmif.clams.ai/apps/tessearct/0.2.1"
       },
       "annotations": [
         { 
