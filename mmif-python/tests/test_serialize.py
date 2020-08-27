@@ -94,7 +94,7 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_medium_cannot_have_text_and_location(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         m1 = mmif_obj.get_medium_by_id('m1')
         m2 = mmif_obj.get_medium_by_id('m2')
         m1.text = m2.text
@@ -250,7 +250,7 @@ class TestMmif(unittest.TestCase):
         b_view = View()
         b_view.id = f'{p}2'
         mmif_obj.add_view(b_view)
-        self.assertEqual({f'{p}0', f'{p}2'}, set(mmif_obj.views.items.keys()))
+        self.assertEqual({f'{p}0', f'{p}2'}, set(mmif_obj.views._items.keys()))
         c_view = mmif_obj.new_view()
         self.assertEqual(c_view.id, f'{p}3')
         d_view = View()
@@ -473,7 +473,7 @@ class TestAnnotation(unittest.TestCase):
                 continue
         self.data = {i: {'string': example,
                          'json': json.loads(example),
-                         'mmif': Mmif(example),
+                         'mmif': Mmif(example, frozen=False),
                          'annotations': [annotation
                                          for view in json.loads(example)['views']
                                          for annotation in view['annotations']]}
@@ -493,7 +493,7 @@ class TestAnnotation(unittest.TestCase):
                 removed_prop_key, removed_prop_value = list(props.items())[-1]
                 props.pop(removed_prop_key)
                 try:
-                    new_mmif = Mmif(datum['json'])
+                    new_mmif = Mmif(datum['json'], frozen=False)
                     new_mmif.get_view_by_id(view_id).annotations[anno_id].add_property(removed_prop_key, removed_prop_value)
                     self.assertEqual(json.loads(datum['string'])['views'][j],
                                      json.loads(new_mmif.serialize())['views'][j],
@@ -536,7 +536,7 @@ class TestMedium(unittest.TestCase):
                 continue
         self.data = {i: {'string': example,
                          'json': json.loads(example),
-                         'mmif': Mmif(example),
+                         'mmif': Mmif(example, frozen=False),
                          'media': json.loads(example)['media']}
                      for i, example in self.examples.items()}
 
@@ -602,7 +602,7 @@ class TestMedium(unittest.TestCase):
                     removed_metadatum_key, removed_metadatum_value = list(metadata.items())[-1]
                     metadata.pop(removed_metadatum_key)
                     try:
-                        new_mmif = Mmif(datum['json'])
+                        new_mmif = Mmif(datum['json'], frozen=False)
                         new_mmif.get_medium_by_id(medium_id).add_metadata(removed_metadatum_key, removed_metadatum_value)
                         self.assertEqual(json.loads(datum['string']), json.loads(new_mmif.serialize()), f'Failed on {i}, {medium_id}')
                     except ValidationError:

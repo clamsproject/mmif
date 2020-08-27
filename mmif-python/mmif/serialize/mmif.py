@@ -33,6 +33,7 @@ class Mmif(MmifObject):
         super().__init__(mmif_obj)
         if frozen:
             self.freeze_media()
+            self.freeze_views()
 
     @staticmethod
     def validate(json_str: Union[str, dict]) -> None:
@@ -71,7 +72,24 @@ class Mmif(MmifObject):
             raise TypeError("MMIF object is frozen")
 
     def freeze_media(self) -> bool:
+        """
+        Deeply freezes the list of media. Returns the result of
+        the deep_freeze() call, signifying whether everything
+        was fully frozen or not.
+        """
         return self.media.deep_freeze()
+
+    def freeze_views(self) -> bool:
+        """
+        Deeply freezes all of the existing views without freezing
+        the list of views itself. Returns the conjunct of the returns
+        of all of the deep_freeze() calls, signifying whether everything
+        was fully frozen or not.
+        """
+        fully_frozen = True
+        for view in self.views:
+            fully_frozen &= view.deep_freeze()
+        return fully_frozen
 
     def get_media_by_source_view_id(self, source_vid: str = None) -> List[Medium]:
         """
@@ -180,20 +198,20 @@ class MmifMetadata(MmifObject):
 
 
 class MediaList(FreezableMmifObject, DataList[Medium]):
-    items: Dict[str, Medium]
+    _items: Dict[str, Medium]
 
     def _deserialize(self, input_list: list) -> None:
-        self.items = {item['id']: Medium(item) for item in input_list}
+        self._items = {item['id']: Medium(item) for item in input_list}
 
     def append(self, value: Medium, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)
 
 
 class ViewsList(DataList[View]):
-    items: Dict[str, View]
+    _items: Dict[str, View]
 
     def _deserialize(self, input_list: list) -> None:
-        self.items = {item['id']: View(item) for item in input_list}
+        self._items = {item['id']: View(item) for item in input_list}
 
     def append(self, value: View, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)

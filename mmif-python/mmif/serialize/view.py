@@ -3,14 +3,14 @@ from typing import Dict, Union, Optional
 import dateutil.parser
 
 from .annotation import Annotation
-from .model import MmifObject, DataList
+from .model import FreezableMmifObject, DataList, DataDict
 from mmif.vocabulary import AnnotationTypesBase
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
 
 
-class View(MmifObject):
+class View(FreezableMmifObject):
 
     def __init__(self, view_obj: Union[str, dict] = None) -> None:
         self._context: str = ''
@@ -62,19 +62,18 @@ class View(MmifObject):
         return anno_result
 
 
-class ViewMetadata(MmifObject):
+class ViewMetadata(FreezableMmifObject):
 
     def __init__(self, viewmetadata_obj: Union[str, dict] = None) -> None:
         self.medium: str = ''
         self.timestamp: Optional[datetime] = None
         self.app: str = ''
-        self.contains: Dict[str, Contain] = {}
+        self.contains: ContainsDict = ContainsDict()
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
         try:
-            self.contains = {at_type: Contain(contain_obj)
-                             for at_type, contain_obj in input_dict.pop('contains').items()}
+            self.contains = ContainsDict(input_dict.pop('contains'))
         except KeyError:
             # means input_dict don't have `contains`, so we'll leave it empty
             pass
@@ -103,7 +102,7 @@ class ViewMetadata(MmifObject):
             return new_contain
 
 
-class Contain(MmifObject):
+class Contain(FreezableMmifObject):
 
     def __init__(self, contain_obj: Union[str, dict] = None) -> None:
         # TODO (krim @ 8/19/20): rename `producer` to `app` maybe?
@@ -117,11 +116,18 @@ class Contain(MmifObject):
             self.gen_time = dateutil.parser.isoparse(self.gen_time)
 
 
-class AnnotationsList(DataList[Annotation]):
-    items: Dict[str, Annotation]
+class AnnotationsList(FreezableMmifObject, DataList[Annotation]):
+    _items: Dict[str, Annotation]
 
     def _deserialize(self, input_list: list) -> None:
-        self.items = {item['properties']['id']: Annotation(item) for item in input_list}
+        self._items = {item['properties']['id']: Annotation(item) for item in input_list}
 
     def append(self, value: Annotation, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)
+
+
+class ContainsDict(FreezableMmifObject, DataDict[Contain]):
+    _items: Dict[str, Contain]
+
+    def _deserialize(self, input_dict: dict) -> None:
+        self._items = {key: Contain(value) for key, value in input_dict.items()}

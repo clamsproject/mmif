@@ -228,25 +228,26 @@ class FreezableMmifObject(MmifObject):
         self.freeze()
         fully_frozen = True
 
-        def _freeze(attribute):
+        def _freeze(item):
             """
             Freezes an attribute if it is Freezable; else, sets fully_frozen to False if it is mutable.
-            :param attribute: the attribute to freeze
+            :param item: the attribute to freeze
             """
             nonlocal fully_frozen
-            if isinstance(attribute, FreezableMmifObject):
-                attribute.deep_freeze()
-            elif not hasattr(attribute, '__hash__') or attribute.__hash__ is object.__hash__:
+            if isinstance(item, FreezableMmifObject):
+                item.deep_freeze()
+            elif isinstance(item, (list, DataList)):
+                for attribute in item:
+                    _freeze(attribute)
+            elif isinstance(item, dict):
+                for attribute in item.values():
+                    _freeze(attribute)
+            elif not hasattr(item, '__hash__') or item.__hash__ is object.__hash__:
                 fully_frozen = False
 
         for name, attr in self.__dict__.items():
-            if name not in self.reversed_names:
-                _freeze(attr)
-        for name in self.reversed_names:
-            item = getattr(self, name)
-            if isinstance(item, (dict, list, DataList)):
-                for attr in item:
-                    _freeze(attr)
+            _freeze(attr)
+
         return fully_frozen
 
     def __setattr__(self, name, value) -> None:
@@ -301,18 +302,21 @@ class MmifObjectEncoder(json.JSONEncoder):
 
 class DataList(MmifObject, Generic[T]):
     def __init__(self, mmif_obj: Union[str, list] = None):
-        self.items: Dict[str, T] = dict()
+        self._items: Dict[str, T] = dict()
         if mmif_obj is None:
             mmif_obj = []
         super().__init__(mmif_obj)
 
     def _serialize(self) -> list:
-        return list(self.items.values())
+        return list(self._items.values())
 
     def deserialize(self, mmif_json: Union[str, list]) -> None:
         if isinstance(mmif_json, str):
             mmif_json = json.loads(mmif_json)
         self._deserialize(mmif_json)
+
+    def _deserialize(self, input_dict: dict) -> None:
+        raise NotImplementedError()
 
     def get(self, key: str) -> Optional[T]:
         try:
@@ -321,25 +325,77 @@ class DataList(MmifObject, Generic[T]):
             return None
 
     def _append_with_key(self, key: str, value: T, overwrite=False) -> None:
-        if not overwrite and key in self.items:
+        if not overwrite and key in self._items:
             raise KeyError(f"Key {key} already exists")
         else:
             self[key] = value
 
     def __getitem__(self, key: str):
-        return self.items.__getitem__(key)
+        return self._items.__getitem__(key)
 
     def __setitem__(self, key: str, value: T):
-        self.items.__setitem__(key, value)
+        self._items.__setitem__(key, value)
 
     def __iter__(self):
-        return self.items.values().__iter__()
+        return self._items.values().__iter__()
 
     def __len__(self):
-        return self.items.__len__()
+        return self._items.__len__()
 
     def __reversed__(self):
-        return reversed(list(self.items.values()))
+        return reversed(list(self._items.values()))
 
     def __contains__(self, item):
-        return item in self.items
+        return item in self._items
+
+
+class DataDict(MmifObject, Generic[T]):
+    def __init__(self, mmif_obj: Union[str, dict] = None):
+        self._items: Dict[str, T] = dict()
+        if mmif_obj is None:
+            mmif_obj = {}
+        super().__init__(mmif_obj)
+
+    def _serialize(self) -> dict:
+        return self._items
+
+    def deserialize(self, mmif_json: Union[str, dict]) -> None:
+        if isinstance(mmif_json, str):
+            mmif_json = json.loads(mmif_json)
+        self._deserialize(mmif_json)
+
+    def _deserialize(self, input_dict: dict) -> None:
+        raise NotImplementedError()
+
+    def get(self, key: str) -> Optional[T]:
+        return self._items.get(key)
+
+    def _append_with_key(self, key: str, value: T, overwrite=False) -> None:
+        if not overwrite and key in self._items:
+            raise KeyError(f"Key {key} already exists")
+        else:
+            self[key] = value
+
+    def items(self):
+        return self._items.items()
+
+    def keys(self):
+        return self._items.keys()
+
+    def values(self):
+        return self._items.values()
+
+    def __getitem__(self, key: str):
+        return self._items.__getitem__(key)
+
+    def __setitem__(self, key: str, value: T):
+        self._items.__setitem__(key, value)
+
+    def __iter__(self):
+        return self._items.__iter__()
+
+    def __len__(self):
+        return self._items.__len__()
+
+    def __contains__(self, item):
+        return item in self._items

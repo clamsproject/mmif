@@ -9,9 +9,62 @@ from mmif.serialize.medium import SubmediaList
 from tests.mmif_examples import *
 
 
+class TestFreezeView(unittest.TestCase):
+    def setUp(self) -> None:
+        self.mmif_obj = Mmif(examples['mmif_example2'], frozen=False)
+        self.v1: View = self.mmif_obj['v1']
+        self.v2: View = self.mmif_obj['v2']
+
+    def test_freeze(self):
+        self.v1.freeze()
+
+        try:
+            self.v1.id = 'v3'
+            self.fail()
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+    def test_deep_freeze(self):
+        self.v1.deep_freeze()
+
+        try:
+            self.v1.id = 'v3'
+            self.fail("able to set top-level attribute")
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+        try:
+            self.v1.metadata.medium = 'm1'
+            self.fail("able to set lower-level attribute")
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+        try:
+            self.v1.metadata.contains['Segment'].producer = 'Phil'
+            self.fail('able to set attribute of Contain object in frozen View')
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+        try:
+            self.v1.metadata.contains['BoundingBox'] = Contain()
+            self.fail('able to add to contains dict after deep freeze')
+        except AssertionError:
+            raise
+        except Exception as ex:
+            print(ex.args[0])
+
+        try:
+            self.v1.metadata.contains['Segment'] = Contain()
+            self.fail('able to overwrite values in contains dict after deep freeze')
+        except AssertionError:
+            raise
+        except Exception as ex:
+            print(ex.args[0])
+
+
 class TestFreezeMedium(unittest.TestCase):
     def setUp(self) -> None:
-        self.mmif_obj = Mmif(examples['mmif_example1'])
+        self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
 
         self.m2: Medium = self.mmif_obj['m2']
 
@@ -89,7 +142,7 @@ class TestFreezeMedium(unittest.TestCase):
 
 class TestFreezeSubmediaList(unittest.TestCase):
     def setUp(self) -> None:
-        self.mmif_obj = Mmif(examples['mmif_example1'])
+        self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         self.submedia: SubmediaList = self.mmif_obj['m2'].submedia
 
     def test_deep_freeze(self):

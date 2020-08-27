@@ -93,7 +93,7 @@ class Submedium(FreezableMmifObject):
 
 
 class SubmediaList(FreezableMmifObject, DataList[Submedium]):
-    items: Dict[str, Submedium]
+    _items: Dict[str, Submedium]
 
     def _deserialize(self, input_list: list) -> None:
         self.items = {item['properties']['id']: Submedium(item) for item in input_list}

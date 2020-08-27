@@ -1,12 +1,12 @@
 from typing import Union
 
-from .model import MmifObject
+from .model import FreezableMmifObject
 from mmif.vocabulary import AnnotationTypesBase
 
 __all__ = ['Annotation', 'AnnotationProperties']
 
 
-class Annotation(MmifObject):
+class Annotation(FreezableMmifObject):
 
     def __init__(self, anno_obj: Union[str, dict] = None) -> None:
         self._type: Union[str, AnnotationTypesBase] = ''
@@ -37,7 +37,7 @@ class Annotation(MmifObject):
         self.properties[name] = value
 
 
-class AnnotationProperties(MmifObject):
+class AnnotationProperties(FreezableMmifObject):
 
     def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
         self.id: str = ''
