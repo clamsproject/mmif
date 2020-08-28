@@ -12,7 +12,7 @@
     "metadata": {
       "$ref": "#/definitions/mmifMetadata"
     },
-    "media": {
+    "documents": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/medium"
@@ -26,9 +26,8 @@
     }
   },
   "required": [
-    "@context",
     "metadata",
-    "media",
+    "documents",
     "views"
   ],
   "definitions": {

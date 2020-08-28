@@ -8,18 +8,123 @@ subtitle: Version $VERSION
 
 # Example: Bars and Tones and Slates
 
+To see the full example scroll down to the end or open the [raw json file](bars-tones-slates.json).
+
+This is a minimal example that contains two media documents, one pointing at a video and the other at a transcript. For the first document there are two views, one with bars-and-tone annotations and one with slate annotations. For the second document there is one view with the results of a tokenizer. This example file, while minimal, has everything required by MMIF.
+
+Some notes:
+
+- The metadata just specify the MMIF version.
+- Both media documents in the *documents* list refer to a location on a local disk. If it is important that this document be put outside of the local disk then URLs should be used. 
+- Each view has some metadata spelling out several kinds of things:
+  - The application that created the view.
+  - A timestamp of when the view was created.
+  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains field has a property "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame" with a dictionary as the value and that dictionary contains the metadata. Here the metadata specify what document the annotations are over what the unit used for annotation offsets is.
+
+Only one annotation is shown for each view, this is to keep the file as small as possible. Of course, often the bars-and-tones and slate views often have only one annotation so it is likely only the tokens view where annotations were left out.
 
 
 
+## Full MMIF File
+
+```json
+{
+  "metadata": {
+    "mmif": "http://miff.clams.ai/0.2.0" },
+
+  "documents": [
+    {
+      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
+      "properties": {
+        "id": "m1",
+        "mime": "video/mp4",
+        "location": "/var/archive/video-0012.mp4" }
+    },
+    {
+      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+      "properties": {
+        "id": "m2",
+        "mime": "text/plain",
+        "location": "/var/archive/video-0012-transcript.txt" }
+    }
+  ],
+
+  "views": [
+
+    {
+      "id": "v1",
+
+      "metadata": {
+        "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
+        "timestamp": "2020-05-27T12:23:45",
+        "contains": {
+          "http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame": {
+            "document": "m1",
+            "unit": "seconds" } },
+      },
+
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+          "properties": {
+            "id": "s1",
+            "start": 0,
+            "end": 5,
+            "frameType": "bars-and-tones" }
+        }
+      ]
+    },
+
+    {
+      "id": "v2",
+
+      "metadata": {
+        "app": "http://apps.clams.ai/slates/1.0.3",
+        "timestamp": "2020-05-27T12:23:45",
+        "contains": {
+          "http://mmif.clams.ai/0.1.0/vocabulary/TimeFrame": {
+            "document": "m1",
+            "unit": "seconds" } }
+      },
+
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+          "properties": {
+            "id": "s1",
+            "start": 25,
+            "end": 38,
+            "frameType": "slate" }
+        }
+      ]
+    },
+
+    {
+      "id": "v3",
+
+      "metadata": {
+        "app": "http://apps.clams.ai/slates/1.0.3",
+        "timestamp": "2020-05-27T12:25:15",
+        "contains": {
+          "document": "m2",
+          "http://vocab.lappsgrid.org/Token": {} }
+      },
+
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/Token",
+          "properties": {
+            "id": "s1",
+            "start": 0,
+            "end": 3,
+            "word": "The" }
+        }
+      ]
+    }
+
+  ]
+}
+```
 
 
 
-We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. 
-
-All components of the specification (the specifications document, the JSON schema and the CLAMS vocabulary) share the same version number. Major updates to the specification including changing the schema and major changes to the hierarchy will increase the major version number, minor changes like adding types or properties change the minor version number. The patch number increases for small fixes and documentation updates.
-
-The SDK shares `major` and `minor` numbers with the specification version and if a new version `X.Y.0` is created for the specifications then a new version `X.Y.0` will be created for the SDK as well, even if there were no changes to the SDK. Patch-level updates to the specifications will not result in new versions of the SDK. Changes to the SDK will always result in an update of the patch number, no matter how major those changes are. 
-
-As a result, it is sufficient to use specifications and SDK with the same `major` and `minor` version numbers. Typically one would take the highest patch level for each of the two. A specific version of the SDK is tied to specific version of the specification, and thus the applications based on different versions of SDK may not be compatible to each other, and may not be used together in a single pipeline. 
-
-> Note: this requires some thoughts on whether and how the CLAMS platform ensures that applications using different versions of the schema and vocabulary can fit together.
