@@ -1,3 +1,10 @@
+"""
+The :mod:`mmif` module contains the classes used to represent a full MMIF
+file as a live Python object.
+
+See the specification docs and the JSON Schema file for more information.
+"""
+
 import json
 from datetime import datetime
 from typing import List, Union, Optional, Dict, ClassVar
@@ -18,16 +25,14 @@ __all__ = ['Mmif']
 class Mmif(MmifObject):
     """
     MmifObject that represents a full MMIF file.
+
+    :param mmif_obj: the JSON-LD data
+    :param validate: whether to validate the data against the MMIF JSON-LD schema.
     """
 
     view_prefix: ClassVar[str] = 'v_'
 
     def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True) -> None:
-        """
-        Constructs a MMIF object.
-        :param mmif_obj: the JSON-LD data
-        :param validate: whether to validate the data against the MMIF JSON-LD schema.
-        """
         # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
         self._context: str = ''
         self.metadata: MmifMetadata = MmifMetadata()
@@ -49,7 +54,7 @@ class Mmif(MmifObject):
         Note that this method operates before processing by MmifObject._load_str,
         so it expects @ and not _ for the JSON-LD @-keys.
 
-        :raises ValidationError: if the input fails validation
+        :raises jsonschema.exceptions.ValidationError: if the input fails validation
         :param json_str: a MMIF JSON-LD dict or string
         :return: None
         """
@@ -124,17 +129,18 @@ class Mmif(MmifObject):
         In either case, this method will return all medium objects that generated
         from a view.
 
-        :param source_vid:
-        :return:
+        :param source_vid: the source view ID to search for
+        :return: a list of media matching the requested source view ID
         """
         return [medium for medium in self.media
                 if medium.metadata.source is not None and medium.metadata.source.split(':')[0] == source_vid]
 
     def get_media_by_app(self, app_id: str) -> List[Medium]:
         """
+        Method to get all media object queries by its originated app name.
 
-        :param app_id:
-        :return:
+        :param app_id: the app name to search for
+        :return: a list of media matching the requested app name
         """
         return [medium for medium in self.media if medium.metadata.app == app_id]
 
@@ -142,9 +148,9 @@ class Mmif(MmifObject):
         """
         Method to retrieve media by an arbitrary key-value pair in the medium metadata objects.
 
-        :param metadata_key:
-        :param metadata_value:
-        :return:
+        :param metadata_key: the metadata key to search for
+        :param metadata_value: the metadata value to match
+        :return: a list of media matching the requested metadata key-value pair
         """
         return [medium for medium in self.media if medium.metadata[metadata_key] == metadata_value]
 
@@ -184,6 +190,7 @@ class Mmif(MmifObject):
     def get_view_by_id(self, req_view_id: str) -> View:
         """
         Finds a View object with the given ID.
+
         :param req_view_id: the ID to search for
         :return: a reference to the corresponding view, if it exists
         :raises Exception: if there is no corresponding view
@@ -260,26 +267,83 @@ class Mmif(MmifObject):
 
 
 class MmifMetadata(MmifObject):
+    """
+    Basic MmifObject class to contain the top-level metadata of a MMIF file.
+
+    :param metadata_obj: the JSON-LD data
+    """
 
     def __init__(self, metadata_obj: Union[str, dict] = None) -> None:
         super().__init__(metadata_obj)
 
 
 class MediaList(DataList[Medium]):
+    """
+    MediaList object that implements :class:`mmif.serialize.model.DataList`
+    for :class:`mmif.serialize.medium.Medium`.
+    """
     items: Dict[str, Medium]
 
     def _deserialize(self, input_list: list) -> None:
+        """
+        Extends base ``_deserialize`` method to initialize ``items`` as a dict from
+        medium IDs to :class:`mmif.serialize.medium.Medium` objects.
+
+        :param input_list: the JSON-LD data that defines the list of media
+        :return: None
+        """
         self.items = {item['id']: Medium(item) for item in input_list}
 
     def append(self, value: Medium, overwrite=False) -> None:
+        """
+        Appends a medium to the list.
+
+        Fails if there is already a medium with the same ID
+        in the list, unless ``overwrite`` is set to True.
+
+        :param value: the :class:`mmif.serialize.medium.Medium`
+                      object to add
+        :param overwrite: if set to True, will overwrite an
+                          existing medium with the same ID
+        :raises KeyError: if ``overwrite`` is set to False and
+                          a medium with the same ID exists
+                          in the list
+        :return: None
+        """
         super()._append_with_key(value.id, value, overwrite)
 
 
 class ViewsList(DataList[View]):
+    """
+    ViewsList object that implements :class:`mmif.serialize.model.DataList`
+    for :class:`mmif.serialize.view.View`.
+    """
     items: Dict[str, View]
 
     def _deserialize(self, input_list: list) -> None:
+        """
+        Extends base ``_deserialize`` method to initialize ``items`` as a dict from
+        view IDs to :class:`mmif.serialize.view.View` objects.
+
+        :param input_list: the JSON-LD data that defines the list of views
+        :return: None
+        """
         self.items = {item['id']: View(item) for item in input_list}
 
     def append(self, value: View, overwrite=False) -> None:
+        """
+        Appends a view to the list.
+
+        Fails if there is already a view with the same ID
+        in the list, unless ``overwrite`` is set to True.
+
+        :param value: the :class:`mmif.serialize.view.View`
+                      object to add
+        :param overwrite: if set to True, will overwrite an
+                          existing view with the same ID
+        :raises KeyError: if ``overwrite`` is set to False and
+                          a view with the same ID exists
+                          in the list
+        :return: None
+        """
         super()._append_with_key(value.id, value, overwrite)
