@@ -15,11 +15,11 @@ This is a minimal example that contains two media documents, one pointing at a v
 Some notes:
 
 - The metadata just specify the MMIF version.
-- Both media documents in the *documents* list refer to a location on a local disk. If it is important that this document be put outside of the local disk then URLs should be used. 
+- Both media documents in the *documents* list refer to a location on a local disk or a mounted disk. If this document is not on a local disk or mounted disk then URLs should be used. 
 - Each view has some metadata spelling out several kinds of things:
   - The application that created the view.
   - A timestamp of when the view was created.
-  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the contains field has a property "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame" with a dictionary as the value and that dictionary contains the metadata. Here the metadata specify what document the annotations are over what the unit used for annotation offsets is.
+  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the *contains* field has a property "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame" with a dictionary as the value and that dictionary contains the metadata. Here the metadata specify what document the annotations are over what unit is used for annotation offsets.
 
 Only one annotation is shown for each view, this is to keep the file as small as possible. Of course, often the bars-and-tones and slate views often have only one annotation so it is likely only the tokens view where annotations were left out.
 
@@ -103,16 +103,16 @@ Only one annotation is shown for each view, this is to keep the file as small as
       "id": "v3",
 
       "metadata": {
-        "app": "http://apps.clams.ai/slates/1.0.3",
+        "app": "http://apps.clams.ai/spacy/1.3.0",
         "timestamp": "2020-05-27T12:25:15",
         "contains": {
-          "document": "m2",
-          "http://vocab.lappsgrid.org/Token": {} }
+          "http://vocab.lappsgrid.org/Token": {
+            "document": "m2" } }
       },
 
       "annotations": [
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/Token",
+          "@type": "http://vocab.lappsgrid.org/Token",
           "properties": {
             "id": "s1",
             "start": 0,

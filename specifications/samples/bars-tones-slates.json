@@ -7,7 +7,7 @@
 			"@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
 			"properties": {
 				"id": "m1",
-				"mime": "video/mp4",
+				"mime": "video/mpeg",
 				"location": "/var/archive/video-0012.mp4" }
 		},
 		{
@@ -73,11 +73,11 @@
 			"id": "v3",
 
 			"metadata": {
-				"app": "http://apps.clams.ai/slates/1.0.3",
+				"app": "http://apps.clams.ai/spacy/1.3.0",
 				"timestamp": "2020-05-27T12:25:15",
 				"contains": {
-					"document": "m2",
-					"http://vocab.lappsgrid.org/Token": {} }
+					"http://vocab.lappsgrid.org/Token": {
+						"document": "m2" } }
 			},
 
 			"annotations": [

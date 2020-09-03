@@ -60,7 +60,7 @@ Here is an example document list with a video and its transcript:
       "@type": "http://mmif.clams.ai/0.2.0/VideoDocument",
       "properties": {
         "id": "m1",
-        "mime": "video/mp4",
+        "mime": "video/mpeg",
         "location": "/var/archive/video-0012.mp4" }
     },
     {
@@ -85,7 +85,7 @@ The description also lists the properties that can be used for a type, and above
       "@type": "http://mmif.clams.ai/0.2.0/VideoDocument",
       "properties": {
         "id": "m1",
-        "mime": "video/mp4",
+        "mime": "video/mpeg",
         "location": "/var/archive/video-0012.mp4" }
     },
     {
@@ -237,7 +237,7 @@ The result of this processing is a MMIF document with an image document and a vi
       "@type": "http://mmif.clams.ai/0.2.0/vocabulary/ImageDocument",
       "properties": {
         "id": "m1",
-        "mime": "image/jpg",
+        "mime": "image/jpeg",
         "location": "/var/archive/image-0012.jpg" }
     }
   ],
@@ -469,9 +469,13 @@ The CLAMS Platform does require that a URL like [https://schema.org/Clip](https:
 
 To finish off this document we provide some full examples of MMIF documents. We have the following examples:
 
-1. Just a couple of [time frames](samples/bars-tones-slates.json.md) with bars-and-tones and slate detection.
-2. [EAST text box recognition, Tesseract OCR and semantic typing](samples/east-tesseract.md).
-3. [Audio segmentation, Kaldi speech recognition and NER](samples/segmenter-kaldi-ner.md).
+
+| example                                                   | description                                                  |
+| --------------------------------------------------------- | ------------------------------------------------------------ |
+| [bars-tones-slates](samples/bars-tones-slates.md)         | A couple of time frames and some minimal text processing on a transcript. |
+| [east-tesseract-typing](samples/east-tesseract-typing.md) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
+| [segmenter-kaldi-ner](samples/segmenter-kaldi-ner.md)     | Audio segmentation followed by Kaldi speech recognition and NER. |
+
 
 Each example has some comments and a link to a raw JSON file.
 
