@@ -15,7 +15,7 @@
     "documents": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/medium"
+        "$ref": "#/definitions/annotation"
       }
     },
     "views": {
@@ -46,9 +46,6 @@
     "viewMetadata": {
       "type": "object",
       "properties": {
-        "medium": {
-          "type": "string"
-        },
         "timestamp": {
           "type": "string",
           "format": "date-time"
@@ -62,7 +59,6 @@
         }
       },
       "required": [
-        "medium",
         "app",
         "contains"
       ]
@@ -78,63 +74,6 @@
           "format": "uri"
         }
       }
-    },
-    "medium": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "mime": {
-          "type": "string"
-        },
-        "location": {
-          "type": "string"
-        },
-        "text": {
-          "$ref": "#/definitions/text"
-        },
-        "metadata": {
-          "$ref": "#/definitions/mediumMetadata"
-        },
-        "submedia": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/submedia"
-          }
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "type"
-      ],
-      "oneOf": [
-        {"required": ["text"]},
-        {"required": ["location"]}
-      ]
-    },
-    "submedia": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "annotation": {
-          "type": "string"
-        },
-        "text": {
-          "$ref": "#/definitions/text"
-        }
-      },
-      "required": [
-        "id",
-        "annotation",
-        "text"
-      ]
     },
     "text": {
       "type": "object",
