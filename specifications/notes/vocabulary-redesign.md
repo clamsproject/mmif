@@ -1,8 +1,10 @@
 # Media and Views
 
+**Discussion notes on media and views from August 2020**
 
+Kept here for historical reasons.
 
-Having a good approach for this is now becoming a bottle neck. Some key points from the current proposal/specifications:
+Having a good approach to dealing with primary data and text derived from primary data is now becoming a bottle neck. Some key points from the current proposal/specifications:
 
 - Use media to store the primary data
   - What we expect as primary data is videos, images, audio streams and transcripts.
@@ -88,7 +90,7 @@ The current specifications has media represented as follows:
 }
 ```
 
-My suggestion is to use something slightly differentand represent them as two documents, here shown for an image and a text:
+My suggestion is to use something slightly different and represent them as two documents, here shown for an image and a text:
 
 ```json
 {
@@ -175,7 +177,7 @@ We discussed creating a new view with bounding boxes annotation types with a *te
   "id": "v2",
   "metadata": {
     "contains": {
-      "http://mmif.clams.ai/0.1.0/TextDocument": {} },
+      "http://mmif.clams.ai/0.1.0/TextDocument": {},
       "http://mmif.clams.ai/0.1.0/Alignment": {} },
     "app": "http://mmif.clams.ai/apps/tessearct/0.2.1"
   },
