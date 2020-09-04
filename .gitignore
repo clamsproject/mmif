@@ -83,3 +83,7 @@ mmif-python/VERSION*
 /vocabulary/rdf/clams.vocabulary
 # re-includes
 !vocabulary/rdf/bin/*.jar
+
+# sphinx/autodoc files
+/mmif-python/_build/
+

@@ -15,6 +15,9 @@ import yaml
 name = "mmif-python"
 version_fname = "VERSION"
 
+# this is only necessary when not using setuptools/distribute
+from sphinx.setup_command import BuildDoc
+# cmdclass = {'build_sphinx': BuildDoc}
 
 def do_not_edit_warning(dirname):
     with open(pjoin(dirname, 'do-not-edit.txt'), 'w') as warning:
@@ -156,6 +159,7 @@ setuptools.setup(
         'sdist': SdistCommand,
         'develop': DevelopCommand,
         'build_py': BuildCommand,
+        'build_sphinx': BuildDoc,
     },
     # this is for *building*, building (build, bdist_*) doesn't get along with MANIFEST.in
     # so using this param explicitly is much safer implementation
@@ -169,6 +173,7 @@ setuptools.setup(
             'pytest-pep8',
             'pytest-cov',
             'pytype',
+            'sphinx'
         ]
     },
     python_requires='>=3.6',
@@ -178,4 +183,14 @@ setuptools.setup(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3 :: Only',
     ],
+    command_options={
+        'build_sphinx': {
+            #  'source_dir': ('setup.py', 'doc'), 
+            'project': ('setup.py', name),
+            'version': ('setup.py', version),
+            #  'release': ('setup.py', release),
+            'build_dir': ('setup.py', '_build'),
+            'builder': ('setup.py', 'html'),
+            }
+        }
 )

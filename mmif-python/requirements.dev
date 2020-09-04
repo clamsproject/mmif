@@ -5,3 +5,6 @@ pytest-cov
 pytype
 bs4
 lxml
+sphinx
+autodoc
+sphinx-rtd-theme
