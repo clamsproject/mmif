@@ -7,6 +7,8 @@
 url: "https://mmif.clams.ai"
 baseurl: ""
 
+clams-url: "https://clams.ai"
+
 # If you are building a GitHub project page then use these settings:
 # url: ""
 # baseurl: ""

@@ -10,7 +10,6 @@ The current version of MMIF is {{ site.data.versions['current'] }} and it is ava
 
 Contributions are welcome via [the github issue tracker](https://github.com/clamsproject/mmif/issues).
 
-
 ---
 
 *Last updated: September 3rd 2020*

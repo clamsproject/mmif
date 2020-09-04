@@ -12,6 +12,9 @@ webpages to ../docs/VERSION/vocabulary. The actual version is taken from the
 VERSION file in the top-level directory of this repository. If the output
 directory exists then files in it will be overwritten.
 
+In addition, this will also copy JSON schema and the specifications to
+../docs/VERSION.
+
 With the --test option files will be written to www in this directory.
 
 When you use the default output directory and merge changes into the master
@@ -404,6 +407,7 @@ def setup(out_dir, vocab_dir, schema_dir, context_dir):
         os.makedirs(css_dir)
     shutil.copy('lappsstyle.css', css_dir)
     compile_index_md('../specifications/index.md', out_dir)
+    shutil.copy('../specifications/versioning.md', out_dir)
     shutil.copy('../specifications/pi78oGjdT.jpg', out_dir)
     shutil.copy('../specifications/pi78oGjdT-annotated.jpg', out_dir)
     samples_in = '../specifications/samples'

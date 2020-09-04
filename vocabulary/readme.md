@@ -14,7 +14,7 @@ To create webpages from the YAML file run the following:
 $ python publish.py
 ```
 
-This creates the webpages from the YAML file and writes results to `../docs/VERSION/vocabulary` where `VERSION` is retrieved from the `VERSION` file at the top-level directory of this repository. Commiting those pages, merging them into the master branch and then pushing them to https://github.com/clamsproject/mmif will update or create pages at http://mmif.clams.ai/0.1.0/vocabulary/.
+This creates the webpages from the YAML file and writes results to `../docs/VERSION/vocabulary` where `VERSION` is retrieved from the `VERSION` file at the top-level directory of this repository. Commiting those pages, merging them into the master branch and then pushing them to https://github.com/clamsproject/mmif will update or create pages at http://mmif.clams.ai/0.2.0/vocabulary/. The script will also add other files to http://mmif.clams.ai/0.2.0/ including the JSON schema and the informal specifications.
 
 You can create a test version in the `www` directory by using the `--test` option:
 
@@ -22,9 +22,10 @@ You can create a test version in the `www` directory by using the `--test` optio
 $ python publish.py --test
 ```
 
-
+There is a `Makefile` in this directory that you can use.  It runs the publish script, but also creates ontology files by running `yaml_to_vdsl.py`, which creates `rdf/clams.vocabulary`, which is then used by `rdf/Makefile` to create JSON-LD, OWL, RDF and TTL files in `rdf/target`.
 
 ````bash
-$ pip install PyYAML, bs4, lxml
+$ make dev
 ````
 
+For now, we are not creating those files because we are considering taking the JSON-LD out of MMIF.
