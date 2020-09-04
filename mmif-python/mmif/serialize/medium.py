@@ -26,7 +26,7 @@ class Medium(MmifObject):
 
     If ``medium_obj`` is not provided, an empty Medium will be generated.
 
-    :param medium_obj: the JSON-LD data that defines the medium
+    :param medium_obj: the JSON data that defines the medium
     """
 
     def __init__(self, medium_obj: Union[str, dict] = None) -> None:

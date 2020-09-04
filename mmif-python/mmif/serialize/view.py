@@ -28,7 +28,7 @@ class View(MmifObject):
 
     If ``view_obj`` is not provided, an empty View will be generated.
 
-    :param view_obj: the JSON-LD data that defines the view
+    :param view_obj: the JSON data that defines the view
     """
 
     def __init__(self, view_obj: Union[str, dict] = None) -> None:
@@ -123,7 +123,7 @@ class ViewMetadata(MmifObject):
     """
     ViewMetadata object that represents the ``metadata`` object within a MMIF view.
 
-    :param viewmetadata_obj: the JSON-LD data that defines the metadata
+    :param viewmetadata_obj: the JSON data that defines the metadata
     """
 
     def __init__(self, viewmetadata_obj: Union[str, dict] = None) -> None:
@@ -138,7 +138,7 @@ class ViewMetadata(MmifObject):
         Extends base ``_deserialize`` method to initialize
         ``contains`` as a dict of Contain objects.
 
-        :param input_dict: the JSON-LD data that defines the metadata
+        :param input_dict: the JSON data that defines the metadata
         :return: None
         """
         try:
@@ -228,7 +228,7 @@ class AnnotationsList(DataList[Annotation]):
         Extends base ``_deserialize`` method to initialize ``items`` as a dict from
         annotation IDs to :class:`mmif.serialize.annotation.Annotation` objects.
 
-        :param input_list: the JSON-LD data that defines the list of annotations
+        :param input_list: the JSON data that defines the list of annotations
         :return: None
         """
         self.items = {item['properties']['id']: Annotation(item) for item in input_list}

@@ -26,8 +26,8 @@ class Mmif(MmifObject):
     """
     MmifObject that represents a full MMIF file.
 
-    :param mmif_obj: the JSON-LD data
-    :param validate: whether to validate the data against the MMIF JSON-LD schema.
+    :param mmif_obj: the JSON data
+    :param validate: whether to validate the data against the MMIF JSON schema.
     """
 
     view_prefix: ClassVar[str] = 'v_'
@@ -50,12 +50,12 @@ class Mmif(MmifObject):
     @staticmethod
     def validate(json_str: Union[str, dict]) -> None:
         """
-        Validates a MMIF JSON-LD object against the MMIF Schema.
+        Validates a MMIF JSON object against the MMIF Schema.
         Note that this method operates before processing by MmifObject._load_str,
         so it expects @ and not _ for the JSON-LD @-keys.
 
         :raises jsonschema.exceptions.ValidationError: if the input fails validation
-        :param json_str: a MMIF JSON-LD dict or string
+        :param json_str: a MMIF JSON dict or string
         :return: None
         """
         # NOTE that schema file first needs to be copied to resources directory
@@ -270,7 +270,7 @@ class MmifMetadata(MmifObject):
     """
     Basic MmifObject class to contain the top-level metadata of a MMIF file.
 
-    :param metadata_obj: the JSON-LD data
+    :param metadata_obj: the JSON data
     """
 
     def __init__(self, metadata_obj: Union[str, dict] = None) -> None:
@@ -289,7 +289,7 @@ class MediaList(DataList[Medium]):
         Extends base ``_deserialize`` method to initialize ``items`` as a dict from
         medium IDs to :class:`mmif.serialize.medium.Medium` objects.
 
-        :param input_list: the JSON-LD data that defines the list of media
+        :param input_list: the JSON data that defines the list of media
         :return: None
         """
         self.items = {item['id']: Medium(item) for item in input_list}
@@ -325,7 +325,7 @@ class ViewsList(DataList[View]):
         Extends base ``_deserialize`` method to initialize ``items`` as a dict from
         view IDs to :class:`mmif.serialize.view.View` objects.
 
-        :param input_list: the JSON-LD data that defines the list of views
+        :param input_list: the JSON data that defines the list of views
         :return: None
         """
         self.items = {item['id']: View(item) for item in input_list}

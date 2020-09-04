@@ -32,15 +32,17 @@ class MmifObject(object):
 
     This superclass has two specially designed instance variables, and these
     variable names cannot be used as attribute names for MMIF objects.
+
     1. _unnamed_attributes
-      only can be either None or an empty dictionary. If it's set to None,
-      it means the class won't take any ``Additional Attributes`` in the JSON
+       only can be either None or an empty dictionary. If it's set to None,
+       it means the class won't take any ``Additional Attributes`` in the JSON
        schema sense. If it's a dict, users can throw any k-v pairs to the
        class, EXCEPT for the reserved two key names.
     2. _attribute_classes:
-      this is a dict from a key name to a specific python class to use for
-      deserialize the value. Note that a key name in this dict does NOT
-      have to be a *named* attribute, but is recommended to be one.
+       this is a dict from a key name to a specific python class to use for
+       deserialize the value. Note that a key name in this dict does NOT
+       have to be a *named* attribute, but is recommended to be one.
+
     # TODO (krim @ 8/17/20): this dict is however, a duplicate with the type hints in the class definition.
     Maybe there is a better way to utilize type hints (e.g. getting them as a programmatically), but for now
     developers should be careful to add types to hints as well as to this dict.
@@ -77,7 +79,7 @@ class MmifObject(object):
         """
         self._unnamed_attributes = None
 
-    def _named_attributes(self) -> Generator[str]:
+    def _named_attributes(self) -> Generator[str, None, None]:
         """
         Returns a generator of the names of all of this object's named attributes.
 
@@ -87,10 +89,10 @@ class MmifObject(object):
 
     def serialize(self, pretty: bool = False) -> str:
         """
-        Generates JSON-LD representation of an object.
+        Generates JSON representation of an object.
 
         :param pretty: If True, returns string representation with indentation.
-        :return: JSON-LD string of the object.
+        :return: JSON string of the object.
         """
         return json.dumps(self._serialize(), indent=2 if pretty else None, cls=MmifObjectEncoder)
 
@@ -140,7 +142,7 @@ class MmifObject(object):
     @staticmethod
     def _load_json(json_obj: Union[dict, str]) -> dict:
         """
-        Maps JSON-LD-format MMIF strings and dicts into Python dicts
+        Maps JSON-format MMIF strings and dicts into Python dicts
         with identifier-compliant keys. To do this, it replaces "@"
         signs in JSON-LD field names with "_" to be python-compliant.
 

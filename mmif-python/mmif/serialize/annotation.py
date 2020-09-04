@@ -56,6 +56,12 @@ class Annotation(MmifObject):
 
 
 class AnnotationProperties(MmifObject):
+    """
+    AnnotationProperties object that represents the
+    ``properties`` object within a MMIF annotation.
+
+    :param mmif_obj: the JSON data that defines the properties
+    """
 
     def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
         self.id: str = ''
