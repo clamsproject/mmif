@@ -467,7 +467,7 @@ The CLAMS Platform does require that a URL like [https://schema.org/Clip](https:
 
 ## 3. MIFF Examples
 
-To finish off this document we provide some full examples of MMIF documents. We have the following examples:
+To finish off this document we provide some examples of complete MMIF documents. We have the following examples:
 
 
 | example                                                   | description                                                  |

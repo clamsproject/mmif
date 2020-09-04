@@ -15,8 +15,12 @@ directory exists then files in it will be overwritten.
 With the --test option files will be written to www in this directory.
 
 When you use the default output directory and merge changes into the master
-branch then the site at http://mmif.clams.ai/vocabulary will be automatically
-updated.
+branch then the site at http://mmif.clams.ai/VERSION/vocabulary will be
+automatically updated.
+
+This requires BeautifulSoup as well as the lxml parser
+
+$ pip install bs4, lxml
 
 """
 
@@ -27,12 +31,16 @@ import shutil
 import time
 import yaml
 
+from glob import glob
 from bs4 import BeautifulSoup
-# make sure to pip install lxml
+from string import Template
 
 
 VERSION = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'VERSION')).read().strip()
+
 VOCABULARY_URL = 'http://mmif.clams.ai/%s/vocabulary' % VERSION
+
+INCLUDE_CONTEXT = False
 
 
 def read_yaml(fname):
@@ -207,7 +215,8 @@ class IndexPage(Page):
         self._add_description()
         self._add_tree(self.tree.root, self.main_content)
         self._add_space()
-        self._add_ontologies()
+        #self._add_ontologies()
+        #self._add_space()
         self._add_footer()
 
     def _add_description(self):
@@ -254,21 +263,11 @@ class IndexPage(Page):
 
     def _add_ontologies(self):
         onto_soup = BeautifulSoup("""
-      <p>The vocabulary is available in the following formats: </p>
-      <ul>
-        <li>
-          <a href='ontologies/clams.vocabulary.rdf'>RDF</a>
-        </li>
-        <li>
-          <a href='ontologies/clams.vocabulary.owl'>OWL</a>
-        </li>
-        <li>
-          <a href='ontologies/clams.vocabulary.jsonld'>JSONLD</a>
-        </li>
-        <li>
-          <a href='ontologies/clams.vocabulary.ttl'>TTL</a>
-        </li>
-      </ul>""", features="lxml")
+      <p>The vocabulary is available in the following formats:
+          <a href='ontologies/clams.vocabulary.rdf'>RDF</a>,
+          <a href='ontologies/clams.vocabulary.owl'>OWL</a>,
+          <a href='ontologies/clams.vocabulary.jsonld'>JSONLD</a> and
+          <a href='ontologies/clams.vocabulary.ttl'>TTL</a>.</p>""", features="lxml")
         for element in onto_soup.body:
             self.main_content.append(element)
 
@@ -386,8 +385,8 @@ def increase_leading_space(text):
                 break
     return '\n'.join(new_lines)
 
+
 def compile_index_md(source_md, target_dir):
-    from string import Template
     source_md_f = open(source_md, 'r')
     #  print(source_md_f.read())
     tmpl_to_compile = Template(source_md_f.read())
@@ -397,24 +396,35 @@ def compile_index_md(source_md, target_dir):
     compiled_md_f.write(compiled)
     compiled_md_f.close()
 
+
 def setup(out_dir, vocab_dir, schema_dir, context_dir):
+    """Copy non-vocabulary files to theoutput directory."""
     css_dir = os.path.join(vocab_dir, 'css')
     if not os.path.exists(css_dir):
         os.makedirs(css_dir)
     shutil.copy('lappsstyle.css', css_dir)
     compile_index_md('../specifications/index.md', out_dir)
+    shutil.copy('../specifications/pi78oGjdT.jpg', out_dir)
     shutil.copy('../specifications/pi78oGjdT-annotated.jpg', out_dir)
-    shutil.copytree('../specifications/samples', os.path.join(out_dir, 'samples'))
+    samples_in = '../specifications/samples'
+    samples_out = os.path.join(out_dir, 'samples')
+    shutil.copytree(samples_in, os.path.join(out_dir, 'samples'))
+    # these are probably even obsolete, so don't publish them
+    for fname in (glob(samples_out + '/image*')
+                  + glob(samples_out + '/video*')
+                  + glob(samples_out + '/slate*')):
+        os.remove(fname)
     if not os.path.exists(schema_dir):
         os.makedirs(schema_dir)
     shutil.copy('../schema/lif.json', schema_dir)
     shutil.copy('../schema/mmif.json', schema_dir)
-    if not os.path.exists(context_dir):
-        os.makedirs(context_dir)
-    shutil.copy('../context/mmif.json', context_dir)
-    shutil.copy('../context/vocab-clams.json', context_dir)
-    shutil.copy('../context/vocab-lapps.json', context_dir)
-    compile_index_md('../context/index.md', context_dir)
+    if INCLUDE_CONTEXT:
+        if not os.path.exists(context_dir):
+            os.makedirs(context_dir)
+        shutil.copy('../context/mmif.json', context_dir)
+        shutil.copy('../context/vocab-clams.json', context_dir)
+        shutil.copy('../context/vocab-lapps.json', context_dir)
+        compile_index_md('../context/index.md', context_dir)
 
 
 if __name__ == '__main__':
@@ -426,8 +436,10 @@ if __name__ == '__main__':
     vocab_dir = os.path.join(out_dir, 'vocabulary')
     schema_dir = os.path.join(out_dir, 'schema')
     context_dir = os.path.join(out_dir, 'context')
+    print("\n>>> Creating directory structure in '%s'" % out_dir)
+    print(">>> Copying non-vocabulary files to '%s'" % out_dir)
     setup(out_dir, vocab_dir, schema_dir, context_dir)
-    print(">>> Creating specifications in '%s'\n" % out_dir)
+    print(">>> Adding vocabulary pages to '%s'\n" % vocab_dir)
     clams_types = read_yaml("clams.vocabulary.yaml")
     tree = Tree(clams_types)
     write_hierarchy(tree, vocab_dir, VERSION)
