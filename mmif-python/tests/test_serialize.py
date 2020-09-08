@@ -611,6 +611,151 @@ class TestMedium(unittest.TestCase):
                         continue
 
 
+class TestDataStructure(unittest.TestCase):
+    def setUp(self) -> None:
+        self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
+        self.datalist = self.mmif_obj.views
+        self.freezable_datalist = self.mmif_obj.media
+        self.freezable_datadict = self.mmif_obj['v1'].metadata.contains
+
+    def test_setitem(self):
+        self.datalist['v1'] = View({'id': 'v1'})
+        self.datalist['v2'] = View({'id': 'v2'})
+        self.freezable_datalist['m1'] = Medium({'id': 'm1'})
+        self.freezable_datalist['m3'] = Medium({'id': 'm3'})
+        self.freezable_datadict['BoundingBox'] = Contain({"unit": "centimeters"})
+        self.freezable_datadict['Segment'] = Contain({"unit": "milliseconds"})
+
+    def test_getitem(self):
+        self.assertIs(self.mmif_obj['v1'], self.datalist['v1'])
+        self.assertIs(self.mmif_obj['m1'], self.freezable_datalist['m1'])
+        self.assertIs(self.mmif_obj['v1'].metadata.contains['BoundingBox'], self.freezable_datadict['BoundingBox'])
+
+    def test_append(self):
+        self.assertTrue('v2' not in self.datalist._items)
+        self.datalist.append(View({'id': 'v2'}))
+        self.assertTrue('v2' in self.datalist._items)
+
+        self.assertTrue('m3' not in self.freezable_datalist._items)
+        self.freezable_datalist.append(Medium({'id': 'm3'}))
+        self.assertTrue('m3' in self.freezable_datalist._items)
+
+    def test_append_overwrite(self):
+        try:
+            self.datalist.append(View({'id': 'v1'}))
+            self.fail('appended without overwrite')
+        except KeyError as ke:
+            self.assertEqual('Key v1 already exists', ke.args[0])
+
+        try:
+            self.datalist.append(View({'id': 'v1'}), overwrite=True)
+        except AssertionError:
+            raise
+        except Exception as ex:
+            self.fail(ex.args[0])
+
+        try:
+            self.freezable_datalist.append(Medium({'id': 'm2'}))
+            self.fail('appended without overwrite')
+        except KeyError as ke:
+            self.assertEqual('Key m2 already exists', ke.args[0])
+
+        try:
+            self.freezable_datalist.append(Medium({'id': 'm2'}), overwrite=True)
+        except AssertionError:
+            raise
+        except Exception as ex:
+            self.fail(ex.args[0])
+
+    def test_membership(self):
+        self.assertIn('v1', self.datalist)
+        self.assertIn('m1', self.freezable_datalist)
+        self.assertIn('BoundingBox', self.freezable_datadict)
+
+        self.assertNotIn('v2', self.datalist)
+        self.datalist['v2'] = View({'id': 'v2'})
+        self.assertIn('v2', self.datalist)
+
+        self.assertNotIn('m3', self.freezable_datalist)
+        self.freezable_datalist['m3'] = Medium({'id': 'm3'})
+        self.assertIn('m3', self.freezable_datalist)
+
+        self.assertNotIn('Segment', self.freezable_datadict)
+        self.freezable_datadict['Segment'] = Contain({"unit": "milliseconds"})
+        self.assertIn('Segment', self.freezable_datadict)
+
+    def test_len(self):
+        self.assertEqual(1, len(self.datalist))
+        for i in range(2, 10):
+            self.datalist[f'v{i}'] = View({'id': f'v{i}'})
+            self.assertEqual(i, len(self.datalist))
+
+        self.assertEqual(2, len(self.freezable_datalist))
+        for i in range(3, 10):
+            self.freezable_datalist[f'm{i}'] = Medium({'id': f'm{i}'})
+            self.assertEqual(i, len(self.freezable_datalist))
+
+        self.assertEqual(1, len(self.freezable_datadict))
+        for i in range(2, 10):
+            self.freezable_datadict[f'Type{i}'] = Contain({"type": f"i"})
+            self.assertEqual(i, len(self.freezable_datadict))
+
+    def test_iter(self):
+        for i in range(2, 10):
+            self.datalist[f'v{i}'] = View({'id': f'v{i}'})
+        for i in range(3, 10):
+            self.freezable_datalist[f'm{i}'] = Medium({'id': f'm{i}'})
+        for i in range(2, 10):
+            self.freezable_datadict[f'Type{i}'] = Contain({"type": f"i"})
+
+        for expected_index, (actual_index, item) in zip(range(9), enumerate(self.datalist)):
+            self.assertEqual(expected_index, actual_index)
+            self.assertEqual(expected_index+1, int(item['id'][-1]))
+        for expected_index, (actual_index, item) in zip(range(9), enumerate(self.freezable_datalist)):
+            self.assertEqual(expected_index, actual_index)
+            self.assertEqual(expected_index+1, int(item['id'][-1]))
+        for expected_index, (actual_index, item) in zip(range(9), enumerate(self.freezable_datadict.values())):
+            self.assertEqual(expected_index, actual_index)
+
+    def test_dict_views(self):
+        for i in range(2, 10):
+            self.freezable_datadict[f'Type{i}'] = Contain({"type": f"i"})
+        i = -1
+        for i, item in enumerate(self.freezable_datadict.values()):
+            pass
+        self.assertEqual(8, i, 'values')
+        i = -1
+        for i, item in enumerate(self.freezable_datadict.keys()):
+            pass
+        self.assertEqual(8, i, 'keys')
+        i = -1
+        for i, (key, value) in enumerate(self.freezable_datadict.items()):
+            pass
+        self.assertEqual(8, i, 'items')
+
+    def test_setitem_fail_on_reserved_name(self):
+        for i, name in enumerate(self.datalist.reserved_names):
+            try:
+                self.datalist[name] = View({'id': f'v{i+1}'})
+                self.fail("was able to setitem on reserved name")
+            except KeyError as ke:
+                self.assertEqual("can't set item on a reserved name", ke.args[0])
+
+        for i, name in enumerate(self.freezable_datalist.reserved_names):
+            try:
+                self.freezable_datalist[name] = Medium({'id': f'm{i+1}'})
+                self.fail("was able to setitem on reserved name")
+            except KeyError as ke:
+                self.assertEqual("can't set item on a reserved name", ke.args[0])
+
+        for i, name in enumerate(self.freezable_datadict.reserved_names):
+            try:
+                self.freezable_datadict[name] = Contain({'index': i})
+                self.fail("was able to setitem on reserved name")
+            except KeyError as ke:
+                self.assertEqual("can't set item on a reserved name", ke.args[0])
+
+
 @unittest.skipIf(*SKIP_SCHEMA)
 class TestSchema(unittest.TestCase):
 
