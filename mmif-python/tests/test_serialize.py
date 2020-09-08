@@ -41,10 +41,12 @@ class TestMmif(unittest.TestCase):
         for i, example in self.examples_json.items():
             try:
                 mmif_obj = Mmif(example)
+                ...
             except ValidationError as ve:
                 self.fail(ve.message)
             except KeyError:
                 self.fail("didn't swap _ and @")
+            self.assertTrue('id' in list(mmif_obj.views._items.values())[0].__dict__)
             roundtrip = Mmif(mmif_obj.serialize())
             self.assertEqual(mmif_obj.serialize(True), roundtrip.serialize(True), f'Failed on {i}')
 

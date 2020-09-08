@@ -1,6 +1,7 @@
 from typing import Union, Optional, Dict
+from pyrsistent import pmap
 
-from .model import FreezableMmifObject, DataList
+from .model import FreezableMmifObject, FreezableDataList
 
 
 __all__ = ['Medium', 'MediumMetadata', 'Submedium', 'Text']
@@ -17,11 +18,11 @@ class Medium(FreezableMmifObject):
         self.metadata: MediumMetadata = MediumMetadata()
         self.submedia: SubmediaList = SubmediaList()
         self.disallow_additional_properties()
-        self._attribute_classes = {
+        self._attribute_classes = pmap({
             'text': Text,
             'metadata': MediumMetadata,
             'submedia': SubmediaList
-        }
+        })
         super().__init__(medium_obj)
 
     def add_metadata(self, name: str, value: str) -> None:
@@ -88,15 +89,15 @@ class Submedium(FreezableMmifObject):
         self.id: str = ''
         self.annotation: str = ''
         self.text: Text = Text()
-        self._attribute_classes = {'text': Text}
+        self._attribute_classes = pmap({'text': Text})
         super().__init__(submedium)
 
 
-class SubmediaList(FreezableMmifObject, DataList[Submedium]):
+class SubmediaList(FreezableDataList[Submedium]):
     _items: Dict[str, Submedium]
 
     def _deserialize(self, input_list: list) -> None:
-        self.items = {item['properties']['id']: Submedium(item) for item in input_list}
+        self.items = {item['id']: Submedium(item) for item in input_list}
 
     def append(self, value: Submedium, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)

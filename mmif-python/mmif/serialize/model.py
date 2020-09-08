@@ -1,21 +1,31 @@
 import logging
 import json
+from pyrsistent import pvector, m, pmap, s, PVector, PMap, PSet, thaw
 from datetime import datetime
 
 from deepdiff import DeepDiff
-from typing import Union, Any, Dict, Optional, TypeVar, Generic, Type
+from typing import Union, Any, Dict, Optional, TypeVar, Generic
 
 T = TypeVar('T')
-__all__ = ['MmifObject', 'FreezableMmifObject', 'MmifObjectEncoder', 'DataList']
+
+__all__ = [
+    'MmifObject',
+    'FreezableMmifObject',
+    'MmifObjectEncoder',
+    'DataList',
+    'DataDict',
+    'FreezableDataList',
+    'FreezableDataDict'
+]
 
 
 class MmifObject(object):
     """
     Abstract superclass for MMIF related key-value pair objects.
     """
-    reversed_names = ['_unnamed_attributes', '_attribute_classes']
+    reserved_names: PSet = s('reserved_names', '_unnamed_attributes', '_attribute_classes')
     _unnamed_attributes: Optional[dict]
-    _attribute_classes: Dict[str, Type] = {}
+    _attribute_classes: PMap = m()  # Mapping: str -> Type
 
     def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
         """
@@ -61,7 +71,7 @@ class MmifObject(object):
         self._unnamed_attributes = None
 
     def _named_attributes(self):
-        return (n for n in self.__dict__.keys() if n not in self.reversed_names)
+        return (n for n in self.__dict__.keys() if n not in self.reserved_names)
 
     def serialize(self, pretty: bool = False) -> str:
         """
@@ -72,12 +82,15 @@ class MmifObject(object):
         """
         return json.dumps(self._serialize(), indent=2 if pretty else None, cls=MmifObjectEncoder)
 
-    def _serialize(self) -> Union[None, dict]:
+    def _serialize(self, alt_container: Dict = None) -> Union[None, dict]:
+        container = alt_container if alt_container is not None else self._unnamed_attributes
         serializing_obj = {}
         try:
-            for k, v in self._unnamed_attributes.items():   # pytype: disable=attribute-error
+            for k, v in container.items():   # pytype: disable=attribute-error
                 if v is None:
                     continue
+                if isinstance(v, (PSet, PVector, PMap)):
+                    v = thaw(v)
                 if k.startswith('_'):   # _ as a placeholder ``@`` in json-ld
                     k = f'@{k[1:]}'
                 serializing_obj[k] = v
@@ -85,8 +98,10 @@ class MmifObject(object):
             # means _unnamed_attributes is None, so nothing unnamed would be serialized
             pass
         for k, v in self.__dict__.items():
-            if k in self.reversed_names or self.is_empty(v):
+            if k in self.reserved_names or self.is_empty(v):
                 continue
+            if isinstance(v, (PSet, PVector, PMap)):
+                v = thaw(v)
             if k.startswith('_'):       # _ as a placeholder ``@`` in json-ld
                 k = f'@{k[1:]}'
             serializing_obj[k] = v
@@ -181,6 +196,8 @@ class MmifObject(object):
                + (len(self._unnamed_attributes) if self._unnamed_attributes else 0)
 
     def __setitem__(self, key, value) -> None:
+        if key in self.reserved_names:
+            raise KeyError("can't set item on a reserved name")
         if key in self._named_attributes():
             self.__dict__[key] = value
         else:
@@ -193,7 +210,7 @@ class MmifObject(object):
 
 
 class FreezableMmifObject(MmifObject):
-    reversed_names = MmifObject.reversed_names + ['_frozen']
+    reserved_names = MmifObject.reserved_names.add('_frozen')
 
     def __init__(self, *args, **kwargs) -> None:
         self._frozen = False
@@ -212,7 +229,7 @@ class FreezableMmifObject(MmifObject):
         """
         self._frozen = True
 
-    def deep_freeze(self) -> bool:
+    def deep_freeze(self, *additional_containers: str) -> bool:
         """
         Deeply freezes this FreezableMmifObject, calling deep_freeze on all FreezableMmifObjects
         contained as attributes or members of iterable attributes.
@@ -223,30 +240,55 @@ class FreezableMmifObject(MmifObject):
         is hashable is not a contract of immutability but merely a suggestion, as anyone can
         implement __hash__.
 
+        :param additional_containers: any names of attributes in the object that should have
+                                      their contents frozen but not themselves. This is only
+                                      used for FreezableDataList and FreezableDataDict classes
+                                      to freeze their contents.
         :return: True if all state is either Freezable or Hashable
         """
-        self.freeze()
         fully_frozen = True
 
-        def _freeze(item):
-            """
-            Freezes an attribute if it is Freezable; else, sets fully_frozen to False if it is mutable.
-            :param item: the attribute to freeze
-            """
+        def _pyrsist(element):
             nonlocal fully_frozen
-            if isinstance(item, FreezableMmifObject):
-                item.deep_freeze()
-            elif isinstance(item, (list, DataList)):
-                for attribute in item:
-                    _freeze(attribute)
-            elif isinstance(item, dict):
-                for attribute in item.values():
-                    _freeze(attribute)
-            elif not hasattr(item, '__hash__') or item.__hash__ is object.__hash__:
-                fully_frozen = False
 
-        for name, attr in self.__dict__.items():
-            _freeze(attr)
+            if isinstance(element, (list, PVector)):
+                return pvector(_pyrsist(item) for item in element)
+            elif isinstance(element, (dict, PMap)):
+                return pmap({key: _pyrsist(value) for key, value in element.items()})
+            elif isinstance(element, FreezableMmifObject):
+                fully_frozen &= element.deep_freeze()
+                return element
+            elif element is not None and (not hasattr(element, '__hash__')
+                                          or element.__class__.__hash__ in {object.__hash__, None}):
+                # element is most likely mutable and not freezable
+                fully_frozen = False
+                return element
+            else:
+                # element is most likely immutable
+                return element
+
+        # freeze unnamed attributes if there are any
+        if hasattr(self, '_unnamed_attributes') and self._unnamed_attributes is not None:
+            self._unnamed_attributes = _pyrsist(self._unnamed_attributes)
+
+        # freeze named attributes
+        for name in self._named_attributes():
+            self.__setattr__(name, _pyrsist(self.__getattribute__(name)))
+
+        # freeze additional containers passed in (currently only used for DataLists and DataDicts
+        # to freeze contents of _items without destroying insertion order by converting to a PMap)
+        for name in additional_containers:
+            container = self.__getattribute__(name)
+            if isinstance(container, dict):
+                iter_pairs = container.items()
+            elif isinstance(container, list):
+                iter_pairs = enumerate(container)
+            else:
+                raise ValueError("additional_containers should only be of types dict or list")
+            for key, value in iter_pairs:
+                container[key] = _pyrsist(value)
+
+        self.freeze()
 
         return fully_frozen
 
@@ -302,13 +344,15 @@ class MmifObjectEncoder(json.JSONEncoder):
 
 class DataList(MmifObject, Generic[T]):
     def __init__(self, mmif_obj: Union[str, list] = None):
+        self.reserved_names = self.reserved_names.add('_items')
         self._items: Dict[str, T] = dict()
+        self.disallow_additional_properties()
         if mmif_obj is None:
             mmif_obj = []
         super().__init__(mmif_obj)
 
-    def _serialize(self) -> list:
-        return list(self._items.values())
+    def _serialize(self, *args, **kwargs) -> list:
+        return list(super()._serialize(self._items).values())
 
     def deserialize(self, mmif_json: Union[str, list]) -> None:
         if isinstance(mmif_json, str):
@@ -331,10 +375,16 @@ class DataList(MmifObject, Generic[T]):
             self[key] = value
 
     def __getitem__(self, key: str):
-        return self._items.__getitem__(key)
+        if key not in self.reserved_names:
+            return self._items.__getitem__(key)
+        else:
+            return self.__dict__[key]
 
     def __setitem__(self, key: str, value: T):
-        self._items.__setitem__(key, value)
+        if key not in self.reserved_names:
+            self._items.__setitem__(key, value)
+        else:
+            super().__setitem__(key, value)
 
     def __iter__(self):
         return self._items.values().__iter__()
@@ -349,15 +399,25 @@ class DataList(MmifObject, Generic[T]):
         return item in self._items
 
 
+class FreezableDataList(FreezableMmifObject, DataList[T]):
+    def _deserialize(self, input_dict: dict) -> None:
+        raise NotImplementedError()
+
+    def deep_freeze(self, *args, **kwargs) -> bool:
+        return super().deep_freeze('_items')
+
+
 class DataDict(MmifObject, Generic[T]):
     def __init__(self, mmif_obj: Union[str, dict] = None):
+        self.reserved_names = self.reserved_names.add('_items')
         self._items: Dict[str, T] = dict()
+        self.disallow_additional_properties()
         if mmif_obj is None:
             mmif_obj = {}
         super().__init__(mmif_obj)
 
-    def _serialize(self) -> dict:
-        return self._items
+    def _serialize(self, *args, **kwargs) -> dict:
+        return super()._serialize(self._items)
 
     def deserialize(self, mmif_json: Union[str, dict]) -> None:
         if isinstance(mmif_json, str):
@@ -386,10 +446,16 @@ class DataDict(MmifObject, Generic[T]):
         return self._items.values()
 
     def __getitem__(self, key: str):
-        return self._items.__getitem__(key)
+        if key not in self.reserved_names:
+            return self._items.__getitem__(key)
+        else:
+            return self.__dict__[key]
 
     def __setitem__(self, key: str, value: T):
-        self._items.__setitem__(key, value)
+        if key not in self.reserved_names:
+            self._items.__setitem__(key, value)
+        else:
+            super().__setitem__(key, value)
 
     def __iter__(self):
         return self._items.__iter__()
@@ -399,3 +465,11 @@ class DataDict(MmifObject, Generic[T]):
 
     def __contains__(self, item):
         return item in self._items
+
+
+class FreezableDataDict(FreezableMmifObject, DataDict[T]):
+    def _deserialize(self, input_dict: dict) -> None:
+        raise NotImplementedError()
+
+    def deep_freeze(self, *args, **kwargs) -> bool:
+        return super().deep_freeze('_items')

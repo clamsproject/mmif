@@ -6,6 +6,7 @@ import json
 
 from mmif.serialize import *
 from mmif.serialize.medium import SubmediaList
+from mmif.serialize.model import FreezableMmifObject
 from tests.mmif_examples import *
 
 
@@ -48,18 +49,17 @@ class TestFreezeView(unittest.TestCase):
         try:
             self.v1.metadata.contains['BoundingBox'] = Contain()
             self.fail('able to add to contains dict after deep freeze')
-        except AssertionError:
-            raise
-        except Exception as ex:
-            print(ex.args[0])
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
             self.v1.metadata.contains['Segment'] = Contain()
             self.fail('able to overwrite values in contains dict after deep freeze')
-        except AssertionError:
-            raise
-        except Exception as ex:
-            print(ex.args[0])
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+
+    def test_deep_freeze_returns_true(self):
+        self.assertTrue(self.v1.deep_freeze())
 
 
 class TestFreezeMedium(unittest.TestCase):
@@ -101,14 +101,11 @@ class TestFreezeMedium(unittest.TestCase):
         try:
             self.m2.submedia.append(Submedium())
             self.fail('able to append to submedia list after deep freeze')
-        except AssertionError:
-            raise
-        except Exception as ex:
-            print(ex.args[0])
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
-    def test_bool_deep_freeze(self):
+    def test_deep_freeze_returns_true(self):
         fully_frozen = self.m2.deep_freeze()
-
         self.assertTrue(fully_frozen)
 
     def test_invariance_after_freeze(self):
@@ -194,10 +191,8 @@ class TestFreezeSubmediaList(unittest.TestCase):
         try:
             self.submedia.append(Submedium())
             self.fail('able to append to submedia after freeze')
-        except AssertionError:
-            raise
-        except Exception as ex:
-            self.assertEqual("frozen FreezableMmifObject should be immutable", ex.args[0])
+        except TypeError as te:
+            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
 
 class TestFreezeMmif(unittest.TestCase):
@@ -229,3 +224,29 @@ class TestFreezeMmif(unittest.TestCase):
             self.mmif_obj_unfrozen.add_medium(Medium())
         except TypeError as te:
             self.assertEqual("MMIF object is frozen", te.args[0])
+
+
+class TestFreezable(unittest.TestCase):
+    def setUp(self) -> None:
+        class MutableFoo:
+            def __init__(self, *args, **kwargs):
+                for k, v in kwargs.items():
+                    self.__setattr__(k, v)
+
+        self.obj1 = FreezableMmifObject({'a': 1, 'b': 2, 'c': 3})  # all fields contain constants
+        self.obj2 = FreezableMmifObject({'a': 1, 'b': 2, 'c': 3, 'd': MutableFoo(x=1, y=2)})  # field 'd'
+        self.mutable_foo = MutableFoo
+
+    def test_deep_freeze_returns_true(self):
+        self.assertTrue(self.obj1.deep_freeze())
+
+    def test_deep_freeze_returns_false(self):
+        self.assertIsInstance(self.obj2['d'], self.mutable_foo, 'type of "d" list should not be changed')
+        fully_frozen = self.obj2.deep_freeze()
+        if fully_frozen:  #
+            try:
+                self.obj2['d'].x = 2
+                self.fail("should be frozen!")
+            except TypeError as te:
+                self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
+        self.assertFalse(fully_frozen, 'deep freeze should return false because "d" is mutable')

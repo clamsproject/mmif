@@ -1,6 +1,6 @@
 import unittest
 import json
-from mmif import Mmif, View, Annotation, __specver__
+from mmif import Mmif, View, __specver__
 from mmif.vocabulary import AnnotationTypes
 from mmif.serialize.model import MmifObjectEncoder
 from tests.mmif_examples import *
@@ -22,7 +22,6 @@ class TestAnnotationTypes(unittest.TestCase):
         self.assertEqual(list(view_obj.metadata.contains.keys()), ['BoundingBox', f'http://mmif.clams.ai/{__specver__}/vocabulary/Polygon'])
 
     def test_serialize_within_mmif(self):
-        print(examples['mmif_example1'])
         mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         view_obj = mmif_obj.get_view_by_id('v1')
         anno_obj = view_obj.new_annotation('p1', AnnotationTypes.Polygon)

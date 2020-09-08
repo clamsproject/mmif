@@ -1,5 +1,5 @@
 from typing import Union
-
+from pyrsistent import pmap
 from .model import FreezableMmifObject
 from mmif.vocabulary import AnnotationTypesBase
 
@@ -12,7 +12,7 @@ class Annotation(FreezableMmifObject):
         self._type: Union[str, AnnotationTypesBase] = ''
         self.properties: AnnotationProperties = AnnotationProperties()
         self.disallow_additional_properties()
-        self._attribute_classes = {'properties': AnnotationProperties}
+        self._attribute_classes = pmap({'properties': AnnotationProperties})
         super().__init__(anno_obj)
 
     @property

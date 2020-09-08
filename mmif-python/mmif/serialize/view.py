@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Dict, Union, Optional
 import dateutil.parser
+from pyrsistent import pmap
 
 from .annotation import Annotation
-from .model import FreezableMmifObject, DataList, DataDict
+from .model import FreezableMmifObject, FreezableDataList, FreezableDataDict
 from mmif.vocabulary import AnnotationTypesBase
 
 
@@ -18,10 +19,10 @@ class View(FreezableMmifObject):
         self.metadata: ViewMetadata = ViewMetadata()
         self.annotations: AnnotationsList = AnnotationsList()
         self.disallow_additional_properties()
-        self._attribute_classes = {
+        self._attribute_classes = pmap({
             'metadata': ViewMetadata,
             'annotations': AnnotationsList
-        }
+        })
         super().__init__(view_obj)
 
     def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
@@ -116,7 +117,7 @@ class Contain(FreezableMmifObject):
             self.gen_time = dateutil.parser.isoparse(self.gen_time)
 
 
-class AnnotationsList(FreezableMmifObject, DataList[Annotation]):
+class AnnotationsList(FreezableDataList[Annotation]):
     _items: Dict[str, Annotation]
 
     def _deserialize(self, input_list: list) -> None:
@@ -126,7 +127,7 @@ class AnnotationsList(FreezableMmifObject, DataList[Annotation]):
         super()._append_with_key(value.id, value, overwrite)
 
 
-class ContainsDict(FreezableMmifObject, DataDict[Contain]):
+class ContainsDict(FreezableDataDict[Contain]):
     _items: Dict[str, Contain]
 
     def _deserialize(self, input_dict: dict) -> None:

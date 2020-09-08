@@ -6,10 +6,12 @@ import jsonschema.validators
 from pkg_resources import resource_stream
 
 import mmif
+from pyrsistent import pmap
+
 from .view import View
 from .medium import Medium
 from .annotation import Annotation
-from .model import MmifObject, DataList, FreezableMmifObject
+from .model import MmifObject, DataList, FreezableDataList
 
 __all__ = ['Mmif']
 
@@ -26,10 +28,10 @@ class Mmif(MmifObject):
         if validate:
             self.validate(mmif_obj)
         self.disallow_additional_properties()
-        self._attribute_classes = {
+        self._attribute_classes = pmap({
             'media': MediaList,
             'views': ViewsList
-        }
+        })
         super().__init__(mmif_obj)
         if frozen:
             self.freeze_media()
@@ -197,7 +199,7 @@ class MmifMetadata(MmifObject):
         super().__init__(metadata_obj)
 
 
-class MediaList(FreezableMmifObject, DataList[Medium]):
+class MediaList(FreezableDataList[Medium]):
     _items: Dict[str, Medium]
 
     def _deserialize(self, input_list: list) -> None:
