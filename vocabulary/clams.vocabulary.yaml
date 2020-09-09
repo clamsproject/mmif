@@ -1,24 +1,42 @@
 
-name: Annotation
+name: Thing
 parent: null
 
 description: >-
-  Any kind of information added to primary data. Could be a region over the
-  primary data or a relation over regions.
-
-metadata:
-  medium:
-    type: ID
-    description: The identifier of the medium that the annotation is over.
-    required: true
+  Abstract top type.
 
 properties:
   id:
     type: ID
     description: >-
-      A unique identifier for the annotation. Uniqueness is relative to the view
-      the annotation is in.
+      A unique identifier for the annotation or document. Uniqueness is relative to the view
+      the annotation is in or the list of documents at the top level of a MMIF file.
     required: true
+
+---
+
+name: Annotation
+parent: Thing
+
+description: >-
+  Any kind of information added to a document. Could be a region over the
+  primary data or a relation over regions.
+
+metadata:
+  document:
+    type: ID
+    description: >-
+      The identifier of the document that the annotation is over. This has to be
+      defined either at the metadata level, in which case it has scope over all
+      annotations of the same type in a view, or at the instance level, in which
+      it has scope over just the single annotation.
+
+properties:
+  document:
+    type: ID
+    description: >-
+      The identifier of the document that the annotation is over.
+
 
 ---
 
@@ -186,31 +204,79 @@ description: >-
 
 ---
 
-name: Alignment
-parent: Relation
+name: Document
+parent: Thing
 
 description: >-
-  An alignment relation between two Regions where typically one of the Regions
-  is a text span and the other a video or audio segment. While there is no
-  enforced directionality we tend to consider the text region as the target of
-  the alignment.
+  A document of some media type. Annotations directly or indirectly anchor to
+  documents. In CLAMS, a document typically refers to an external file fia the
+  *location* property, but for text documents the actual content can be in-line
+  in the document type.
 
-metadata:
-  source_type:
+properties:
+  location:
     type: String
-    description: The type of the first of the aligned Regions.
-    required: true
-  target_type:
-    type: String
-    description: The type of the second of the aligned Regions.
-    required: true
+    description: The location of an external file.
+  mime:
+    type: String or URI
+    description: The MIME type of the document, only used when the *location* property is used.
+
+---
+
+name: VideoDocument
+parent: Document
+
+description: >-
+  A video document.
+
+---
+
+name: AudioDocument
+parent: Document
+
+description: >-
+  An audio document.
+
+---
+
+name: ImageDocument
+parent: Document
+
+description: >-
+  An image document.
+
+---
+
+name: TextDocument
+parent: Document
+
+description: >-
+  A text document.
+
+properties:
+  text:
+    type: Object
+    description: >-
+      A JSON-LD value object which has a *@value* and a *@language* property.
+
+---
+
+name: Alignment
+parent: Thing
+
+description: >-
+  An alignment between two regions, two documents or a region and a
+  document. Typically one of the regions or documents is a text span or text
+  document and the other an image or audio segment or document. While there is no
+  enforced directionality we tend to consider the text region or document as the
+  target of the alignment.
 
 properties:
   source:
     type: ID
-    description: The first of the aligned Regions.
+    description: The first of the aligned regions or documents.
     required: true
   target:
     type: ID
-    description: The first of the aligned Regions.
+    description: The second of the aligned regions or documents.
     required: true

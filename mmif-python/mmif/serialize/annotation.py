@@ -1,3 +1,12 @@
+"""
+The :mod:`annotation` module contains the classes used to represent a
+MMIF annotation as a live Python object.
+
+In MMIF, annotations are created by apps in a pipeline as a part
+of a view. For documentation on how views are represented, see
+:mod:`mmif.serialize.view`.
+"""
+
 from typing import Union
 from pyrsistent import pmap
 from .model import FreezableMmifObject
@@ -7,6 +16,9 @@ __all__ = ['Annotation', 'AnnotationProperties']
 
 
 class Annotation(FreezableMmifObject):
+    """
+    MmifObject that represents an annotation in a MMIF view.
+    """
 
     def __init__(self, anno_obj: Union[str, dict] = None) -> None:
         self._type: Union[str, AnnotationTypesBase] = ''
@@ -34,10 +46,22 @@ class Annotation(FreezableMmifObject):
         self.properties.id = aid
 
     def add_property(self, name: str, value: str) -> None:
+        """
+        Adds a property to the annotation's properties.
+        :param name: the name of the property
+        :param value: the property's desired value
+        :return: None
+        """
         self.properties[name] = value
 
 
 class AnnotationProperties(FreezableMmifObject):
+    """
+    AnnotationProperties object that represents the
+    ``properties`` object within a MMIF annotation.
+
+    :param mmif_obj: the JSON data that defines the properties
+    """
 
     def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
         self.id: str = ''

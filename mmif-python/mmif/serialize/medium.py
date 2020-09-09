@@ -1,3 +1,12 @@
+"""
+The :mod:`medium` module contains the classes used to represent a
+MMIF medium as a live Python object.
+
+In MMIF, media are objects that either point to a file containing
+the medium being described, or contain the medium directly in some
+text medium cases.
+"""
+
 from typing import Union, Optional, Dict
 from pyrsistent import pmap
 
@@ -8,6 +17,18 @@ __all__ = ['Medium', 'MediumMetadata', 'Submedium', 'Text']
 
 
 class Medium(FreezableMmifObject):
+    """
+    Medium object that represents a single medium in a MMIF file.
+
+    A medium is identified by an ID, and contains certain attributes
+    and potentially contains the contents of the medium itself,
+    metadata about how the medium was created, and/or a list of
+    submedia grouped together logically.
+
+    If ``medium_obj`` is not provided, an empty Medium will be generated.
+
+    :param medium_obj: the JSON data that defines the medium
+    """
 
     def __init__(self, medium_obj: Union[str, dict] = None) -> None:
         self.id: str = ''

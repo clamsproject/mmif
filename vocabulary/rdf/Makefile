@@ -19,7 +19,7 @@ rdf:
 	./bin/vocab -V $(VERSION) --output target --rdf owl $(VOCABULARY) 
 	./bin/vocab -V $(VERSION) --output target --rdf ttl $(VOCABULARY) 
 	./bin/vocab -V $(VERSION) --output target --rdf jsonld $(VOCABULARY)
-	
+
 all: clean rdf
 
 clean:
