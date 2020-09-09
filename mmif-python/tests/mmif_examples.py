@@ -134,7 +134,7 @@ example_templates = dict(
   "metadata": {
     "mmif": "http://mmif.clams.ai/${specver}",
     "contains": {
-      "http://mmif.clams.ai/1.0/vocabulary/Segment": ["v1"],
+      "http://mmif.clams.ai/${specver}/vocabulary/Segment": ["v1"],
       "http://mmif.clams.ai/${specver}/vocabulary/TimePoint": ["v1"],
       "http://vocab.lappsgrid.org/NamedEntity": ["v2"]
     }
