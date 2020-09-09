@@ -154,7 +154,7 @@ class MmifObject(object):
         elif type(json_obj) is str:
             return json.loads(json_obj, object_hook=from_atsign)
         else:
-            raise TypeError("tried to load MMIF JSON in a format other than str or dict")
+            raise TypeError(f"tried to load MMIF JSON in a format other than str or dict: {type(json_obj)}")
 
     def deserialize(self, mmif_json: Union[str, dict]) -> None:
         """
