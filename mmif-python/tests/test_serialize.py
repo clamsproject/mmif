@@ -11,6 +11,7 @@ import pytest
 from jsonschema import ValidationError
 from mmif.serialize import *
 from mmif.serialize.model import *
+from mmif.serialize.view import ContainsDict
 from pkg_resources import resource_stream
 
 from tests.mmif_examples import *
@@ -754,6 +755,46 @@ class TestDataStructure(unittest.TestCase):
                 self.fail("was able to setitem on reserved name")
             except KeyError as ke:
                 self.assertEqual("can't set item on a reserved name", ke.args[0])
+
+    def test_get_reserved_name(self):
+        self.assertEqual(self.datalist._items, self.datalist['_items'])
+        self.assertEqual(self.datalist.reserved_names, self.datalist['reserved_names'])
+        self.assertEqual(self.freezable_datalist._items, self.freezable_datalist['_items'])
+        self.assertEqual(self.freezable_datalist.reserved_names, self.freezable_datalist['reserved_names'])
+        self.assertEqual(self.freezable_datadict._items, self.freezable_datadict['_items'])
+        self.assertEqual(self.freezable_datadict.reserved_names, self.freezable_datadict['reserved_names'])
+
+    def test_get(self):
+        self.assertEqual(self.datalist['v1'], self.datalist.get('v1'))
+        self.assertEqual(self.freezable_datalist['m1'], self.freezable_datalist.get('m1'))
+        self.assertEqual(self.freezable_datadict['BoundingBox'], self.freezable_datadict.get('BoundingBox'))
+        self.assertIsNone(self.datalist.get('v5'))
+        self.assertIsNone(self.freezable_datalist.get('m5'))
+        self.assertIsNone(self.freezable_datadict.get('Segment'))
+
+    def test_update(self):
+        other_contains = """{
+          "Segment": { "unit": "seconds" },
+          "TimePoint": { "unit": "seconds" }
+        }"""
+        other_datadict = ContainsDict(other_contains)
+        self.freezable_datadict.update(other_datadict)
+        self.assertEqual(3, len(self.freezable_datadict))
+
+        other_contains = """{
+                  "Segment": { "unit": "seconds" },
+                  "TimePoint": { "unit": "milliseconds" , "foo": "bar" }
+                }"""
+        other_datadict = ContainsDict(other_contains)
+
+        try:
+            self.freezable_datadict.update(other_datadict)
+            self.fail('overwrote without error')
+        except KeyError as ke:
+            self.assertEqual("Key Segment already exists", ke.args[0])
+
+        self.freezable_datadict.update(other_datadict, overwrite=True)
+        self.assertEqual({"unit": "milliseconds", "foo": "bar"}, self.freezable_datadict['TimePoint']._serialize())
 
 
 @unittest.skipIf(*SKIP_SCHEMA)
