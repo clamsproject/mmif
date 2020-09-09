@@ -374,6 +374,9 @@ class DataList(MmifObject, Generic[T]):
         else:
             self[key] = value
 
+    def append(self, value, overwrite):
+        raise NotImplementedError()
+
     def __getitem__(self, key: str):
         if key not in self.reserved_names:
             return self._items.__getitem__(key)
@@ -435,6 +438,9 @@ class DataDict(MmifObject, Generic[T]):
             raise KeyError(f"Key {key} already exists")
         else:
             self[key] = value
+
+    def update(self, other, overwrite):
+        raise NotImplementedError()
 
     def items(self):
         return self._items.items()

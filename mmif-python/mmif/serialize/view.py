@@ -132,3 +132,7 @@ class ContainsDict(FreezableDataDict[Contain]):
 
     def _deserialize(self, input_dict: dict) -> None:
         self._items = {key: Contain(value) for key, value in input_dict.items()}
+
+    def update(self, other: Union[dict, 'ContainsDict'], overwrite=False):
+        for k, v in other.items():
+            self._append_with_key(k, v, overwrite=overwrite)
