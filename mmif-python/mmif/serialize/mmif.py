@@ -13,11 +13,12 @@ import jsonschema.validators
 from pkg_resources import resource_stream
 
 import mmif
+from pyrsistent import pmap
+
 from .view import View
 from .medium import Medium
 from .annotation import Annotation
-from .model import MmifObject, DataList
-
+from .model import MmifObject, DataList, FreezableDataList
 
 __all__ = ['Mmif']
 
@@ -32,7 +33,7 @@ class Mmif(MmifObject):
 
     view_prefix: ClassVar[str] = 'v_'
 
-    def __init__(self, mmif_obj: Union[str, dict] = None, validate: bool = True) -> None:
+    def __init__(self, mmif_obj: Union[str, dict] = None, *, validate: bool = True, frozen: bool = True) -> None:
         # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
         self._context: str = ''
         self.metadata: MmifMetadata = MmifMetadata()
@@ -41,11 +42,14 @@ class Mmif(MmifObject):
         if validate:
             self.validate(mmif_obj)
         self.disallow_additional_properties()
-        self._attribute_classes = {
+        self._attribute_classes = pmap({
             'media': MediaList,
             'views': ViewsList
-        }
+        })
         super().__init__(mmif_obj)
+        if frozen:
+            self.freeze_media()
+            self.freeze_views()
 
     @staticmethod
     def validate(json_str: Union[str, dict]) -> None:
@@ -117,7 +121,30 @@ class Mmif(MmifObject):
                           an existing view with the same ID
         :return: None
         """
-        self.media.append(medium, overwrite)
+        if not self.media.is_frozen():
+            self.media.append(medium, overwrite)
+        else:
+            raise TypeError("MMIF object is frozen")
+
+    def freeze_media(self) -> bool:
+        """
+        Deeply freezes the list of media. Returns the result of
+        the deep_freeze() call, signifying whether everything
+        was fully frozen or not.
+        """
+        return self.media.deep_freeze()
+
+    def freeze_views(self) -> bool:
+        """
+        Deeply freezes all of the existing views without freezing
+        the list of views itself. Returns the conjunct of the returns
+        of all of the deep_freeze() calls, signifying whether everything
+        was fully frozen or not.
+        """
+        fully_frozen = True
+        for view in self.views:
+            fully_frozen &= view.deep_freeze()
+        return fully_frozen
 
     def get_media_by_source_view_id(self, source_vid: str = None) -> List[Medium]:
         """
@@ -277,12 +304,12 @@ class MmifMetadata(MmifObject):
         super().__init__(metadata_obj)
 
 
-class MediaList(DataList[Medium]):
+class MediaList(FreezableDataList[Medium]):
     """
     MediaList object that implements :class:`mmif.serialize.model.DataList`
     for :class:`mmif.serialize.medium.Medium`.
     """
-    items: Dict[str, Medium]
+    _items: Dict[str, Medium]
 
     def _deserialize(self, input_list: list) -> None:
         """
@@ -292,7 +319,7 @@ class MediaList(DataList[Medium]):
         :param input_list: the JSON data that defines the list of media
         :return: None
         """
-        self.items = {item['id']: Medium(item) for item in input_list}
+        self._items = {item['id']: Medium(item) for item in input_list}
 
     def append(self, value: Medium, overwrite=False) -> None:
         """
@@ -318,7 +345,7 @@ class ViewsList(DataList[View]):
     ViewsList object that implements :class:`mmif.serialize.model.DataList`
     for :class:`mmif.serialize.view.View`.
     """
-    items: Dict[str, View]
+    _items: Dict[str, View]
 
     def _deserialize(self, input_list: list) -> None:
         """
@@ -328,7 +355,7 @@ class ViewsList(DataList[View]):
         :param input_list: the JSON data that defines the list of views
         :return: None
         """
-        self.items = {item['id']: View(item) for item in input_list}
+        self._items = {item['id']: View(item) for item in input_list}
 
     def append(self, value: View, overwrite=False) -> None:
         """

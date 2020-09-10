@@ -8,14 +8,14 @@ of a view. For documentation on how views are represented, see
 """
 
 from typing import Union
-
-from .model import MmifObject
+from pyrsistent import pmap
+from .model import FreezableMmifObject
 from mmif.vocabulary import AnnotationTypesBase
 
 __all__ = ['Annotation', 'AnnotationProperties']
 
 
-class Annotation(MmifObject):
+class Annotation(FreezableMmifObject):
     """
     MmifObject that represents an annotation in a MMIF view.
     """
@@ -24,7 +24,7 @@ class Annotation(MmifObject):
         self._type: Union[str, AnnotationTypesBase] = ''
         self.properties: AnnotationProperties = AnnotationProperties()
         self.disallow_additional_properties()
-        self._attribute_classes = {'properties': AnnotationProperties}
+        self._attribute_classes = pmap({'properties': AnnotationProperties})
         super().__init__(anno_obj)
 
     @property
@@ -55,7 +55,7 @@ class Annotation(MmifObject):
         self.properties[name] = value
 
 
-class AnnotationProperties(MmifObject):
+class AnnotationProperties(FreezableMmifObject):
     """
     AnnotationProperties object that represents the
     ``properties`` object within a MMIF annotation.

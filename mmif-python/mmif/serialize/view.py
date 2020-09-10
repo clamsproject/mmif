@@ -9,16 +9,17 @@ data that was previously present in the MMIF file.
 from datetime import datetime
 from typing import Dict, Union, Optional
 import dateutil.parser
+from pyrsistent import pmap
 
 from .annotation import Annotation
-from .model import MmifObject, DataList
+from .model import FreezableMmifObject, FreezableDataList, FreezableDataDict
 from mmif.vocabulary import AnnotationTypesBase
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
 
 
-class View(MmifObject):
+class View(FreezableMmifObject):
     """
     View object that represents a single view in a MMIF file.
 
@@ -37,10 +38,10 @@ class View(MmifObject):
         self.metadata: ViewMetadata = ViewMetadata()
         self.annotations: AnnotationsList = AnnotationsList()
         self.disallow_additional_properties()
-        self._attribute_classes = {
+        self._attribute_classes = pmap({
             'metadata': ViewMetadata,
             'annotations': AnnotationsList
-        }
+        })
         super().__init__(view_obj)
 
     def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
@@ -119,7 +120,8 @@ class View(MmifObject):
         return anno_result
 
 
-class ViewMetadata(MmifObject):
+
+class ViewMetadata(FreezableMmifObject):
     """
     ViewMetadata object that represents the ``metadata`` object within a MMIF view.
 
@@ -130,7 +132,7 @@ class ViewMetadata(MmifObject):
         self.medium: str = ''
         self.timestamp: Optional[datetime] = None
         self.app: str = ''
-        self.contains: Dict[str, Contain] = {}
+        self.contains: ContainsDict = ContainsDict()
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
@@ -142,8 +144,7 @@ class ViewMetadata(MmifObject):
         :return: None
         """
         try:
-            self.contains = {at_type: Contain(contain_obj)
-                             for at_type, contain_obj in input_dict.pop('contains').items()}
+            self.contains = ContainsDict(input_dict.pop('contains'))
         except KeyError:
             # means input_dict don't have `contains`, so we'll leave it empty
             pass
@@ -189,7 +190,7 @@ class ViewMetadata(MmifObject):
             return new_contain
 
 
-class Contain(MmifObject):
+class Contain(FreezableMmifObject):
     """
     Contain object that represents the metadata of a single
     annotation type in the ``contains`` metadata of a MMIF view.
@@ -216,12 +217,12 @@ class Contain(MmifObject):
             self.gen_time = dateutil.parser.isoparse(self.gen_time)
 
 
-class AnnotationsList(DataList[Annotation]):
+class AnnotationsList(FreezableDataList[Annotation]):
     """
     AnnotationsList object that implements :class:`mmif.serialize.model.DataList`
     for :class:`mmif.serialize.annotation.Annotation`.
     """
-    items: Dict[str, Annotation]
+    _items: Dict[str, Annotation]
 
     def _deserialize(self, input_list: list) -> None:
         """
@@ -231,7 +232,7 @@ class AnnotationsList(DataList[Annotation]):
         :param input_list: the JSON data that defines the list of annotations
         :return: None
         """
-        self.items = {item['properties']['id']: Annotation(item) for item in input_list}
+        self._items = {item['properties']['id']: Annotation(item) for item in input_list}
 
     def append(self, value: Annotation, overwrite=False) -> None:
         """
@@ -250,3 +251,14 @@ class AnnotationsList(DataList[Annotation]):
         :return: None
         """
         super()._append_with_key(value.id, value, overwrite)
+
+
+class ContainsDict(FreezableDataDict[Contain]):
+    _items: Dict[str, Contain]
+
+    def _deserialize(self, input_dict: dict) -> None:
+        self._items = {key: Contain(value) for key, value in input_dict.items()}
+
+    def update(self, other: Union[dict, 'ContainsDict'], overwrite=False):
+        for k, v in other.items():
+            self._append_with_key(k, v, overwrite=overwrite)

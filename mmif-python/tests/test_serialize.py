@@ -11,6 +11,7 @@ import pytest
 from jsonschema import ValidationError
 from mmif.serialize import *
 from mmif.serialize.model import *
+from mmif.serialize.view import ContainsDict
 from pkg_resources import resource_stream
 
 from tests.mmif_examples import *
@@ -41,10 +42,12 @@ class TestMmif(unittest.TestCase):
         for i, example in self.examples_json.items():
             try:
                 mmif_obj = Mmif(example)
+                ...
             except ValidationError as ve:
                 self.fail(ve.message)
             except KeyError:
                 self.fail("didn't swap _ and @")
+            self.assertTrue('id' in list(mmif_obj.views._items.values())[0].__dict__)
             roundtrip = Mmif(mmif_obj.serialize())
             self.assertEqual(mmif_obj.serialize(True), roundtrip.serialize(True), f'Failed on {i}')
 
@@ -94,7 +97,7 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_medium_cannot_have_text_and_location(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         m1 = mmif_obj.get_medium_by_id('m1')
         m2 = mmif_obj.get_medium_by_id('m2')
         m1.text = m2.text
@@ -159,7 +162,7 @@ class TestMmif(unittest.TestCase):
     def test_add_media(self):
         medium_json = json.loads(examples['medium_ext_video_example'])
         # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         old_media_count = len(mmif_obj.media)
         mmif_obj.add_medium(Medium(medium_json))  # just raise exception if this fails
         self.assertEqual(old_media_count+1, len(mmif_obj.media))
@@ -179,7 +182,7 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_get_media_by_view_id(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 1)
         self.assertEqual(mmif_obj.get_media_by_source_view_id('v1')[0],
                          mmif_obj.get_medium_by_id('m2'))
@@ -196,7 +199,7 @@ class TestMmif(unittest.TestCase):
 
     def test_get_medium_by_appid(self):
         tesseract_appid = 'http://apps.clams.io/tesseract/1.2.1'
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_media_by_app(tesseract_appid)), 1)
         self.assertEqual(len(mmif_obj.get_media_by_app('xxx')), 0)
         new_medium = Medium()
@@ -250,7 +253,7 @@ class TestMmif(unittest.TestCase):
         b_view = View()
         b_view.id = f'{p}2'
         mmif_obj.add_view(b_view)
-        self.assertEqual({f'{p}0', f'{p}2'}, set(mmif_obj.views.items.keys()))
+        self.assertEqual({f'{p}0', f'{p}2'}, set(mmif_obj.views._items.keys()))
         c_view = mmif_obj.new_view()
         self.assertEqual(c_view.id, f'{p}3')
         d_view = View()
@@ -261,7 +264,7 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(len(mmif_obj.views), 5)
 
     def test_add_medium(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         med_obj = Medium(examples['medium_ext_video_example'])
         mmif_obj.add_medium(med_obj)
         try:
@@ -473,7 +476,7 @@ class TestAnnotation(unittest.TestCase):
                 continue
         self.data = {i: {'string': example,
                          'json': json.loads(example),
-                         'mmif': Mmif(example),
+                         'mmif': Mmif(example, frozen=False),
                          'annotations': [annotation
                                          for view in json.loads(example)['views']
                                          for annotation in view['annotations']]}
@@ -493,7 +496,7 @@ class TestAnnotation(unittest.TestCase):
                 removed_prop_key, removed_prop_value = list(props.items())[-1]
                 props.pop(removed_prop_key)
                 try:
-                    new_mmif = Mmif(datum['json'])
+                    new_mmif = Mmif(datum['json'], frozen=False)
                     new_mmif.get_view_by_id(view_id).annotations[anno_id].add_property(removed_prop_key, removed_prop_value)
                     self.assertEqual(json.loads(datum['string'])['views'][j],
                                      json.loads(new_mmif.serialize())['views'][j],
@@ -536,7 +539,7 @@ class TestMedium(unittest.TestCase):
                 continue
         self.data = {i: {'string': example,
                          'json': json.loads(example),
-                         'mmif': Mmif(example),
+                         'mmif': Mmif(example, frozen=False),
                          'media': json.loads(example)['media']}
                      for i, example in self.examples.items()}
 
@@ -566,7 +569,7 @@ class TestMedium(unittest.TestCase):
                 if 'submedia' in medium:
                     self.assertIsInstance(medium_obj.submedia, list)
                     for submedium in medium_obj.submedia:
-                        self.assertIsInstance(submedium, Submedia)
+                        self.assertIsInstance(submedium, Submedium)
 
     def test_deserialize_with_medium_str(self):
         for i, datum in self.data.items():
@@ -578,7 +581,7 @@ class TestMedium(unittest.TestCase):
                 if 'submedia' in medium:
                     self.assertIsInstance(medium_obj.submedia, list)
                     for submedium in medium_obj.submedia:
-                        self.assertIsInstance(submedium, Submedia)
+                        self.assertIsInstance(submedium, Submedium)
 
     def test_serialize_to_medium_str(self):
         for i, datum in self.data.items():
@@ -602,11 +605,196 @@ class TestMedium(unittest.TestCase):
                     removed_metadatum_key, removed_metadatum_value = list(metadata.items())[-1]
                     metadata.pop(removed_metadatum_key)
                     try:
-                        new_mmif = Mmif(datum['json'])
+                        new_mmif = Mmif(datum['json'], frozen=False)
                         new_mmif.get_medium_by_id(medium_id).add_metadata(removed_metadatum_key, removed_metadatum_value)
                         self.assertEqual(json.loads(datum['string']), json.loads(new_mmif.serialize()), f'Failed on {i}, {medium_id}')
                     except ValidationError:
                         continue
+
+
+class TestDataStructure(unittest.TestCase):
+    def setUp(self) -> None:
+        self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
+        self.datalist = self.mmif_obj.views
+        self.freezable_datalist = self.mmif_obj.media
+        self.freezable_datadict = self.mmif_obj['v1'].metadata.contains
+
+    def test_setitem(self):
+        self.datalist['v1'] = View({'id': 'v1'})
+        self.datalist['v2'] = View({'id': 'v2'})
+        self.freezable_datalist['m1'] = Medium({'id': 'm1'})
+        self.freezable_datalist['m3'] = Medium({'id': 'm3'})
+        self.freezable_datadict['BoundingBox'] = Contain({"unit": "centimeters"})
+        self.freezable_datadict['Segment'] = Contain({"unit": "milliseconds"})
+
+    def test_getitem(self):
+        self.assertIs(self.mmif_obj['v1'], self.datalist['v1'])
+        self.assertIs(self.mmif_obj['m1'], self.freezable_datalist['m1'])
+        self.assertIs(self.mmif_obj['v1'].metadata.contains['BoundingBox'], self.freezable_datadict['BoundingBox'])
+
+    def test_append(self):
+        self.assertTrue('v2' not in self.datalist._items)
+        self.datalist.append(View({'id': 'v2'}))
+        self.assertTrue('v2' in self.datalist._items)
+
+        self.assertTrue('m3' not in self.freezable_datalist._items)
+        self.freezable_datalist.append(Medium({'id': 'm3'}))
+        self.assertTrue('m3' in self.freezable_datalist._items)
+
+    def test_append_overwrite(self):
+        try:
+            self.datalist.append(View({'id': 'v1'}))
+            self.fail('appended without overwrite')
+        except KeyError as ke:
+            self.assertEqual('Key v1 already exists', ke.args[0])
+
+        try:
+            self.datalist.append(View({'id': 'v1'}), overwrite=True)
+        except AssertionError:
+            raise
+        except Exception as ex:
+            self.fail(ex.args[0])
+
+        try:
+            self.freezable_datalist.append(Medium({'id': 'm2'}))
+            self.fail('appended without overwrite')
+        except KeyError as ke:
+            self.assertEqual('Key m2 already exists', ke.args[0])
+
+        try:
+            self.freezable_datalist.append(Medium({'id': 'm2'}), overwrite=True)
+        except AssertionError:
+            raise
+        except Exception as ex:
+            self.fail(ex.args[0])
+
+    def test_membership(self):
+        self.assertIn('v1', self.datalist)
+        self.assertIn('m1', self.freezable_datalist)
+        self.assertIn('BoundingBox', self.freezable_datadict)
+
+        self.assertNotIn('v2', self.datalist)
+        self.datalist['v2'] = View({'id': 'v2'})
+        self.assertIn('v2', self.datalist)
+
+        self.assertNotIn('m3', self.freezable_datalist)
+        self.freezable_datalist['m3'] = Medium({'id': 'm3'})
+        self.assertIn('m3', self.freezable_datalist)
+
+        self.assertNotIn('Segment', self.freezable_datadict)
+        self.freezable_datadict['Segment'] = Contain({"unit": "milliseconds"})
+        self.assertIn('Segment', self.freezable_datadict)
+
+    def test_len(self):
+        self.assertEqual(1, len(self.datalist))
+        for i in range(2, 10):
+            self.datalist[f'v{i}'] = View({'id': f'v{i}'})
+            self.assertEqual(i, len(self.datalist))
+
+        self.assertEqual(2, len(self.freezable_datalist))
+        for i in range(3, 10):
+            self.freezable_datalist[f'm{i}'] = Medium({'id': f'm{i}'})
+            self.assertEqual(i, len(self.freezable_datalist))
+
+        self.assertEqual(1, len(self.freezable_datadict))
+        for i in range(2, 10):
+            self.freezable_datadict[f'Type{i}'] = Contain({"type": f"i"})
+            self.assertEqual(i, len(self.freezable_datadict))
+
+    def test_iter(self):
+        for i in range(2, 10):
+            self.datalist[f'v{i}'] = View({'id': f'v{i}'})
+        for i in range(3, 10):
+            self.freezable_datalist[f'm{i}'] = Medium({'id': f'm{i}'})
+        for i in range(2, 10):
+            self.freezable_datadict[f'Type{i}'] = Contain({"type": f"i"})
+
+        for expected_index, (actual_index, item) in zip(range(9), enumerate(self.datalist)):
+            self.assertEqual(expected_index, actual_index)
+            self.assertEqual(expected_index+1, int(item['id'][-1]))
+        for expected_index, (actual_index, item) in zip(range(9), enumerate(self.freezable_datalist)):
+            self.assertEqual(expected_index, actual_index)
+            self.assertEqual(expected_index+1, int(item['id'][-1]))
+        for expected_index, (actual_index, item) in zip(range(9), enumerate(self.freezable_datadict.values())):
+            self.assertEqual(expected_index, actual_index)
+
+    def test_dict_views(self):
+        for i in range(2, 10):
+            self.freezable_datadict[f'Type{i}'] = Contain({"type": f"i"})
+        i = -1
+        for i, item in enumerate(self.freezable_datadict.values()):
+            pass
+        self.assertEqual(8, i, 'values')
+        i = -1
+        for i, item in enumerate(self.freezable_datadict.keys()):
+            pass
+        self.assertEqual(8, i, 'keys')
+        i = -1
+        for i, (key, value) in enumerate(self.freezable_datadict.items()):
+            pass
+        self.assertEqual(8, i, 'items')
+
+    def test_setitem_fail_on_reserved_name(self):
+        for i, name in enumerate(self.datalist.reserved_names):
+            try:
+                self.datalist[name] = View({'id': f'v{i+1}'})
+                self.fail("was able to setitem on reserved name")
+            except KeyError as ke:
+                self.assertEqual("can't set item on a reserved name", ke.args[0])
+
+        for i, name in enumerate(self.freezable_datalist.reserved_names):
+            try:
+                self.freezable_datalist[name] = Medium({'id': f'm{i+1}'})
+                self.fail("was able to setitem on reserved name")
+            except KeyError as ke:
+                self.assertEqual("can't set item on a reserved name", ke.args[0])
+
+        for i, name in enumerate(self.freezable_datadict.reserved_names):
+            try:
+                self.freezable_datadict[name] = Contain({'index': i})
+                self.fail("was able to setitem on reserved name")
+            except KeyError as ke:
+                self.assertEqual("can't set item on a reserved name", ke.args[0])
+
+    def test_get_reserved_name(self):
+        self.assertEqual(self.datalist._items, self.datalist['_items'])
+        self.assertEqual(self.datalist.reserved_names, self.datalist['reserved_names'])
+        self.assertEqual(self.freezable_datalist._items, self.freezable_datalist['_items'])
+        self.assertEqual(self.freezable_datalist.reserved_names, self.freezable_datalist['reserved_names'])
+        self.assertEqual(self.freezable_datadict._items, self.freezable_datadict['_items'])
+        self.assertEqual(self.freezable_datadict.reserved_names, self.freezable_datadict['reserved_names'])
+
+    def test_get(self):
+        self.assertEqual(self.datalist['v1'], self.datalist.get('v1'))
+        self.assertEqual(self.freezable_datalist['m1'], self.freezable_datalist.get('m1'))
+        self.assertEqual(self.freezable_datadict['BoundingBox'], self.freezable_datadict.get('BoundingBox'))
+        self.assertIsNone(self.datalist.get('v5'))
+        self.assertIsNone(self.freezable_datalist.get('m5'))
+        self.assertIsNone(self.freezable_datadict.get('Segment'))
+
+    def test_update(self):
+        other_contains = """{
+          "Segment": { "unit": "seconds" },
+          "TimePoint": { "unit": "seconds" }
+        }"""
+        other_datadict = ContainsDict(other_contains)
+        self.freezable_datadict.update(other_datadict)
+        self.assertEqual(3, len(self.freezable_datadict))
+
+        other_contains = """{
+                  "Segment": { "unit": "seconds" },
+                  "TimePoint": { "unit": "milliseconds" , "foo": "bar" }
+                }"""
+        other_datadict = ContainsDict(other_contains)
+
+        try:
+            self.freezable_datadict.update(other_datadict)
+            self.fail('overwrote without error')
+        except KeyError as ke:
+            self.assertEqual("Key Segment already exists", ke.args[0])
+
+        self.freezable_datadict.update(other_datadict, overwrite=True)
+        self.assertEqual({"unit": "milliseconds", "foo": "bar"}, self.freezable_datadict['TimePoint']._serialize())
 
 
 @unittest.skipIf(*SKIP_SCHEMA)
