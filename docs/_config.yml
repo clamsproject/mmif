@@ -1,90 +1,49 @@
-# --- General options --- #
+# Welcome to Beautiful Jekyll!
+# This config file is meant for settings that affect your entire website. When you first
+# set up your website you should go through all these settings and edit them, but after
+# the initial set up you won't need to come back to this file often.
 
-# url is the full website URL
-# baseurl is the website's URL without the hostname
-
-# If you are building a simple GitHub user page (https://username.github.io) then use these settings:
 url: "https://mmif.clams.ai"
 baseurl: ""
 
-clams-url: "https://clams.ai"
-
-# If you are building a GitHub project page then use these settings:
-# url: ""
-# baseurl: ""
-
-# Of course don't forget to change the username and projectname to YOUR username and project
+# --- Required options --- #
 
 # Name of website
 title: MMIF
 
-# Short description of your site
-description: Multi-Media Interchange Format
+# Your name to show in the footer
+author: Brandeis LLC
 
-# --- Navigation bar options --- #
+# --- List of links in the navigation bar --- #
 
-# List of links in the navigation bar
 navbar-links:
   HOME: ""
   CLAMS: "https://www.clams.ai"
-  # Documentation:
-    # - Quick Start: "appliance"
-    # - CLAMS Book: "https://book.clams.ai/"
-    # - MMIF: "mmif"
-    # - SDK: "sdk"
-    # - Citing CLAMS: "cite"
-  # Events: "events"
-  # Blog: "blog"
 
+# --- Logo --- #
 
-# Image to show in the navigation bar - image must be a square (width = height)
+# Image to show in the navigation bar - works best with a square image
 # Remove this parameter if you don't want an image in the navbar
-avatar: "https://clamsproject.github.io/assets/img/clams-logo.png"
+avatar: "/assets/img/clams-logo.png"
+# By default, the image is cut into a circle. You can disable this behaviour by setting 'round-avatar: false'
+round-avatar: true
 
-# If you want to have an image logo in the top-left corner instead of the title text,
+# If you want to have an image logo in the top-left corner instead of having the title of the website,
 # then specify the following parameter
 # title-img: "img/clams-logo.png"
-#
-# --- Background colour/image options --- #
 
-# Personalize the colors in your website. Colour values can be any valid CSS colour
 
-navbar-col: "#f5F5F5"
-navbar-text-col: "#404040"
-navbar-children-col: "#F5F5F5"
-page-col: "#FFFFFF"
-link-col: "#008AFF"
-hover-col: "#0085A1"
-footer-col: "#F5F5F5"
-footer-text-col: "#777777"
-footer-link-col: "#404040"
+# --- Footer social media links --- #
 
-# Alternatively, the navbar, footer, and page background can be set to use background images
-# instead of colour
-
-# navbar-img: "/assets/img/bgimage.png"
-# footer-img: "/assets/img/bgimage.png"
-# page-img: "/assets/img/bgimage.png"
-
-# --- Footer options --- #
-
-# Change all these values or delete the ones you don't want.
-# Important: you must keep the "name" parameter, everything else you can remove
-author:
-  name: Brandeis LLC
-
-# Select your active Social Network Links.
-# Uncomment the links you want to show in the footer and add your information to each link.
-# You can reorder the items to define the link order.
-# If you want to add a new link that isn't here, you'll need to also edit the file _data/SocialNetworks.yml
+# Select the social network links that you want to show in the footer.
+# Uncomment the links you want to show and add your information to each one.
 social-network-links:
-  rss: true
+social-network-links:
   email: "admin@clams.ai"
   # facebook: daattali
   github: clamsproject
   # twitter: daattali
 #  reddit: yourname
-#  google-plus: +DeanAttali
 #  linkedin: daattali
 #  xing: yourname
 #  stackoverflow: "3943160/daattali"
@@ -96,25 +55,80 @@ social-network-links:
 #  steam: deanat78
 #  twitch: yourname
 #  yelp: yourname
+#  telegram: yourname
+#  calendly: yourname
+#  mastodon: instance.url/@username
+#  ORCID: your ORCID ID
+#  google-scholar: your google scholar
 
-# Select which share links to show in posts
+# If you want to show a link to an RSS in the footer, add the site description here.
+# If you don't want to show an RSS link, remove the following line.
+rss-description: Multi-Media Interchange Format
+
+# --- General options --- #
+
+# Select which social network share links to show in posts
 share-links-active:
   twitter: true
   facebook: true
-  google: false
   linkedin: true
+  vk: false
 
-# How to display the link to the website in the footer
+# How to display the link to your website in the footer
 # Remove this if you don't want a link in the footer
-url-pretty: "clams.ai"  # eg. "deanattali.com/beautiful-jekyll"
+# krim: will be ignored as footer.html hardcodes clams.ai links in the footer
+url-pretty: "MyWebsite.com"
 
-# --- Web Statistics Section --- #
+# Excerpt word length - Truncate the excerpt of each post on the feed page to the specified number of words
+excerpt_length: 50
+
+# Whether or not to show an excerpt for every blog post in the feed page
+feed_show_excerpt: true
+
+# Whether or not to show a list of tags below each post preview in the feed page
+feed_show_tags: true
+
+# The keywords to associate with your website, for SEO purposes
+#keywords: "my,list,of,keywords"
+
+# --- Colours / background image --- #
+
+# Personalize the colours in your website. Colour values can be any valid CSS colour
+
+
+
+navbar-col: "#F5F5F5"
+navbar-text-col: "#404040"
+navbar-border-col: "#DDDDDD"
+page-col: "#FFFFFF"
+text-col: "#404040"
+link-col: "#008AFF"
+hover-col: "#0085A1"
+footer-col: "#F5F5F5"
+footer-text-col: "#777777"
+footer-link-col: "#404040"
+
+# Alternatively, the navbar, footer, and page background can be set to an image
+# instead of colour
+
+#navbar-img: "/assets/img/bgimage.png"
+#footer-img: "/assets/img/bgimage.png"
+#page-img: "/assets/img/bgimage.png"
+
+# Suggest a colour for mobile browsers to use as the browser's theme. This is only supported by a few mobile browsers.
+#mobile-theme-col: "#0085A1"
+
+# For any extra customization, you can include additional CSS files in every page on your site. List any custom CSS files here
+#site-css:
+#  - "/assets/css/custom-styles.css"
+
+# --- Web Analytics Section --- #
 
 # Fill in your Google Analytics gtag.js ID to track your website using gtag
 gtag: "UA-141649660-2"
 
-# Fill in your Google Analytics ID to track your website using GA
-# google_analytics: "UA-141649660-1"
+# Fill in your Google Analytics ID to track your website using Google Analytics
+# google_analytics: "UA-141649660-2"
 
 # Google Tag Manager ID
 #gtm: ""
@@ -122,26 +136,52 @@ gtag: "UA-141649660-2"
 # Matomo (aka Piwik) Web statistics
 # Uncomment the following section to enable Matomo. The opt-out parameter controls
 # whether or not you want to allow users to opt out of tracking.
-
 #matomo:
 #  site_id: "9"
 #  uri: "demo.wiki.pro"
 #  opt-out: true
 
+# --- Comments --- #
+
+# To use Disqus comments, sign up to https://disqus.com and fill in your Disqus shortname (NOT the userid)
+#disqus: ""
+
+# To use Facebook Comments, create a Facebook app and fill in the Facebook App ID
+#fb_comment_id: ""
+
+# To use Utterances comments: (0) uncomment the following section, (1) fill in
+# "repository" (make sure the repository is public), (2) Enable Issues in your repository,
+# (3) Install the Utterances app in your repository https://github.com/apps/utterances
+# See more details about the parameters below at https://utteranc.es/
+#utterances:
+#  repository: # GitHub username/repository eg. "daattali/beautiful-jekyll"
+#  issue-term: title   # Mapping between blog posts and GitHub issues
+#  theme: github-light # Utterances theme
+#  label: blog-comments # Label that will be assigned to GitHub Issues created by Utterances
+
+# To use Staticman comments, first invite `staticmanlab` as a collaborator to your repository and
+# accept the invitation by going to `https://staticman3.herokuapp.com/v3/connect/github/<username>/<repo-name>`.
+# Then uncomment the following section and fill in "repository" and "branch".
+# If you want to use reCaptcha for staticman (optional for spam protection), then fill
+# in the "siteKey" and "secret" parameters below and also in `staticman.yml`.
+# See more details at https://staticman.net/
+#staticman:
+#  repository : # GitHub username/repository eg. "daattali/beautiful-jekyll"
+#  branch     : master # If you're not using `master` branch, then you also need to update the `branch` parameter in `staticman.yml`
+#  endpoint   : # (optional) URL of your own deployment, with a trailing slash eg. https://<your-api>/v3/entry/github/ (will fallback to a public GitLab instance)
+#  reCaptcha:
+#    siteKey  : # Use your own site key, you need to apply for one on Google
+#    secret   : # ENCRYPT your password by going to https://staticman3.herokuapp.com/v3/encrypt/<your-site-secret>
+
 # --- Misc --- #
 
+# Ruby Date Format to show dates of posts
+date_format: "%B %-d, %Y"
+
 # Facebook App ID
-# fb_app_id: ""
+#fb_app_id: ""
 
-# Excerpt Word Length
-# Truncates the excerpt to the specified number of words on the index page
-excerpt_length: 50
-
-# Character used to separate site title and description in HTML document title
-# and RSS feed title
-title-separator: "-"
-
-# --- Don't need to touch anything below here (but you can if you want) --- #
+# --- You don't need to touch anything below here (but you can if you want) --- #
 
 # Output options (more information on Jekyll's site)
 timezone: "America/New_York"
@@ -165,26 +205,28 @@ defaults:
       social-share: true # add social media sharing buttons to all blog posts
   -
     scope:
-      path: "" # all files
+      path: "" # any file that's not a post will be a "page" layout by default
     values:
       layout: "page"
-      show-avatar: true
-
-# Use tags index page and make tags on each post clickable
-link-tags: true
 
 # Exclude these files from production site
 exclude:
   - CHANGELOG.md
   - CNAME
-  - Dockerfile
   - Gemfile
   - Gemfile.lock
   - LICENSE
   - README.md
-  - Vagrantfile
+  - screenshot.png
+  - docs/
 
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-remote-theme
+
+remote_theme: clamsproject/website-theme
+
+# Beautiful Jekyll / Dean Attali
+# 2fc73a3a967e97599c9763d05e564189
 
