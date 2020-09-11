@@ -78,8 +78,8 @@ class TestMmif(unittest.TestCase):
         except ValidationError:
             pass
 
-    def test_bad_mmif_deserialize_no_media(self):
-        self.examples_json['mmif_example1'].pop('media')
+    def test_bad_mmif_deserialize_no_documents(self):
+        self.examples_json['mmif_example1'].pop('documents')
         json_str = json.dumps(self.examples_json['mmif_example1'])
         try:
             _ = Mmif(json_str)
@@ -96,10 +96,10 @@ class TestMmif(unittest.TestCase):
         except ValidationError:
             pass
 
-    def test_medium_cannot_have_text_and_location(self):
+    def test_document_cannot_have_text_and_location(self):
         mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        m1 = mmif_obj.get_medium_by_id('m1')
-        m2 = mmif_obj.get_medium_by_id('m2')
+        m1 = mmif_obj.get_document_by_id('m1')
+        m2 = mmif_obj.get_document_by_id('m2')
         m1.text = m2.text
         with pytest.raises(ValidationError) as ve:
             Mmif(mmif_obj.serialize())
@@ -111,112 +111,112 @@ class TestMmif(unittest.TestCase):
         mmif_obj.new_view()  # just raise exception if this fails
         self.assertEqual(old_view_count+1, len(mmif_obj.views))
 
-    def test_medium_metadata(self):
-        medium = Medium()
-        medium.id = 'm999'
-        medium.type = "text"
-        medium.location = "random_location"
-        medium.metadata['source'] = "v10"
-        medium.metadata['app'] = "some_sentence_splitter"
-        medium.metadata['random_key'] = "random_value"
-        serialized = medium.serialize()
-        deserialized = Medium(serialized)
-        self.assertEqual(medium, deserialized)
+    def test_document_metadata(self):
+        document = Document()
+        document.id = 'm999'
+        document.type = "text"
+        document.location = "random_location"
+        document.metadata['source'] = "v10"
+        document.metadata['app'] = "some_sentence_splitter"
+        document.metadata['random_key'] = "random_value"
+        serialized = document.serialize()
+        deserialized = Document(serialized)
+        self.assertEqual(document, deserialized)
         plain_json = json.loads(serialized)
-        deserialized = Medium(plain_json)
-        self.assertEqual(medium, deserialized)
+        deserialized = Document(plain_json)
+        self.assertEqual(document, deserialized)
         self.assertEqual({'id', 'type', 'location', 'metadata'}, plain_json.keys())
         self.assertEqual({'source', 'app', 'random_key'}, plain_json['metadata'].keys())
 
-    def test_medium_text(self):
+    def test_document_text(self):
         text = "Karen flew to New York."
         en = 'en'
-        medium = Medium()
-        medium.id = 'm998'
-        medium.type = "text"
-        medium.text_value = text
-        self.assertEqual(medium.text_value, text)
-        medium.text_language = en
-        serialized = medium.serialize()
+        document = Document()
+        document.id = 'm998'
+        document.type = "text"
+        document.text_value = text
+        self.assertEqual(document.text_value, text)
+        document.text_language = en
+        serialized = document.serialize()
         plain_json = json.loads(serialized)
-        deserialized = Medium(serialized)
+        deserialized = Document(serialized)
         self.assertEqual(deserialized.text_value, text)
         self.assertEqual(deserialized.text_language, en)
         self.assertEqual({'@value', '@language'}, plain_json['text'].keys())
 
-    def test_medium_empty_text(self):
-        medium = Medium()
-        medium.id = 'm997'
-        medium.type = "text"
-        serialized = medium.serialize()
-        deserialized = Medium(serialized)
+    def test_document_empty_text(self):
+        document = Document()
+        document.id = 'm997'
+        document.type = "text"
+        serialized = document.serialize()
+        deserialized = Document(serialized)
         self.assertEqual(deserialized.text_value, '')
         self.assertEqual(deserialized.text_language, '')
 
-    def test_medium(self):
-        medium = Medium(examples['medium_ext_video_example'])
-        serialized = medium.serialize()
+    def test_document(self):
+        document = Document(examples['document_ext_video_example'])
+        serialized = document.serialize()
         plain_json = json.loads(serialized)
         self.assertEqual({'id', 'type', 'location', 'mime'}, plain_json.keys())
 
-    def test_add_media(self):
-        medium_json = json.loads(examples['medium_ext_video_example'])
+    def test_add_documents(self):
+        document_json = json.loads(examples['document_ext_video_example'])
         # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
         mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        old_media_count = len(mmif_obj.media)
-        mmif_obj.add_medium(Medium(medium_json))  # just raise exception if this fails
-        self.assertEqual(old_media_count+1, len(mmif_obj.media))
+        old_documents_count = len(mmif_obj.documents)
+        mmif_obj.add_document(Document(document_json))  # just raise exception if this fails
+        self.assertEqual(old_documents_count+1, len(mmif_obj.documents))
 
-    def test_get_medium_by_id(self):
+    def test_get_document_by_id(self):
         mmif_obj = Mmif(examples['mmif_example1'])
         try:
             # should succeed
-            mmif_obj.get_medium_by_id('m1')
+            mmif_obj.get_document_by_id('m1')
         except KeyError:
             self.fail("didn't get m1")
         try:
             # should fail
-            mmif_obj.get_medium_by_id('m55')
+            mmif_obj.get_document_by_id('m55')
             self.fail("didn't raise exception on getting m55")
         except KeyError:
             pass
 
-    def test_get_media_by_view_id(self):
+    def test_get_documents_by_view_id(self):
         mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 1)
-        self.assertEqual(mmif_obj.get_media_by_source_view_id('v1')[0],
-                         mmif_obj.get_medium_by_id('m2'))
-        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('xxx')), 0)
-        new_medium = Medium()
-        new_medium.metadata.source = 'v1:bb2'
-        mmif_obj.add_medium(new_medium)
-        self.assertEqual(len(mmif_obj.get_media_by_source_view_id('v1')), 2)
+        self.assertEqual(len(mmif_obj.get_documents_by_source_view_id('v1')), 1)
+        self.assertEqual(mmif_obj.get_documents_by_source_view_id('v1')[0],
+                         mmif_obj.get_document_by_id('m2'))
+        self.assertEqual(len(mmif_obj.get_documents_by_source_view_id('xxx')), 0)
+        new_document = Document()
+        new_document.metadata.source = 'v1:bb2'
+        mmif_obj.add_document(new_document)
+        self.assertEqual(len(mmif_obj.get_documents_by_source_view_id('v1')), 2)
 
-    def test_get_medium_by_metadata(self):
+    def test_get_document_by_metadata(self):
         mmif_obj = Mmif(examples['mmif_example1'])
-        self.assertEqual(len(mmif_obj.get_media_by_metadata("source", "v1:bb1")), 1)
-        self.assertEqual(len(mmif_obj.get_media_by_metadata("source", "v3")), 0)
+        self.assertEqual(len(mmif_obj.get_documents_by_metadata("source", "v1:bb1")), 1)
+        self.assertEqual(len(mmif_obj.get_documents_by_metadata("source", "v3")), 0)
 
-    def test_get_medium_by_appid(self):
+    def test_get_document_by_appid(self):
         tesseract_appid = 'http://apps.clams.io/tesseract/1.2.1'
         mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        self.assertEqual(len(mmif_obj.get_media_by_app(tesseract_appid)), 1)
-        self.assertEqual(len(mmif_obj.get_media_by_app('xxx')), 0)
-        new_medium = Medium()
-        new_medium.metadata.source = 'v1:bb2'
-        new_medium.metadata.app = tesseract_appid
-        mmif_obj.add_medium(new_medium)
-        self.assertEqual(len(mmif_obj.get_media_by_app(tesseract_appid)), 2)
+        self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 1)
+        self.assertEqual(len(mmif_obj.get_documents_by_app('xxx')), 0)
+        new_document = Document()
+        new_document.metadata.source = 'v1:bb2'
+        new_document.metadata.app = tesseract_appid
+        mmif_obj.add_document(new_document)
+        self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 2)
 
-    def test_get_media_locations(self):
+    def test_get_documents_locations(self):
         mmif_obj = Mmif(examples['mmif_example1'])
-        self.assertEqual(len(mmif_obj.get_media_locations('image')), 1)
-        self.assertEqual(mmif_obj.get_medium_location('image'), "/var/archive/image-0012.jpg")
-        # text medium is there but no location is specified
-        self.assertEqual(len(mmif_obj.get_media_locations('text')), 0)
-        self.assertEqual(mmif_obj.get_medium_location('text'), None)
-        # audio medium is not there
-        self.assertEqual(len(mmif_obj.get_media_locations('audio')), 0)
+        self.assertEqual(len(mmif_obj.get_documents_locations('image')), 1)
+        self.assertEqual(mmif_obj.get_document_location('image'), "/var/archive/image-0012.jpg")
+        # text document is there but no location is specified
+        self.assertEqual(len(mmif_obj.get_documents_locations('text')), 0)
+        self.assertEqual(mmif_obj.get_document_location('text'), None)
+        # audio document is not there
+        self.assertEqual(len(mmif_obj.get_documents_locations('audio')), 0)
 
     def test_get_view_by_id(self):
         mmif_obj = Mmif(examples['mmif_example1'])
@@ -263,17 +263,17 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(e_view.id, f'{p}4')
         self.assertEqual(len(mmif_obj.views), 5)
 
-    def test_add_medium(self):
+    def test_add_document(self):
         mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        med_obj = Medium(examples['medium_ext_video_example'])
-        mmif_obj.add_medium(med_obj)
+        med_obj = Document(examples['document_ext_video_example'])
+        mmif_obj.add_document(med_obj)
         try:
-            mmif_obj.add_medium(med_obj)
+            mmif_obj.add_document(med_obj)
             self.fail("didn't raise exception on duplicate ID add")
         except KeyError:
             ...
         try:
-            mmif_obj.add_medium(med_obj, overwrite=True)
+            mmif_obj.add_document(med_obj, overwrite=True)
         except KeyError:
             self.fail("raised exception on duplicate ID add when overwrite was set to True")
 
@@ -294,7 +294,7 @@ class TestMmif(unittest.TestCase):
 
     def test___getitem__(self):
         mmif_obj = Mmif(examples['mmif_example1'])
-        self.assertIsInstance(mmif_obj['m1'], Medium)
+        self.assertIsInstance(mmif_obj['m1'], Document)
         self.assertIsInstance(mmif_obj['v1'], View)
         self.assertIsInstance(mmif_obj['v1:bb1'], Annotation)
         with self.assertRaises(KeyError):
@@ -304,9 +304,9 @@ class TestMmif(unittest.TestCase):
         mmif_obj.add_view(a_view)
         with self.assertRaises(KeyError):
             mmif_obj['m1']
-        medium = Medium()
-        medium.add_metadata('random_key', 'random_value')
-        self.assertEqual(medium.metadata['random_key'], 'random_value')
+        document = Document()
+        document.add_metadata('random_key', 'random_value')
+        self.assertEqual(document.metadata['random_key'], 'random_value')
 
 
 class TestMmifObject(unittest.TestCase):
@@ -353,14 +353,14 @@ class TestGetItem(unittest.TestCase):
         self.mmif_obj = Mmif(examples['mmif_example1'])
         self.view_obj = View(examples['view_example1'])
 
-    def test_mmif_getitem_medium(self):
+    def test_mmif_getitem_document(self):
         try:
             m1 = self.mmif_obj['m1']
-            self.assertIs(m1, self.mmif_obj.media.get('m1'))
+            self.assertIs(m1, self.mmif_obj.documents.get('m1'))
         except TypeError:
             self.fail("__getitem__ not implemented")
         except KeyError:
-            self.fail("didn't get medium 'm1'")
+            self.fail("didn't get document 'm1'")
 
     def test_mmif_getitem_view(self):
         try:
@@ -484,7 +484,7 @@ class TestAnnotation(unittest.TestCase):
 
     def test_annotation_properties(self):
         props_json = self.data['mmif_example1']['annotations'][0]['properties']
-        props_obj = MediumMetadata(props_json)
+        props_obj = DocumentMetadata(props_json)
         self.assertEqual(props_json, json.loads(props_obj.serialize()))
 
     def test_add_property(self):
@@ -525,7 +525,7 @@ class TestAnnotation(unittest.TestCase):
         self.assertEqual('bb2', new_id_from_mmif)
 
 
-class TestMedium(unittest.TestCase):
+class TestDocument(unittest.TestCase):
 
     def setUp(self) -> None:
         self.examples = {}
@@ -540,67 +540,67 @@ class TestMedium(unittest.TestCase):
         self.data = {i: {'string': example,
                          'json': json.loads(example),
                          'mmif': Mmif(example, frozen=False),
-                         'media': json.loads(example)['media']}
+                         'documents': json.loads(example)['documents']}
                      for i, example in self.examples.items()}
 
     def test_init(self):
         for i, datum in self.data.items():
-            for j, medium in enumerate(datum['media']):
+            for j, document in enumerate(datum['documents']):
                 try:
-                    _ = Medium(medium)
+                    _ = Document(document)
                 except Exception as ex:
-                    self.fail(f"{type(ex)}: {str(ex)}: {i} {medium['id']}")
+                    self.fail(f"{type(ex)}: {str(ex)}: {i} {document['id']}")
 
-    def test_medium_metadata(self):
-        metadata_json = self.data['mmif_example1']['media'][1]['metadata']
-        metadata_obj = MediumMetadata(metadata_json)
+    def test_document_metadata(self):
+        metadata_json = self.data['mmif_example1']['documents'][1]['metadata']
+        metadata_obj = DocumentMetadata(metadata_json)
         self.assertEqual(metadata_json, json.loads(metadata_obj.serialize()))
 
     def test_deserialize_with_whole_mmif(self):
         for i, datum in self.data.items():
-            for j, medium in enumerate(datum['media']):
+            for j, document in enumerate(datum['documents']):
                 try:
-                    medium_obj = datum['mmif'].get_medium_by_id(medium['id'])
+                    document_obj = datum['mmif'].get_document_by_id(document['id'])
                 except KeyError:
-                    self.fail(f"Medium {medium['id']} not found in MMIF")
-                self.assertIsInstance(medium_obj, Medium)
-                if 'metadata' in medium:
-                    self.assertIsInstance(medium_obj.metadata, MediumMetadata)
-                if 'submedia' in medium:
-                    self.assertIsInstance(medium_obj.submedia, list)
-                    for submedium in medium_obj.submedia:
+                    self.fail(f"Document {document['id']} not found in MMIF")
+                self.assertIsInstance(document_obj, Document)
+                if 'metadata' in document:
+                    self.assertIsInstance(document_obj.metadata, DocumentMetadata)
+                if 'subdocuments' in document:
+                    self.assertIsInstance(medium_obj.subdocuments, list)
+                    for submedium in medium_obj.subdocuments:
                         self.assertIsInstance(submedium, Submedium)
 
     def test_deserialize_with_medium_str(self):
         for i, datum in self.data.items():
-            for j, medium in enumerate(datum['media']):
-                medium_obj = Medium(medium)
-                self.assertIsInstance(medium_obj, Medium)
+            for j, medium in enumerate(datum['documents']):
+                medium_obj = Document(medium)
+                self.assertIsInstance(medium_obj, Document)
                 if 'metadata' in medium:
-                    self.assertIsInstance(medium_obj.metadata, MediumMetadata)
-                if 'submedia' in medium:
-                    self.assertIsInstance(medium_obj.submedia, list)
-                    for submedium in medium_obj.submedia:
+                    self.assertIsInstance(medium_obj.metadata, DocumentMetadata)
+                if 'subdocuments' in medium:
+                    self.assertIsInstance(medium_obj.subdocuments, list)
+                    for submedium in medium_obj.subdocuments:
                         self.assertIsInstance(submedium, Submedium)
 
     def test_serialize_to_medium_str(self):
         for i, datum in self.data.items():
-            for j, medium in enumerate(datum['media']):
-                medium_obj = Medium(medium)
+            for j, medium in enumerate(datum['documents']):
+                medium_obj = Document(medium)
                 serialized = json.loads(medium_obj.serialize())
                 self.assertEqual(medium, serialized, f'Failed on {i}, {medium["id"]}')
 
     def test_serialize_with_whole_mmif(self):
         for i, datum in self.data.items():
-            for j, medium in enumerate(datum['media']):
-                medium_serialized = json.loads(datum['mmif'].serialize())['media'][j]
+            for j, medium in enumerate(datum['documents']):
+                medium_serialized = json.loads(datum['mmif'].serialize())['documents'][j]
                 self.assertEqual(medium, medium_serialized, f'Failed on {i}, {medium["id"]}')
 
     def test_add_metadata(self):
         for i, datum in self.data.items():
-            for j in range(len(datum['json']['media'])):
-                medium_id = datum['json']['media'][j]['id']
-                metadata = datum['json']['media'][j].get('metadata')
+            for j in range(len(datum['json']['documents'])):
+                medium_id = datum['json']['documents'][j]['id']
+                metadata = datum['json']['documents'][j].get('metadata')
                 if metadata:
                     removed_metadatum_key, removed_metadatum_value = list(metadata.items())[-1]
                     metadata.pop(removed_metadatum_key)
@@ -616,14 +616,14 @@ class TestDataStructure(unittest.TestCase):
     def setUp(self) -> None:
         self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
         self.datalist = self.mmif_obj.views
-        self.freezable_datalist = self.mmif_obj.media
+        self.freezable_datalist = self.mmif_obj.documents
         self.freezable_datadict = self.mmif_obj['v1'].metadata.contains
 
     def test_setitem(self):
         self.datalist['v1'] = View({'id': 'v1'})
         self.datalist['v2'] = View({'id': 'v2'})
-        self.freezable_datalist['m1'] = Medium({'id': 'm1'})
-        self.freezable_datalist['m3'] = Medium({'id': 'm3'})
+        self.freezable_datalist['m1'] = Document({'id': 'm1'})
+        self.freezable_datalist['m3'] = Document({'id': 'm3'})
         self.freezable_datadict['BoundingBox'] = Contain({"unit": "centimeters"})
         self.freezable_datadict['Segment'] = Contain({"unit": "milliseconds"})
 
@@ -638,7 +638,7 @@ class TestDataStructure(unittest.TestCase):
         self.assertTrue('v2' in self.datalist._items)
 
         self.assertTrue('m3' not in self.freezable_datalist._items)
-        self.freezable_datalist.append(Medium({'id': 'm3'}))
+        self.freezable_datalist.append(Document({'id': 'm3'}))
         self.assertTrue('m3' in self.freezable_datalist._items)
 
     def test_append_overwrite(self):
@@ -656,13 +656,13 @@ class TestDataStructure(unittest.TestCase):
             self.fail(ex.args[0])
 
         try:
-            self.freezable_datalist.append(Medium({'id': 'm2'}))
+            self.freezable_datalist.append(Document({'id': 'm2'}))
             self.fail('appended without overwrite')
         except KeyError as ke:
             self.assertEqual('Key m2 already exists', ke.args[0])
 
         try:
-            self.freezable_datalist.append(Medium({'id': 'm2'}), overwrite=True)
+            self.freezable_datalist.append(Document({'id': 'm2'}), overwrite=True)
         except AssertionError:
             raise
         except Exception as ex:
@@ -678,7 +678,7 @@ class TestDataStructure(unittest.TestCase):
         self.assertIn('v2', self.datalist)
 
         self.assertNotIn('m3', self.freezable_datalist)
-        self.freezable_datalist['m3'] = Medium({'id': 'm3'})
+        self.freezable_datalist['m3'] = Document({'id': 'm3'})
         self.assertIn('m3', self.freezable_datalist)
 
         self.assertNotIn('Segment', self.freezable_datadict)
@@ -693,7 +693,7 @@ class TestDataStructure(unittest.TestCase):
 
         self.assertEqual(2, len(self.freezable_datalist))
         for i in range(3, 10):
-            self.freezable_datalist[f'm{i}'] = Medium({'id': f'm{i}'})
+            self.freezable_datalist[f'm{i}'] = Document({'id': f'm{i}'})
             self.assertEqual(i, len(self.freezable_datalist))
 
         self.assertEqual(1, len(self.freezable_datadict))
@@ -705,7 +705,7 @@ class TestDataStructure(unittest.TestCase):
         for i in range(2, 10):
             self.datalist[f'v{i}'] = View({'id': f'v{i}'})
         for i in range(3, 10):
-            self.freezable_datalist[f'm{i}'] = Medium({'id': f'm{i}'})
+            self.freezable_datalist[f'm{i}'] = Document({'id': f'm{i}'})
         for i in range(2, 10):
             self.freezable_datadict[f'Type{i}'] = Contain({"type": f"i"})
 
@@ -744,7 +744,7 @@ class TestDataStructure(unittest.TestCase):
 
         for i, name in enumerate(self.freezable_datalist.reserved_names):
             try:
-                self.freezable_datalist[name] = Medium({'id': f'm{i+1}'})
+                self.freezable_datalist[name] = Document({'id': f'm{i+1}'})
                 self.fail("was able to setitem on reserved name")
             except KeyError as ke:
                 self.assertEqual("can't set item on a reserved name", ke.args[0])
