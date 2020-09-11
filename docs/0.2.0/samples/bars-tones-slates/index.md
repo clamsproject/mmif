@@ -1,14 +1,12 @@
 ---
 layout: page
 title: MMIF Specification
-subtitle: Version $VERSION
+subtitle: Version 0.2.0
 ---
-
-
 
 # Example: Bars and Tones and Slates
 
-To see the full example scroll down to the end or open the [raw json file](bars-tones-slates.json).
+To see the full example scroll down to the end or open the [raw json file](raw.json).
 
 This is a minimal example that contains two media documents, one pointing at a video and the other at a transcript. For the first document there are two views, one with bars-and-tone annotations and one with slate annotations. For the second document there is one view with the results of a tokenizer. This example file, while minimal, has everything required by MMIF.
 

@@ -1,21 +1,20 @@
 ---
 layout: page
 title: MMIF Specification
-subtitle: Version $VERSION
-
+subtitle: Version 0.2.0
 ---
+
+
 
 # Example: EAST, Tesseract and Typing
 
-To see the full example scroll down to the end or open the [raw json file](east-tesseract-ner.json).
-
 This example contains one image document which points to this image:
 
-<img src="../pi78oGjdT.jpg" border="1" height="200"/>
+<img src="../../pi78oGjdT.jpg" border="1" height="200"/>
 
 In addition, there are three views, one created by EAST, one by Tesseract and one by a semantic typing component. We now give fragments of the four relevant parts of the MMIF file, each with some comments.
 
-To see the full example scroll down to the end or open the [raw json file](east-tesseract-ner.json).
+To see the full example scroll down to the end or open the [raw json file](raw.json).
 
 ### Fragment 1: the documents list
 
