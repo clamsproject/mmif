@@ -33,7 +33,7 @@
 	    "metadata": {
 		"medium": "m1",
 		"timestamp": "2020-05-27T12:23:45",
-		"tool": "http://tools.clams.ai/bars-and-tones/1.0.5",
+		"app": "http://apps.clams.ai/bars-and-tones/1.0.5",
 		"contains": {
 		    "Segment": { "unit": "seconds" }}},
 
@@ -57,7 +57,7 @@
 	    "metadata": {
 		"medium": "m2",
 		"timestamp": "2020-05-27T12:23:45",
-		"tool": "http://tools.clams.ai/lapps/stanford-ner/1.3.2",
+		"app": "http://apps.clams.ai/lapps/stanford-ner/1.3.2",
 		"contains": {
 		    "NamedEntity": { "namedEntityCategorySet": "Stanford" }}},
 
