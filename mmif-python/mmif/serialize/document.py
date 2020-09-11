@@ -1,10 +1,10 @@
 """
-The :mod:`medium` module contains the classes used to represent a
-MMIF medium as a live Python object.
+The :mod:`document` module contains the classes used to represent a
+MMIF document as a live Python object.
 
-In MMIF, media are objects that either point to a file containing
-the medium being described, or contain the medium directly in some
-text medium cases.
+In MMIF, documents are objects that either point to a file containing
+the document being described, or contain the document directly in some
+text document cases.
 """
 
 from typing import Union, Optional, Dict
@@ -13,38 +13,38 @@ from pyrsistent import pmap
 from .model import FreezableMmifObject, FreezableDataList
 
 
-__all__ = ['Medium', 'MediumMetadata', 'Submedium', 'Text']
+__all__ = ['Document', 'DocumentMetadata', 'Subdocument', 'Text']
 
 
-class Medium(FreezableMmifObject):
+class Document(FreezableMmifObject):
     """
-    Medium object that represents a single medium in a MMIF file.
+    Document object that represents a single document in a MMIF file.
 
-    A medium is identified by an ID, and contains certain attributes
-    and potentially contains the contents of the medium itself,
-    metadata about how the medium was created, and/or a list of
-    submedia grouped together logically.
+    A document is identified by an ID, and contains certain attributes
+    and potentially contains the contents of the document itself,
+    metadata about how the document was created, and/or a list of
+    subdocuments grouped together logically.
 
-    If ``medium_obj`` is not provided, an empty Medium will be generated.
+    If ``document_obj`` is not provided, an empty Document will be generated.
 
-    :param medium_obj: the JSON data that defines the medium
+    :param document_obj: the JSON data that defines the document
     """
 
-    def __init__(self, medium_obj: Union[str, dict] = None) -> None:
+    def __init__(self, document_obj: Union[str, dict] = None) -> None:
         self.id: str = ''
         self.type: str = ''
         self.mime: str = ''
         self.location: str = ''
         self.text: Text = Text()
-        self.metadata: MediumMetadata = MediumMetadata()
-        self.submedia: SubmediaList = SubmediaList()
+        self.metadata: DocumentMetadata = DocumentMetadata()
+        self.subdocuments: SubdocumentsList = SubdocumentsList()
         self.disallow_additional_properties()
         self._attribute_classes = pmap({
             'text': Text,
-            'metadata': MediumMetadata,
-            'submedia': SubmediaList
+            'metadata': DocumentMetadata,
+            'subdocuments': SubdocumentsList
         })
-        super().__init__(medium_obj)
+        super().__init__(document_obj)
 
     def add_metadata(self, name: str, value: str) -> None:
         self.metadata[name] = value
@@ -92,7 +92,7 @@ class Text(FreezableMmifObject):
         self._value = s
 
 
-class MediumMetadata(FreezableMmifObject):
+class DocumentMetadata(FreezableMmifObject):
     source: Optional[str]
     app: Optional[str]
 
@@ -103,22 +103,22 @@ class MediumMetadata(FreezableMmifObject):
         super().__init__(mmeta_obj)
 
 
-class Submedium(FreezableMmifObject):
+class Subdocument(FreezableMmifObject):
 
-    def __init__(self, submedium: Union[str, dict] = None):
+    def __init__(self, subdocument: Union[str, dict] = None):
         # need to set instance variables for ``_named_attributes()`` to work
         self.id: str = ''
         self.annotation: str = ''
         self.text: Text = Text()
         self._attribute_classes = pmap({'text': Text})
-        super().__init__(submedium)
+        super().__init__(subdocument)
 
 
-class SubmediaList(FreezableDataList[Submedium]):
-    _items: Dict[str, Submedium]
+class SubdocumentsList(FreezableDataList[Subdocument]):
+    _items: Dict[str, Subdocument]
 
     def _deserialize(self, input_list: list) -> None:
-        self.items = {item['id']: Submedium(item) for item in input_list}
+        self.items = {item['id']: Subdocument(item) for item in input_list}
 
-    def append(self, value: Submedium, overwrite=False) -> None:
+    def append(self, value: Subdocument, overwrite=False) -> None:
         super()._append_with_key(value.id, value, overwrite)

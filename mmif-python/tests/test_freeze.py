@@ -5,7 +5,7 @@ from unittest.mock import patch
 import json
 
 from mmif.serialize import *
-from mmif.serialize.medium import SubmediaList
+from mmif.serialize.document import SubdocumentsList
 from mmif.serialize.model import FreezableMmifObject
 from tests.mmif_examples import *
 
@@ -35,7 +35,7 @@ class TestFreezeView(unittest.TestCase):
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
-            self.v1.metadata.medium = 'm1'
+            self.v1.metadata.document = 'm1'
             self.fail("able to set lower-level attribute")
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
@@ -62,11 +62,11 @@ class TestFreezeView(unittest.TestCase):
         self.assertTrue(self.v1.deep_freeze())
 
 
-class TestFreezeMedium(unittest.TestCase):
+class TestFreezeDocument(unittest.TestCase):
     def setUp(self) -> None:
         self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
 
-        self.m2: Medium = self.mmif_obj['m2']
+        self.m2: Document = self.mmif_obj['m2']
 
     def test_freeze(self):
         self.m2.freeze()
@@ -99,8 +99,8 @@ class TestFreezeMedium(unittest.TestCase):
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
-            self.m2.submedia.append(Submedium())
-            self.fail('able to append to submedia list after deep freeze')
+            self.m2.subdocuments.append(Subdocument())
+            self.fail('able to append to subdocuments list after deep freeze')
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
@@ -137,34 +137,34 @@ class TestFreezeMedium(unittest.TestCase):
         self.assertEqual('MmifObject.__setitem__', fake_out.getvalue().split()[2])
 
 
-class TestFreezeSubmediaList(unittest.TestCase):
+class TestFreezeSubdocumentsList(unittest.TestCase):
     def setUp(self) -> None:
         self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        self.submedia: SubmediaList = self.mmif_obj['m2'].submedia
+        self.subdocuments: SubdocumentsList = self.mmif_obj['m2'].subdocuments
 
     def test_deep_freeze(self):
-        self.submedia['sm1'] = Submedium({ "id": "sm1", "annotation": "bb1", "text": { "@value": "yelp" }})
-        self.submedia.deep_freeze()
+        self.subdocuments['sm1'] = Subdocument({ "id": "sm1", "annotation": "bb1", "text": { "@value": "yelp" }})
+        self.subdocuments.deep_freeze()
         try:
-            self.submedia['sm1']['annotation'] = 'bb2'
+            self.subdocuments['sm1']['annotation'] = 'bb2'
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
     def test_invariance_after_freeze(self):
-        before = json.loads(self.submedia.serialize())
+        before = json.loads(self.subdocuments.serialize())
 
-        self.submedia.freeze()
+        self.subdocuments.freeze()
 
-        after = json.loads(self.submedia.serialize())
+        after = json.loads(self.subdocuments.serialize())
 
         self.assertEqual(before, after)
 
     def test_invariance_after_deep_freeze(self):
-        before = json.loads(self.submedia.serialize())
+        before = json.loads(self.subdocuments.serialize())
 
-        self.submedia.deep_freeze()
+        self.subdocuments.deep_freeze()
 
-        after = json.loads(self.submedia.serialize())
+        after = json.loads(self.subdocuments.serialize())
 
         self.assertEqual(before, after)
 
@@ -174,23 +174,23 @@ class TestFreezeSubmediaList(unittest.TestCase):
         logger.setLevel(logging.DEBUG)
         with patch('sys.stdout', new=StringIO()) as fake_out:
             logger.addHandler(logging.StreamHandler(fake_out))
-            self.submedia['sub1'] = Submedium()
+            self.subdocuments['sub1'] = Subdocument()
         logger.setLevel(old_level)
         self.assertEqual('DataList.__setitem__', fake_out.getvalue().split()[2])
 
     def test_freezing_works_for_setitem(self):
-        self.submedia.freeze()
+        self.subdocuments.freeze()
         try:
-            self.submedia['sub1'] = Submedium()
+            self.subdocuments['sub1'] = Subdocument()
             self.fail("was able to setitem")
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
     def test_freezing_works_for_append(self):
-        self.submedia.freeze()
+        self.subdocuments.freeze()
         try:
-            self.submedia.append(Submedium())
-            self.fail('able to append to submedia after freeze')
+            self.subdocuments.append(Subdocument())
+            self.fail('able to append to subdocuments after freeze')
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
@@ -202,26 +202,26 @@ class TestFreezeMmif(unittest.TestCase):
         self.mmif_obj_default = Mmif(examples['mmif_example1'])
 
     def test_freeze_mmif(self):
-        self.assertFalse(self.mmif_obj_unfrozen.media.is_frozen())
-        self.mmif_obj_unfrozen.freeze_media()
-        self.assertTrue(self.mmif_obj_unfrozen.media.is_frozen())
+        self.assertFalse(self.mmif_obj_unfrozen.documents.is_frozen())
+        self.mmif_obj_unfrozen.freeze_documents()
+        self.assertTrue(self.mmif_obj_unfrozen.documents.is_frozen())
 
     def test_default_behavior_is_frozen(self):
-        self.assertTrue(self.mmif_obj_default.media.is_frozen())
+        self.assertTrue(self.mmif_obj_default.documents.is_frozen())
 
     def test_kwarg(self):
-        self.assertFalse(self.mmif_obj_unfrozen.media.is_frozen())
-        self.assertTrue(self.mmif_obj_frozen.media.is_frozen())
+        self.assertFalse(self.mmif_obj_unfrozen.documents.is_frozen())
+        self.assertTrue(self.mmif_obj_frozen.documents.is_frozen())
 
-    def test_try_frozen_add_medium(self):
+    def test_try_frozen_add_document(self):
         try:
-            self.mmif_obj_frozen.add_medium(Medium())
+            self.mmif_obj_frozen.add_document(Document())
         except TypeError as te:
             self.assertEqual("MMIF object is frozen", te.args[0])
 
-        self.mmif_obj_unfrozen.freeze_media()
+        self.mmif_obj_unfrozen.freeze_documents()
         try:
-            self.mmif_obj_unfrozen.add_medium(Medium())
+            self.mmif_obj_unfrozen.add_document(Document())
         except TypeError as te:
             self.assertEqual("MMIF object is frozen", te.args[0])
 

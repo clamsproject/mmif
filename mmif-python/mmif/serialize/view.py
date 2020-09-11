@@ -100,7 +100,7 @@ class View(FreezableMmifObject):
         """
         getitem implementation for View.
 
-        >>> obj = View('''{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"medium": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}''')
+        >>> obj = View('''{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"document": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}''')
         >>> type(obj['bb1'])
         <class 'mmif.serialize.annotation.Annotation'>
         >>> obj['asdf']
@@ -129,7 +129,7 @@ class ViewMetadata(FreezableMmifObject):
     """
 
     def __init__(self, viewmetadata_obj: Union[str, dict] = None) -> None:
-        self.medium: str = ''
+        self.document: str = ''
         self.timestamp: Optional[datetime] = None
         self.app: str = ''
         self.contains: ContainsDict = ContainsDict()

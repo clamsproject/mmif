@@ -383,7 +383,7 @@ class MmifObjectEncoder(json.JSONEncoder):
 class DataList(MmifObject, Generic[T]):
     """
     The DataList class is an abstraction that represents the
-    various lists found in a MMIF file, such as media, submedia,
+    various lists found in a MMIF file, such as documents, subdocuments,
     views, and annotations.
 
     :param Union[str, list] mmif_obj: the data that the list contains

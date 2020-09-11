@@ -7,7 +7,7 @@ example_templates = dict(
   "metadata": {
     "mmif": "http://mmif.clams.ai/${specver}"
   },
-  "media": [
+  "documents": [
     {
       "id": "m1",
       "type": "image",
@@ -34,7 +34,7 @@ example_templates = dict(
         "contains": {
           "BoundingBox": {"unit": "pixels"}
         },
-        "medium": "m1",
+        "document": "m1",
         "app": "http://apps.clams.io/east/1.0.4"
       },
       "annotations": [
@@ -59,7 +59,7 @@ example_templates = dict(
     }
   },
 
-  "media": [
+  "documents": [
     {
       "id": "m1",
       "type": "video",
@@ -79,7 +79,7 @@ example_templates = dict(
       "@context": "http://mmif.clams.ai/${specver}/context/vocab-clams.json",
       "id": "v1",
       "metadata": {
-        "medium": "m1",
+        "document": "m1",
         "timestamp": "2020-05-27T12:23:45",
         "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
         "contains": {
@@ -105,7 +105,7 @@ example_templates = dict(
       "@context": "http://mmif.clams.ai/${specver}/context/vocab-lapps.json",
       "id": "v2",
       "metadata": {
-        "medium": "m2",
+        "document": "m2",
         "timestamp": "2020-05-27T12:23:45",
         "app": "http://apps.clams.ai/lapps/stanford-ner/1.3.2",
         "contains": {
@@ -140,7 +140,7 @@ example_templates = dict(
     }
   },
 
-  "media": [
+  "documents": [
     {
       "id": "m1",
       "type": "video",
@@ -160,7 +160,7 @@ example_templates = dict(
       "@context": "http://mmif.clams.ai/${specver}/context/vocab-clams.json",
       "id": "v1",
       "metadata": {
-        "medium": "m1",
+        "document": "m1",
         "timestamp": "2020-05-27T12:23:45",
         "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
         "contains": {
@@ -194,7 +194,7 @@ example_templates = dict(
       "@context": "http://mmif.clams.ai/${specver}/context/vocab-lapps.json",
       "id": "v2",
       "metadata": {
-        "medium": "m2",
+        "document": "m2",
         "timestamp": "2020-05-27T12:23:45",
         "app": "http://apps.clams.ai/lapps/stanford-ner/1.3.2",
         "contains": {
@@ -228,7 +228,7 @@ example_templates = dict(
     }
   },
 
-  "media": [
+  "documents": [
     {
       "id": "m1",
       "type": "video",
@@ -255,7 +255,7 @@ example_templates = dict(
             "unit": "seconds"
           }
         },
-        "medium": "m1",
+        "document": "m1",
         "timestamp": "2020-05-27T12:23:45",
         "app": "http://apps.clams.ai/bars-and-tones/1.0.5"
       },
@@ -283,7 +283,7 @@ example_templates = dict(
             "unit": "seconds"
           }
         },
-        "medium": "m1",
+        "document": "m1",
         "timestamp": "2020-05-27T12:23:45",
         "app": "http://apps.clams.ai/slates/1.0.3"
       },
@@ -309,7 +309,7 @@ example_templates = dict(
         "contains": {
           "http://vocab.lappsgrid.org/Token": {}
         },
-        "medium": "m2",
+        "document": "m2",
         "timestamp": "2020-05-27T12:25:15",
         "app": "http://apps.clams.ai/slates/1.0.3"
       },
@@ -350,7 +350,7 @@ example_templates = dict(
       "@context": "http://mmif.clams.ai/${specver}/context/vocab-clams.json",
       "id": "v1",
       "metadata": {
-        "medium": "m1",
+        "document": "m1",
         "timestamp": "2020-05-27T12:23:45",
         "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
         "contains": {
@@ -378,13 +378,13 @@ example_templates = dict(
         }
       ]
     }""",
-    medium_ext_video_example = """{
+    document_ext_video_example = """{
       "id": "m3",
       "type": "video",
       "mime": "video/mp4",
       "location": "/var/archive/video-0012.mp4"
     }""",
-    medium_text_medium_example = """{
+    document_text_document_example = """{
       "id": "m4",
       "type": "text",
       "mime": "text/plain",
@@ -395,7 +395,7 @@ example_templates = dict(
   "metadata": {
     "mmif": "http://mmif.clams.ai/${specver}"
   },
-  "media": [
+  "documents": [
     {
       "id": "m1",
       "type": "image",
@@ -423,7 +423,7 @@ example_templates = dict(
           "BoundingBox": {"unit": "pixels"},
           "http://mmif.clams.ai/${specver}/vocabulary/Polygon": {"gen_time": "2020-05-27T12:23:45"}
         },
-        "medium": "m1",
+        "document": "m1",
         "app": "http://apps.clams.io/east/1.0.4"
       },
       "annotations": [

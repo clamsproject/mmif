@@ -16,7 +16,7 @@ import mmif
 from pyrsistent import pmap
 
 from .view import View
-from .medium import Medium
+from .document import Document
 from .annotation import Annotation
 from .model import MmifObject, DataList, FreezableDataList
 
@@ -37,18 +37,18 @@ class Mmif(MmifObject):
         # TODO (krim @ 7/6/20): maybe need IRI/URI as a python class for typing?
         self._context: str = ''
         self.metadata: MmifMetadata = MmifMetadata()
-        self.media: MediaList = MediaList()
+        self.documents: DocumentsList = DocumentsList()
         self.views: ViewsList = ViewsList()
         if validate:
             self.validate(mmif_obj)
         self.disallow_additional_properties()
         self._attribute_classes = pmap({
-            'media': MediaList,
+            'documents': DocumentsList,
             'views': ViewsList
         })
         super().__init__(mmif_obj)
         if frozen:
-            self.freeze_media()
+            self.freeze_documents()
             self.freeze_views()
 
     @staticmethod
@@ -103,36 +103,36 @@ class Mmif(MmifObject):
 
         Fails if there is already a view with the same ID in the MMIF object.
 
-        :param view: the Medium object to add
+        :param view: the Document object to add
         :param overwrite: if set to True, will overwrite
                           an existing view with the same ID
         :return: None
         """
         self.views.append(view, overwrite)
 
-    def add_medium(self, medium: Medium, overwrite=False) -> None:
+    def add_document(self, document: Document, overwrite=False) -> None:
         """
-        Appends a Medium object to the media list.
+        Appends a Document object to the documents list.
 
-        Fails if there is already a medium with the same ID in the MMIF object.
+        Fails if there is already a document with the same ID in the MMIF object.
 
-        :param medium: the Medium object to add
+        :param document: the Document object to add
         :param overwrite: if set to True, will overwrite
                           an existing view with the same ID
         :return: None
         """
-        if not self.media.is_frozen():
-            self.media.append(medium, overwrite)
+        if not self.documents.is_frozen():
+            self.documents.append(document, overwrite)
         else:
             raise TypeError("MMIF object is frozen")
 
-    def freeze_media(self) -> bool:
+    def freeze_documents(self) -> bool:
         """
-        Deeply freezes the list of media. Returns the result of
+        Deeply freezes the list of documents. Returns the result of
         the deep_freeze() call, signifying whether everything
         was fully frozen or not.
         """
-        return self.media.deep_freeze()
+        return self.documents.deep_freeze()
 
     def freeze_views(self) -> bool:
         """
@@ -146,72 +146,72 @@ class Mmif(MmifObject):
             fully_frozen &= view.deep_freeze()
         return fully_frozen
 
-    def get_media_by_source_view_id(self, source_vid: str = None) -> List[Medium]:
+    def get_documents_by_source_view_id(self, source_vid: str = None) -> List[Document]:
         """
-        Method to get all media object queries by its originated view id.
-        With current specification, a *source* of a medium can be external or
+        Method to get all documents object queries by its originated view id.
+        With current specification, a *source* of a document can be external or
         an annotation. The *source* field gets its value only in the latter.
-        Also note that, depending on how submedia is represented, the value of
+        Also note that, depending on how subdocuments is represented, the value of
         ``source`` field can be either ``view_id`` or ``view_id``:``annotation_id``.
-        In either case, this method will return all medium objects that generated
+        In either case, this method will return all document objects that generated
         from a view.
 
         :param source_vid: the source view ID to search for
-        :return: a list of media matching the requested source view ID
+        :return: a list of documents matching the requested source view ID
         """
-        return [medium for medium in self.media
-                if medium.metadata.source is not None and medium.metadata.source.split(':')[0] == source_vid]
+        return [document for document in self.documents
+                if document.metadata.source is not None and document.metadata.source.split(':')[0] == source_vid]
 
-    def get_media_by_app(self, app_id: str) -> List[Medium]:
+    def get_documents_by_app(self, app_id: str) -> List[Document]:
         """
-        Method to get all media object queries by its originated app name.
+        Method to get all documents object queries by its originated app name.
 
         :param app_id: the app name to search for
-        :return: a list of media matching the requested app name
+        :return: a list of documents matching the requested app name
         """
-        return [medium for medium in self.media if medium.metadata.app == app_id]
+        return [document for document in self.documents if document.metadata.app == app_id]
 
-    def get_media_by_metadata(self, metadata_key: str, metadata_value: str) -> List[Medium]:
+    def get_documents_by_metadata(self, metadata_key: str, metadata_value: str) -> List[Document]:
         """
-        Method to retrieve media by an arbitrary key-value pair in the medium metadata objects.
+        Method to retrieve documents by an arbitrary key-value pair in the document metadata objects.
 
         :param metadata_key: the metadata key to search for
         :param metadata_value: the metadata value to match
-        :return: a list of media matching the requested metadata key-value pair
+        :return: a list of documents matching the requested metadata key-value pair
         """
-        return [medium for medium in self.media if medium.metadata[metadata_key] == metadata_value]
+        return [document for document in self.documents if document.metadata[metadata_key] == metadata_value]
 
-    def get_media_locations(self, m_type: str) -> List[str]:
+    def get_documents_locations(self, m_type: str) -> List[str]:
         """
-        This method returns the file paths of media of given type.
-
-        :param m_type: the type to search for
-        :return: a list of the values of the location fields in the corresponding media
-        """
-        return [medium.location for medium in self.media if medium.type == m_type and len(medium.location) > 0]
-
-    def get_medium_location(self, m_type: str) -> str:
-        """
-        Method to get the location of *first* medium of given type.
+        This method returns the file paths of documents of given type.
 
         :param m_type: the type to search for
-        :return: the value of the location field in the corresponding medium
+        :return: a list of the values of the location fields in the corresponding documents
+        """
+        return [document.location for document in self.documents if document.type == m_type and len(document.location) > 0]
+
+    def get_document_location(self, m_type: str) -> str:
+        """
+        Method to get the location of *first* document of given type.
+
+        :param m_type: the type to search for
+        :return: the value of the location field in the corresponding document
         """
         # TODO (krim @ 8/10/20): Is returning the first location desirable?
-        locations = self.get_media_locations(m_type)
+        locations = self.get_documents_locations(m_type)
         return locations[0] if len(locations) > 0 else None
 
-    def get_medium_by_id(self, req_med_id: str) -> Medium:
+    def get_document_by_id(self, req_med_id: str) -> Document:
         """
-        Finds a Medium object with the given ID.
+        Finds a Document object with the given ID.
 
         :param req_med_id: the ID to search for
-        :return: a reference to the corresponding medium, if it exists
-        :raises Exception: if there is no corresponding medium
+        :return: a reference to the corresponding document, if it exists
+        :raises Exception: if there is no corresponding document
         """
-        result = self.media.get(req_med_id)
+        result = self.documents.get(req_med_id)
         if result is None:
-            raise KeyError("{} medium not found".format(req_med_id))
+            raise KeyError("{} document not found".format(req_med_id))
         return result
 
     def get_view_by_id(self, req_view_id: str) -> View:
@@ -252,13 +252,13 @@ class Mmif(MmifObject):
                 return view
         return None
 
-    def __getitem__(self, item: str) -> Union[Medium, View, Annotation]:
+    def __getitem__(self, item: str) -> Union[Document, View, Annotation]:
         """
         getitem implementation for Mmif.
 
-        >>> obj = Mmif('''{"@context": "http://mmif.clams.ai/0.1.0/context/mmif.json","metadata": {"mmif": "http://mmif.clams.ai/0.1.0","contains": {"http://mmif.clams.ai/vocabulary/0.1.0/BoundingBox": ["v1"]}},"media": [{"id": "m1","type": "image","mime": "image/jpeg","location": "/var/archive/image-0012.jpg"}],"views": [{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"medium": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}]}''')
+        >>> obj = Mmif('''{"@context": "http://mmif.clams.ai/0.1.0/context/mmif.json","metadata": {"mmif": "http://mmif.clams.ai/0.1.0","contains": {"http://mmif.clams.ai/vocabulary/0.1.0/BoundingBox": ["v1"]}},"documents": [{"id": "m1","type": "image","mime": "image/jpeg","location": "/var/archive/image-0012.jpg"}],"views": [{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"document": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}]}''')
         >>> type(obj['m1'])
-        <class 'mmif.serialize.medium.Medium'>
+        <class 'mmif.serialize.document.Document'>
         >>> type(obj['v1'])
         <class 'mmif.serialize.view.View'>
         >>> type(obj['v1:bb1'])
@@ -269,14 +269,14 @@ class Mmif(MmifObject):
         KeyError: 'ID not found: asdf'
 
         :raises KeyError: if the item is not found or if the search results are ambiguous
-        :param item: the search string, a medium ID, a view ID, or a view-scoped annotation ID
+        :param item: the search string, a document ID, a view ID, or a view-scoped annotation ID
         :return: the object searched for
         """
         if item in self._named_attributes():
             return self.__dict__[item]
         split_attempt = item.split(':')
 
-        medium_result = self.media.get(split_attempt[0])
+        document_result = self.documents.get(split_attempt[0])
         view_result = self.views.get(split_attempt[0])
 
         if len(split_attempt) == 1:
@@ -286,11 +286,11 @@ class Mmif(MmifObject):
         else:
             raise KeyError("Tried to subscript into a view that doesn't exist")
 
-        if view_result and medium_result:
+        if view_result and document_result:
             raise KeyError("Ambiguous ID search result")
-        if not (view_result or medium_result):
+        if not (view_result or document_result):
             raise KeyError("ID not found: %s" % item)
-        return anno_result or view_result or medium_result
+        return anno_result or view_result or document_result
 
 
 class MmifMetadata(MmifObject):
@@ -304,36 +304,36 @@ class MmifMetadata(MmifObject):
         super().__init__(metadata_obj)
 
 
-class MediaList(FreezableDataList[Medium]):
+class DocumentsList(FreezableDataList[Document]):
     """
-    MediaList object that implements :class:`mmif.serialize.model.DataList`
-    for :class:`mmif.serialize.medium.Medium`.
+    DocumentsList object that implements :class:`mmif.serialize.model.DataList`
+    for :class:`mmif.serialize.document.Document`.
     """
-    _items: Dict[str, Medium]
+    _items: Dict[str, Document]
 
     def _deserialize(self, input_list: list) -> None:
         """
         Extends base ``_deserialize`` method to initialize ``items`` as a dict from
-        medium IDs to :class:`mmif.serialize.medium.Medium` objects.
+        document IDs to :class:`mmif.serialize.document.Document` objects.
 
-        :param input_list: the JSON data that defines the list of media
+        :param input_list: the JSON data that defines the list of documents
         :return: None
         """
-        self._items = {item['id']: Medium(item) for item in input_list}
+        self._items = {item['id']: Document(item) for item in input_list}
 
-    def append(self, value: Medium, overwrite=False) -> None:
+    def append(self, value: Document, overwrite=False) -> None:
         """
-        Appends a medium to the list.
+        Appends a document to the list.
 
-        Fails if there is already a medium with the same ID
+        Fails if there is already a document with the same ID
         in the list, unless ``overwrite`` is set to True.
 
-        :param value: the :class:`mmif.serialize.medium.Medium`
+        :param value: the :class:`mmif.serialize.document.Document`
                       object to add
         :param overwrite: if set to True, will overwrite an
-                          existing medium with the same ID
+                          existing document with the same ID
         :raises KeyError: if ``overwrite`` is set to False and
-                          a medium with the same ID exists
+                          a document with the same ID exists
                           in the list
         :return: None
         """
