@@ -1,7 +1,7 @@
 ---
 layout: page
 title: MMIF Specification
-subtitle: version $VERSION
+subtitle: Version 0.2.0
 ---
 
 MMIF is an annotation format for audiovisual media and associated text like transcripts and closed captions. It is a JSON-LD format used to transport data between CLAMS services and is inspired by and partially based on LIF, the [LAPPS Interchange Format](https://wiki.lappsgrid.org/interchange/). MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
@@ -17,7 +17,7 @@ The  JSON schema for MMIF defines the syntactic elements of MMIF which will be e
 
 Along with the formal specifications and documentation we also provide a reference implementation of MMIF. It is developed in the Python programming language and it will be distributed via github (as source code) as well as via the [Python Package Index](https://pypi.org/) (as a Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
 
-We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](versioning.md) for more information.
+We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](versioning) for more information.
 
 
 
@@ -57,14 +57,14 @@ Here is an example document list with a video and its transcript:
 {
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/0.2.0/VideoDocument",
+      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
       "properties": {
         "id": "m1",
         "mime": "video/mpeg",
         "location": "/var/archive/video-0012.mp4" }
     },
     {
-      "@type": "http://mmif.clams.ai/0.2.0/TextDocument",
+      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
       "properties": {
         "id": "m2",
         "mime": "text/plain",
@@ -74,7 +74,7 @@ Here is an example document list with a video and its transcript:
 }
 ```
 
-The *@type* key has a special meaning in JSON-LD and it is used to define the type of a datastructure. In MMIF, the value should be a URL that points to a description of the type of document. Above we have a video and a text document and they are described at [http://mmif.clams.ai/0.2.0/VideoDocument](http://mmif.clams.ai/0.2.0/VideoDocument) and [http://mmif.clams.ai/0.2.0/TextDocument](http://mmif.clams.ai/0.2.0/TextDocument) respectively. Currently, four document types are defined: *VideoDocument*, *TextDocument*, *ImageDocument* and *AudioDocument*.
+The *@type* key has a special meaning in JSON-LD and it is used to define the type of a datastructure. In MMIF, the value should be a URL that points to a description of the type of document. Above we have a video and a text document and those types are described at [http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument](vocabulary/VideoDocument) and [http://mmif.clams.ai/0.2.0/vocabulary/TextDocument](vocabulary/TextDocument) respectively. Currently, four document types are defined: *VideoDocument*, *TextDocument*, *ImageDocument* and *AudioDocument*.
 
 The description also lists the properties that can be used for a type, and above we have the *id*, *mime* and *location* properties, used for the document identifier, its MIME type and the location of the document, which is a URL or a local path to a file. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the *text* property in LIF, which is a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* key and optionally a *@language* key:
 
@@ -82,14 +82,14 @@ The description also lists the properties that can be used for a type, and above
 {
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/0.2.0/VideoDocument",
+      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
       "properties": {
         "id": "m1",
         "mime": "video/mpeg",
         "location": "/var/archive/video-0012.mp4" }
     },
     {
-      "@type": "http://mmif.clams.ai/0.2.0/TextDocument",
+      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
       "properties": {
         "id": "m1",
         "text": {
@@ -180,7 +180,7 @@ The value of the annotations property on a view is a list of annotation objects.
 }
 ```
 
-The two required keys are *@type* and *properties*. As mentioned before, the *@type* key in JSON-LD is used to define the type of a datastructure. The *properties* dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [http://mmif.clams.ai/0.2.0/vocabulary](http://mmif.clams.ai/0.2.0/vocabulary) or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature *frameType* as well as the inherited features *id*, *start* and *end*. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers.
+The two required keys are *@type* and *properties*. As mentioned before, the *@type* key in JSON-LD is used to define the type of a datastructure. The *properties* dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [http://mmif.clams.ai/0.2.0/vocabulary](vocabulary) or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature *frameType* as well as the inherited features *id*, *start* and *end*. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers.
 
 The *id* key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s1”) or the identifier with a view identifier prefix (for example “v1:s1”). If there is no prefix the current view is assumed.
 
@@ -461,24 +461,22 @@ Using a LAPPS type is actually an instance of the more general notion that the v
 
 This assumes that [https://schema.org/Clip](https://schema.org/Clip) defines all the features used in the *properties* dictionary. One little disconnect here is that in MMIF we insist on each annotation having an identifier in the *id* property and as it happens [https://schema.org](https://schema.org) does not define an *id* attribute, although it does define *identifier*. 
 
-The CLAMS Platform does require that a URL like [https://schema.org/Clip](https://schema.org/Clip) actually exists, but if it doesn't users of an application that creates the *Clip* type will not necessarily know exactly what the application does.
+The CLAMS Platform does not require that a URL like [https://schema.org/Clip](https://schema.org/Clip) actually exists, but if it doesn't users of an application that creates the *Clip* type will not know exactly what the application creates.
 
 
 
 ## 3. MIFF Examples
 
-To finish off this document we provide some examples of complete MMIF documents. We have the following examples:
+To finish off this document we provide some examples of complete MMIF documents:
 
 
 | example                                                   | description                                                  |
 | --------------------------------------------------------- | ------------------------------------------------------------ |
-| [bars-tones-slates](samples/bars-tones-slates.md)         | A couple of time frames and some minimal text processing on a transcript. |
-| [east-tesseract-typing](samples/east-tesseract-typing.md) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
-| [segmenter-kaldi-ner](samples/segmenter-kaldi-ner.md)     | Audio segmentation followed by Kaldi speech recognition and NER. |
-
+| [bars-tones-slates](samples/bars-tones-slates)         | A couple of time frames and some minimal text processing on a transcript. |
+| [east-tesseract-typing](samples/east-tesseract-typing) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
+| [segmenter-kaldi-ner](samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER. |
 
 Each example has some comments and a link to a raw JSON file.
 
-As we move along with integrating new applications, other examples will be added with other kinds of annotation types.
-
+As we move along integrating new applications, other examples will be added with other kinds of annotation types.
 

@@ -12,7 +12,7 @@ This file documents changes made to the specification as well as changes to the 
 - Changed the SDK to work with the specifications in `spec-0.2.0`.
 
 
-## Version spec-0.2.0 − 2020-09-04
+## Version spec-0.2.0 − 2020-09-11
 
 - Added document types to the vocabulary, this included adding a new top type.
 - Changed the *Annotation* type by adding *document* as a metadata property and a regular property.

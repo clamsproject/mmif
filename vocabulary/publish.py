@@ -7,19 +7,25 @@ Usage:
 $ python publish.py
 $ python publish.py --test
 
-This takes the vocabulary specifications in clams.vocabulary.yaml and write
-webpages to ../docs/VERSION/vocabulary. The actual version is taken from the
-VERSION file in the top-level directory of this repository. If the output
-directory exists then files in it will be overwritten.
+This publishes the specifications to the ../docs/VERSION directory where the
+actual version is taken from the VERSION file in the top-level directory of this
+repository. If the output directory exists then files in it will be overwritten.
 
-In addition, this will also copy JSON schema and the specifications to
-../docs/VERSION.
+This copies the specifications, schema and the vocabulary:
 
-With the --test option files will be written to www in this directory.
+- Some files from /specifications will be copied to ../docs/VERSION, including
+  the index file which will be copied to ../docs/VERSION/index.md.
+
+- Some of the JSON schema in /schema are copied to ../docs/VERSION/schema
+
+- The vocabulary specifications in clams.vocabulary.yaml are used to write
+  webpages to ../docs/VERSION/vocabulary.
+
+With the --test option all files will be written to www in this directory.
 
 When you use the default output directory and merge changes into the master
-branch then the site at http://mmif.clams.ai/VERSION/vocabulary will be
-automatically updated.
+branch then the site at http://mmif.clams.ai/VERSION will be automatically
+created or updated.
 
 This requires BeautifulSoup as well as the lxml parser
 
@@ -401,7 +407,7 @@ def compile_index_md(source_md, target_dir):
 
 
 def setup(out_dir, vocab_dir, schema_dir, context_dir):
-    """Copy non-vocabulary files to theoutput directory."""
+    """Copy non-vocabulary files to the output directory."""
     css_dir = os.path.join(vocab_dir, 'css')
     if not os.path.exists(css_dir):
         os.makedirs(css_dir)
@@ -413,7 +419,7 @@ def setup(out_dir, vocab_dir, schema_dir, context_dir):
     samples_in = '../specifications/samples'
     samples_out = os.path.join(out_dir, 'samples')
     shutil.copytree(samples_in, os.path.join(out_dir, 'samples'))
-    # these are probably even obsolete, so don't publish them
+    # these are probably obsolete, so don't publish them
     for fname in (glob(samples_out + '/image*')
                   + glob(samples_out + '/video*')
                   + glob(samples_out + '/slate*')):
