@@ -4,18 +4,18 @@
 from .thing_types import ThingTypesBase
 
 
-class AnnotationTypesBase(ThingTypesBase):
+class DocumentTypesBase(ThingTypesBase):
     """
-    Inherit from this class to build your own custom annotation
+    Inherit from this class to build your own custom document
     vocabularies. Each member's name should be the name of the
     type, and each member's value should be the URI of that type.
     """
     ...
 
 
-class AnnotationTypes(AnnotationTypesBase):
+class DocumentTypes(DocumentTypesBase):
     """
-    This enum contains the URIs for the MMIF annotation types defined in the spec version <VERSION>.
+    This enum contains the URIs for the MMIF document types defined in the spec version <VERSION>.
     Use this to quickly get the correct URIs for those types, or use the objects themselves in your
     code and they will serialize to the strings.
     """
