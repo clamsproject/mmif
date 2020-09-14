@@ -59,7 +59,7 @@ def generate_vocabulary(spec_version, clams_types, source_path):
     :return:
     """
     types = {
-        'thing_types': ['ThingTypesBase'],
+        'thing_types': ['ThingTypesBase', 'ThingType'],
         'annotation_types': ['AnnotationTypesBase', 'AnnotationTypes'],
         'document_types': ['DocumentTypesBase', 'DocumentTypes']
     }
