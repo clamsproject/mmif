@@ -99,8 +99,7 @@ blah
 ## Full MMIF File
 
 ```json
-{
-}
+{% include_relative raw.json %}
 ```
 
 
