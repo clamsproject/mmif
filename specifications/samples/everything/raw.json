@@ -4,11 +4,18 @@
 
 	"documents": [
 		{
-			"@type": "http://mmif.clams.ai/0.2.0/vocabulary/AudioDocument",
+			"@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
 			"properties": {
 				"id": "m1",
-				"mime": "audio/mpeg",
-				"location": "/var/archive/audio-002.mp3" }
+				"mime": "video/mpeg",
+				"location": "/var/archive/video-002.mp4" }
+		},
+		{
+			"@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+			"properties": {
+				"id": "m3",
+				"mime": "text/plain",
+				"location": "/var/archive/transcript-002.txt" }
 		}
 	],
 
@@ -16,6 +23,54 @@
 
 		{
 			"id": "v1",
+
+			"metadata": {
+				"app": "http://apps.clams.ai/bars-and-tones/1.0.5",
+				"timestamp": "2020-05-27T12:23:45",
+				"contains": {
+					"http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame": {
+						"document": "m1",
+						"unit": "milliseconds" } },
+			},
+
+			"annotations": [
+				{
+					"@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+					"properties": {
+						"id": "s1",
+						"start": 0,
+						"end": 2600,
+						"frameType": "bars-and-tones" }
+				}
+			]
+		},
+
+		{
+			"id": "v2",
+
+			"metadata": {
+				"app": "http://apps.clams.ai/slates/1.0.3",
+				"timestamp": "2020-05-27T12:23:45",
+				"contains": {
+					"http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame": {
+						"document": "m1",
+						"unit": "milliseconds" } }
+			},
+
+			"annotations": [
+				{
+					"@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+					"properties": {
+						"id": "s1",
+						"start": 2700,
+						"end": 5300,
+						"frameType": "slate" }
+				}
+			]
+		},
+
+		{
+			"id": "v3",
 			"metadata": {
 				"app": "http://mmif.clams.ai/apps/audio-segmenter/0.2.1",
 				"contains": {
@@ -27,29 +82,24 @@
 				{
 					"@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
 					"properties": {
-						"id": "tf1",
-						"frameType": "speech",
-						"start": 17,
-						"end": 132 }
-				},
-				{
-					"@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
-					"properties": {
 						"frameType": "non-speech",
-						"id": "tf2",
-						"start": 132,
-						"end": 194 }
+						"id": "tf1",
+						"start": 0,
+						"end": 5500 }
 				},
 				{
 					"@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
 					"properties": {
-						"id": "tf3",				
+						"id": "tf2",
 						"frameType": "speech",
-						"start": 194,
-						"end": 342 }
+						"start": 5500,
+						"end": 22000 }
 				}
 			]
 		},
+
+
+KALDI
 
 		{	
 			"id": "v2",
@@ -79,7 +129,7 @@
 						"target": "td1" }
 				},
 				{
-					"@type": "http://vocab.lappsgrid.org/Token",
+					"@type": "http://vocab.lappsgrid.org/vocabulary/Token",
 					"properties": {
 						"id": "t1",
 						"document": "v2:td1",
@@ -88,7 +138,7 @@
 						"text": "Fido" }
 				},
 				{
-					"@type": "http://vocab.lappsgrid.org/Token",
+					"@type": "http://vocab.lappsgrid.org/vocabulary/Token",
 					"properties": {
 						"id": "t2",
 						"document": "v2:td1",
@@ -141,7 +191,7 @@
 						"target": "td2" }
 				},
 				{
-					"@type": "http://vocab.lappsgrid.org/Token",
+					"@type": "http://vocab.lappsgrid.org/vocabulary/Token",
 					"properties": {
 						"id": "t3",
 						"document": "v2:td2",
@@ -150,7 +200,7 @@
 						"text": "Fluffy" }
 				},
 				{
-					"@type": "http://vocab.lappsgrid.org/Token",
+					"@type": "http://vocab.lappsgrid.org/vocabulary/Token",
 					"properties": {
 						"id": "t4",
 						"document": "v2:td2",
@@ -188,6 +238,78 @@
 				},
 			]
 		},
+
+
+EAST and TESSERACT
+
+		{
+			"id": "v1",
+			"metadata": {
+				"app": "http://mmif.clams.ai/apps/east/0.2.1",
+				"contains": {
+					"http://mmif.clams.ai/0.2.0/BoundingBox": {
+						"document": "m1" } }
+			},
+			"annotations": [
+				{
+					"@type": "http://mmif.clams.ai/0.2.0/BoundingBox",
+					"properties": {
+						"id": "bb1",
+						"coordinates": [[10,20], [40,20], [10,30], [40,30]],
+						"boxType": "text" }
+				},
+				{
+					"@type": "http://mmif.clams.ai/0.2.0/BoundingBox",
+					"properties": {
+						"id": "bb2",
+						"coordinates": [[210,220], [240,220], [210,230], [240,230]],
+						"boxType": "text" }
+				}
+			]
+		},
+		
+		{
+			"id": "v2",
+			"metadata": {
+				"app": "http://mmif.clams.ai/apps/tessearct/0.2.1",
+				"contains": {
+					"http://mmif.clams.ai/0.1.0/TextDocument": {},
+					"http://mmif.clams.ai/0.1.0/Alignment": {} }
+			},
+			"annotations": [
+				{ 
+					"@type": "http://mmif.clams.ai/0.2.0/TextDocument",
+					"properties": {
+						"id": "td1",
+						"text": {
+							"@value": "Arf" } }
+				},
+				{
+					"@type": "http://mmif.clams.ai/0.2.0/Alignment",
+					"properties": {
+						"id": "a1",
+						"source": "v1:bb1",
+						"target": "td1" }
+				},
+				{ 
+					"@type": "http://mmif.clams.ai/0.2.0/TextDocument",
+					"properties": {
+						"id": "td2",
+						"text": {
+							"@value": "yelp" } }
+				},
+				{
+					"@type": "http://mmif.clams.ai/0.2.0/Alignment",
+					"properties": {
+						"id": "a2",
+						"source": "v1:bb2",
+						"target": "td2" }
+				}
+			]
+		},
+
+
+NER
 
 		{
 			"id": "v3",
