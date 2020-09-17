@@ -33,7 +33,6 @@ class View(FreezableMmifObject):
     """
 
     def __init__(self, view_obj: Union[str, dict] = None) -> None:
-        self._context: str = ''
         self.id: str = ''
         self.metadata: ViewMetadata = ViewMetadata()
         self.annotations: AnnotationsList = AnnotationsList()
