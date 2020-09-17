@@ -60,15 +60,6 @@ class TestMmif(unittest.TestCase):
             json_mmif_obj = Mmif(json.loads(example))
             self.assertEqual(str_mmif_obj.serialize(True), json_mmif_obj.serialize(True), f'Failed on {i}')
 
-    def test_bad_mmif_deserialize_no_context(self):
-        self.examples_json['mmif_example1'].pop('@context')
-        json_str = json.dumps(self.examples_json['mmif_example1'])
-        try:
-            _ = Mmif(json_str)
-            self.fail()
-        except ValidationError:
-            pass
-
     def test_bad_mmif_deserialize_no_metadata(self):
         self.examples_json['mmif_example1'].pop('metadata')
         json_str = json.dumps(self.examples_json['mmif_example1'])
