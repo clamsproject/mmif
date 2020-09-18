@@ -16,8 +16,7 @@ import mmif
 from pyrsistent import pmap
 
 from .view import View
-from .document import Document
-from .annotation import Annotation
+from .annotation import Annotation, Document
 from .model import MmifObject, DataList, FreezableDataList
 
 __all__ = ['Mmif']
@@ -144,49 +143,63 @@ class Mmif(MmifObject):
             fully_frozen &= view.deep_freeze()
         return fully_frozen
 
-    def get_documents_by_source_view_id(self, source_vid: str = None) -> List[Document]:
+    def get_documents_in_view(self, vid: str = None) -> List[Document]:
         """
-        Method to get all documents object queries by its originated view id.
-        With current specification, a *source* of a document can be external or
-        an annotation. The *source* field gets its value only in the latter.
-        Also note that, depending on how subdocuments is represented, the value of
-        ``source`` field can be either ``view_id`` or ``view_id``:``annotation_id``.
-        In either case, this method will return all document objects that generated
-        from a view.
+        Method to get all documents object queries by a view id.
 
-        :param source_vid: the source view ID to search for
-        :return: a list of documents matching the requested source view ID
+        :param vid: the source view ID to search for
+        :return: a list of documents matching the requested source view ID, or an empty list if the view not found
         """
-        return [document for document in self.documents
-                if document.metadata.source is not None and document.metadata.source.split(':')[0] == source_vid]
+        view = self.views.get(vid)
+        if view is not None:
+            return view.get_documents()
+        else:
+            return []
 
     def get_documents_by_app(self, app_id: str) -> List[Document]:
         """
         Method to get all documents object queries by its originated app name.
 
         :param app_id: the app name to search for
-        :return: a list of documents matching the requested app name
+        :return: a list of documents matching the requested app name, or an empty list if the app not found
         """
-        return [document for document in self.documents if document.metadata.app == app_id]
+        # TODO (krim @ 9/19/20): what if there are two or more views generated
+        # by the same app (separately)
+        for view in self.views:
+            if view.metadata.app == app_id:
+                return view.get_documents()
+        return []
 
-    def get_documents_by_metadata(self, metadata_key: str, metadata_value: str) -> List[Document]:
+    def get_documents_by_property(self, prop_key: str, prop_value: str) -> List[Document]:
         """
-        Method to retrieve documents by an arbitrary key-value pair in the document metadata objects.
+        Method to retrieve documents by an arbitrary key-value pair in the document properties objects.
 
-        :param metadata_key: the metadata key to search for
-        :param metadata_value: the metadata value to match
+        :param prop_key: the metadata key to search for
+        :param prop_value: the metadata value to match
         :return: a list of documents matching the requested metadata key-value pair
         """
-        return [document for document in self.documents if document.metadata[metadata_key] == metadata_value]
+        docs = []
+        for view in self.views:
+            for doc in view.get_documents():
+                if doc.properties[prop_key] == prop_value:
+                    # TODO (krim @ 9/19/20): we can have a reserved_name in `Document` to store parent view id,
+                    # instead of changing the doc ID
+                    # TODO (krim @ 9/19/20): colon should be stored as a constant with a proper name
+                    if ":" not in doc.id:
+                        doc.id = f"{view.id}:{doc.id}"
+                    docs.append(doc)
+        docs.extend([document for document in self.documents if document.properties[prop_key] == prop_value])
+        return docs
 
     def get_documents_locations(self, m_type: str) -> List[str]:
         """
         This method returns the file paths of documents of given type.
+        Only top-level documents have locations, so we only check them.
 
         :param m_type: the type to search for
         :return: a list of the values of the location fields in the corresponding documents
         """
-        return [document.location for document in self.documents if document.type == m_type and len(document.location) > 0]
+        return [document.location for document in self.documents if document.at_type == m_type and len(document.location) > 0]
 
     def get_document_location(self, m_type: str) -> str:
         """
@@ -199,18 +212,22 @@ class Mmif(MmifObject):
         locations = self.get_documents_locations(m_type)
         return locations[0] if len(locations) > 0 else None
 
-    def get_document_by_id(self, req_med_id: str) -> Document:
+    def get_document_by_id(self, doc_id: str) -> Document:
         """
         Finds a Document object with the given ID.
 
-        :param req_med_id: the ID to search for
+        :param doc_id: the ID to search for
         :return: a reference to the corresponding document, if it exists
         :raises Exception: if there is no corresponding document
         """
-        result = self.documents.get(req_med_id)
-        if result is None:
-            raise KeyError("{} document not found".format(req_med_id))
-        return result
+        if ":" in doc_id:
+            vid, did = doc_id.split(":")
+            doc_found = self[vid][did]
+        else:
+            doc_found = self.documents.get(doc_id)
+        if doc_found is None:
+            raise KeyError("{} document not found".format(doc_id))
+        return doc_found
 
     def get_view_by_id(self, req_view_id: str) -> View:
         """
