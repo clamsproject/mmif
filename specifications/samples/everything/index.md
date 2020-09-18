@@ -29,7 +29,7 @@ Following now are short explanations of some frgaments of the full MMIF file, so
 
 ### Extracting time frames
 
-The first three steps are straightforward and all result in views with time frame annotations (views with id=v1, id=v2 and id=v3). The bars-and-tones and slate extraction applications each find one time frame and the audio segmenter finds two segments with the second one being a speech time frame that starts at about 5500ms from the start. 
+The first three steps are straightforward and all result in views with time frame annotations (views with id=v1, id=v2 and id=v3). The bars-and-tone and slate extraction applications each find one time frame and the audio segmenter finds two segments with the second one being a speech time frame that starts at about 5500ms from the start.
 
 ```json
 {
@@ -83,7 +83,7 @@ Note that a text document can refer to its text by either using the *text* prope
 }
 ```
 
-We assume perfect speech recognition for the sake of argument and the content of the external file is as follows. 
+For the sake of argument we assume perfect speech recognition, and the content of the external file is as follows.
 
 >  Hello, this is Jim Lehrer with the NewsHour on PBS. In the nineteen eighties, barking dogs have increasingly become a problem in urban areas.
 
@@ -103,7 +103,7 @@ See the full example below for all the tokens, time frames for each token and th
 
 ### EAST and Tesseract
 
-EAST adds bounding boxes aonchored to the text document with id=m1 using pixles as the unit:
+EAST adds bounding boxes anchored to the text document with id=m1 using pixles as the unit:
 
 ```json
 {
@@ -120,7 +120,7 @@ Let's assume that EAST runs on frames sampled from the video at 1 second interva
 ```json
 {
   "@type": "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox",
-  "properties: {
+  "properties": {
     "id": "bb9",
     "timePoint": 4000,
     "coordinates": [[180, 110], [460, 110], [180, 170], [460, 170]],
@@ -128,7 +128,7 @@ Let's assume that EAST runs on frames sampled from the video at 1 second interva
 }
 ```
 
-Due to the nature of the input many of the bounding boxes will have identical coordinates. For example, there are two more bounding boxes with the coordinates above, one for the box with time offset 3000 and one for the box with time offset 5000.
+Due to the nature of the input many of the bounding boxes will have identical or near-identical coordinates. For example, there are two more bounding boxes with the coordinates above, one for the box with time offset 3000 and one for the box with time offset 5000.
 
 Tesseract now runs on all those boxes and creates a text document for each of them, here's one:
 
@@ -203,6 +203,8 @@ Here is the tag annotation on the same document as the named entity annotation a
 
 Note that the *tagName* property has the same value as the *category* property on the named entity. This is a coincidence in that there is a named entity category *Date* as well as a slate category *Date*.
 
+Similar to what we saw for the named entities, there will be multiple versions of this data tag due to multiple text boxes with the same text.
+
 
 
 blah
@@ -212,6 +214,5 @@ blah
 ```json
 {% include_relative raw.json %}
 ```
-
 
 
