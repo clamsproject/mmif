@@ -12,7 +12,7 @@ from pyrsistent import pmap
 from .model import FreezableMmifObject
 from mmif.vocabulary import AnnotationTypesBase
 
-__all__ = ['Annotation', 'AnnotationProperties']
+__all__ = ['Annotation', 'AnnotationProperties', 'Document', 'DocumentProperties', 'Text']
 
 
 class Annotation(FreezableMmifObject):
@@ -54,6 +54,38 @@ class Annotation(FreezableMmifObject):
         """
         self.properties[name] = value
 
+    def is_document(self):
+        return self.at_type.endswith("Document")
+
+
+class Document(Annotation):
+    """
+    Document object that represents a single document in a MMIF file.
+
+    A document is identified by an ID, and contains certain attributes
+    and potentially contains the contents of the document itself,
+    metadata about how the document was created, and/or a list of
+    subdocuments grouped together logically.
+
+    If ``document_obj`` is not provided, an empty Document will be generated.
+
+    :param document_obj: the JSON data that defines the document
+    """
+    def __init__(self, doc_obj: Union[str, dict] = None) -> None:
+        self._type: Union[str, AnnotationTypesBase] = ''
+        self.properties: DocumentProperties = DocumentProperties()
+        self.disallow_additional_properties()
+        self._attribute_classes = pmap({'properties': DocumentProperties})
+        super().__init__(doc_obj)
+
+    @property
+    def location(self) -> str:
+        return self.properties.location
+
+    @location.setter
+    def location(self, location: str) -> None:
+        self.properties.location = location
+
 
 class AnnotationProperties(FreezableMmifObject):
     """
@@ -66,3 +98,62 @@ class AnnotationProperties(FreezableMmifObject):
     def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
         self.id: str = ''
         super().__init__(mmif_obj)
+
+
+class DocumentProperties(AnnotationProperties):
+    """
+    DocumentProperties object that represents the
+    ``properties`` object within a MMIF document.
+
+    :param mmif_obj: the JSON data that defines the properties
+    """
+
+    def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
+        self.mime: str = ''
+        self.location: str = ''
+        self.text: Text = Text()
+        super().__init__(mmif_obj)
+        self._attribute_classes = pmap({'text': Text})
+
+    @property
+    def text_language(self) -> str:
+        return self.text.lang
+
+    @text_language.setter
+    def text_language(self, lang_code: str) -> None:
+        self.text.lang = lang_code
+
+    @property
+    def text_value(self) -> str:
+        return self.text.value
+
+    @text_value.setter
+    def text_value(self, s: str) -> None:
+        self.text.value = s
+
+
+class Text(FreezableMmifObject):
+
+    def __init__(self, text_obj: Union[str, dict] = None) -> None:
+        self._value: str = ''
+        self._language: str = ''
+        self.disallow_additional_properties()
+        super().__init__(text_obj)
+
+    @property
+    def lang(self) -> str:
+        return self._language
+
+    @lang.setter
+    def lang(self, lang_code: str) -> None:
+        # TODO (krim @ 8/11/20): add validation for language code (ISO 639)
+        self._language = lang_code
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+    @value.setter
+    def value(self, s: str) -> None:
+        self._value = s
+

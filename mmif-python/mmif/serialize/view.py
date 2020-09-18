@@ -11,7 +11,7 @@ from typing import Dict, Union, Optional
 import dateutil.parser
 from pyrsistent import pmap
 
-from .annotation import Annotation
+from .annotation import Annotation, Document
 from .model import FreezableMmifObject, FreezableDataList, FreezableDataDict
 from mmif.vocabulary import AnnotationTypesBase
 
@@ -95,6 +95,29 @@ class View(FreezableMmifObject):
         self.new_contain(annotation.at_type)
         return annotation
 
+    def add_document(self, document: Document, overwrite=False) -> Annotation:
+        """
+        Appends a Document object to the annotations list.
+
+        Fails if there is already a document with the same ID in the annotations list.
+
+        :param document: the Document object to add
+        :param overwrite: if set to True, will overwrite
+                          an existing view with the same ID
+        :return: None
+        """
+        return self.add_annotation(document, overwrite)
+
+    def get_documents(self):
+        return [annotation for annotation in self.annotations if annotation.is_document()]
+
+    def get_document_by_id(self, doc_id) -> Document:
+        doc_found = self.annotations.get(doc_id)
+        if doc_found is None or not isinstance(doc_found, Document):
+            raise KeyError(f"{doc_id} not found in view {self.id}.")
+        else:
+            return doc_found
+
     def __getitem__(self, key: str) -> 'Annotation':
         """
         getitem implementation for View.
@@ -117,7 +140,6 @@ class View(FreezableMmifObject):
         if not anno_result:
             raise KeyError("Annotation ID not found: %s" % key)
         return anno_result
-
 
 
 class ViewMetadata(FreezableMmifObject):
@@ -216,12 +238,12 @@ class Contain(FreezableMmifObject):
             self.gen_time = dateutil.parser.isoparse(self.gen_time)
 
 
-class AnnotationsList(FreezableDataList[Annotation]):
+class AnnotationsList(FreezableDataList[Union[Annotation, Document]]):
     """
     AnnotationsList object that implements :class:`mmif.serialize.model.DataList`
     for :class:`mmif.serialize.annotation.Annotation`.
     """
-    _items: Dict[str, Annotation]
+    _items: Dict[str, Union[Annotation, Document]]
 
     def _deserialize(self, input_list: list) -> None:
         """
@@ -231,9 +253,11 @@ class AnnotationsList(FreezableDataList[Annotation]):
         :param input_list: the JSON data that defines the list of annotations
         :return: None
         """
-        self._items = {item['properties']['id']: Annotation(item) for item in input_list}
+        self._items = {item['properties']['id']: Document(item)
+                           if item['@type'].endswith("Document") else Annotation(item)
+                       for item in input_list}
 
-    def append(self, value: Annotation, overwrite=False) -> None:
+    def append(self, value: Union[Annotation, Document], overwrite=False) -> None:
         """
         Appends an annotation to the list.
 

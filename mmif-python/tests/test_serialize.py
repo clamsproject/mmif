@@ -174,19 +174,19 @@ class TestMmif(unittest.TestCase):
 
     def test_get_documents_by_view_id(self):
         mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        self.assertEqual(len(mmif_obj.get_documents_by_source_view_id('v1')), 1)
-        self.assertEqual(mmif_obj.get_documents_by_source_view_id('v1')[0],
+        self.assertEqual(len(mmif_obj.get_documents_in_view('v1')), 1)
+        self.assertEqual(mmif_obj.get_documents_in_view('v1')[0],
                          mmif_obj.get_document_by_id('m2'))
-        self.assertEqual(len(mmif_obj.get_documents_by_source_view_id('xxx')), 0)
+        self.assertEqual(len(mmif_obj.get_documents_in_view('xxx')), 0)
         new_document = Document()
         new_document.metadata.source = 'v1:bb2'
         mmif_obj.add_document(new_document)
-        self.assertEqual(len(mmif_obj.get_documents_by_source_view_id('v1')), 2)
+        self.assertEqual(len(mmif_obj.get_documents_in_view('v1')), 2)
 
     def test_get_document_by_metadata(self):
         mmif_obj = Mmif(examples['mmif_example1'])
-        self.assertEqual(len(mmif_obj.get_documents_by_metadata("source", "v1:bb1")), 1)
-        self.assertEqual(len(mmif_obj.get_documents_by_metadata("source", "v3")), 0)
+        self.assertEqual(len(mmif_obj.get_documents_by_property("source", "v1:bb1")), 1)
+        self.assertEqual(len(mmif_obj.get_documents_by_property("source", "v3")), 0)
 
     def test_get_document_by_appid(self):
         tesseract_appid = 'http://apps.clams.io/tesseract/1.2.1'

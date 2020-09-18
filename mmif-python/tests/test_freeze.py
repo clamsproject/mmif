@@ -5,7 +5,6 @@ from unittest.mock import patch
 import json
 
 from mmif.serialize import *
-from mmif.serialize.document import SubdocumentsList
 from mmif.serialize.model import FreezableMmifObject
 from tests.mmif_examples import *
 

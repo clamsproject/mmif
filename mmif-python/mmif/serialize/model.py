@@ -107,7 +107,7 @@ class MmifObject(object):
         """
         return json.dumps(self._serialize(), indent=2 if pretty else None, cls=MmifObjectEncoder)
 
-    def _serialize(self, alt_container: Dict = None) -> Union[None, dict]:
+    def _serialize(self, alt_container: Dict = None) -> dict:
         """
         Maps a MMIF object to a plain python dict object,
         rewriting internal keys that start with '_' to
