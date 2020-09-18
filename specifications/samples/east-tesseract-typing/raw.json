@@ -19,6 +19,7 @@
         "app": "http://mmif.clams.ai/apps/east/0.2.1",
         "contains": {
           "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox": {
+            "unit": "pixels"
             "document": "m1"
           }
         }
@@ -28,24 +29,7 @@
           "@type": "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox",
           "properties": {
             "id": "bb1",
-            "coordinates": [
-              [
-                10,
-                20
-              ],
-              [
-                40,
-                20
-              ],
-              [
-                10,
-                30
-              ],
-              [
-                40,
-                30
-              ]
-            ],
+            "coordinates": [ [10, 20], [40, 20], [10, 30], [40, 30] ],
             "boxType": "text"
           }
         },
@@ -53,24 +37,7 @@
           "@type": "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox",
           "properties": {
             "id": "bb2",
-            "coordinates": [
-              [
-                210,
-                220
-              ],
-              [
-                240,
-                220
-              ],
-              [
-                210,
-                230
-              ],
-              [
-                240,
-                230
-              ]
-            ],
+            "coordinates": [ [210, 220], [240, 220], [210, 230], [240, 230] ],
             "boxType": "text"
           }
         }
