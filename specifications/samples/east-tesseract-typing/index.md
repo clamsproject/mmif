@@ -42,11 +42,12 @@ Here are the metadata in this view:
   "app": "http://mmif.clams.ai/apps/east/0.2.1",
   "contains": {
     "http://mmif.clams.ai/0.2.0/BoundingBox": {
+      "unit": "pixels",
       "document": "m1" } }
 }
 ```
 
-It simply says that EAST created the view and that all bounding box annotations are over document "m1".
+It simply says that EAST created the view and that all bounding box annotations are over document "m1" using pixels as the unit.
 
 And here is the annotations list:
 
