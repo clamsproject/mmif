@@ -206,9 +206,6 @@ Note that the *tagName* property has the same value as the *category* property o
 Similar to what we saw for the named entities, there will be multiple versions of this data tag due to multiple text boxes with the same text.
 
 
-
-blah
-
 ## Full MMIF File
 
 ```json

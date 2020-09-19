@@ -2,6 +2,16 @@
 
 Utility script to create the named entities of the NER view in the example.
 
+Tracking entities back to times (done manually):
+
+Jim Lehrer	v4  t5 td1:15-18  -->  tf4 7255-7606
+		v4  t6 td1:19-25  -->  tf5 7723-8425
+
+PBS		v4  t11 td1:47-50  -->  tf11 10999-11350
+
+New York	v7  ne10 v6:td25:7-16
+		v6  td25 text: "Dog in New York"  -->  v5:bb25
+		v5  bb25 timePoint: 21000
 """
 
 from utils import print_annotation
@@ -18,7 +28,7 @@ entities = [
     ('1982-05-12', 'Date', 'v6:td18'),
     ('Jim Lehrer', 'Person', 'v6:td22'),
     ('Sara Just', 'Person', 'v6:td24'),
-    ('New York', 'Location', 'v6:td24', 7, 15),
+    ('New York', 'Location', 'v6:td25', 7, 15),
     ('Jim Lehrer', 'Person', 'v4:td1', 15, 25),
     ('PBS', 'Organization', 'v4:td1', 47, 50) ]
 
