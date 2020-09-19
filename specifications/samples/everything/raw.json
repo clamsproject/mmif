@@ -950,7 +950,7 @@
             "timePoint": 21000,
             "coordinates": [[150, 810], [1120, 810], [150, 870], [1120, 870]],
             "boxType": "text" }
-        },
+        }
       ]
     },
 
@@ -1288,14 +1288,14 @@
             "id": "a25",
             "source": "v5:bb25",
             "target": "td25" }
-        },
+        }
       ]
     },
 
     {
       "id": "v7",
       "metadata": {
-        "app": "http://mmif.clams.ai/apps/spacy-ner/0.2.1",
+        "app": "http://apps.clams.ai/spacy-ner/0.2.1",
         "contains": {
           "http://vocab.lappsgrid.org/NamedEntity": {}
         }
@@ -1395,7 +1395,7 @@
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
           "properties": {
             "id": "ne10",
-            "document": "v6:td24",
+            "document": "v6:td25",
             "start": 7,
             "end": 15,
             "category": "Location",
@@ -1420,7 +1420,7 @@
             "end": 50,
             "category": "Organization",
             "text": "PBS" }
-        },
+        }
       ]
     },
 
@@ -1553,9 +1553,9 @@
             "end": 9,
             "tagName": "Producer",
             "text": "Sara Just" }
-        },
+        }
       ]
-    },
+    }
 
   ]
 }
