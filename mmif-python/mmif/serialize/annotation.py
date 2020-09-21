@@ -22,9 +22,11 @@ class Annotation(FreezableMmifObject):
 
     def __init__(self, anno_obj: Union[str, dict] = None) -> None:
         self._type: Union[str, ThingTypesBase] = ''
-        self.properties: AnnotationProperties = AnnotationProperties()
+        if 'properties' not in self.__dict__:  # don't overwrite DocumentProperties on super() call
+            self.properties: AnnotationProperties = AnnotationProperties()
         self.disallow_additional_properties()
-        self._attribute_classes = pmap({'properties': AnnotationProperties})
+        if 'properties' not in self._attribute_classes:
+            self._attribute_classes = pmap({'properties': AnnotationProperties})
         super().__init__(anno_obj)
 
     @property
@@ -112,8 +114,8 @@ class DocumentProperties(AnnotationProperties):
         self.mime: str = ''
         self.location: str = ''
         self.text: Text = Text()
-        super().__init__(mmif_obj)
         self._attribute_classes = pmap({'text': Text})
+        super().__init__(mmif_obj)
 
     @property
     def text_language(self) -> str:
