@@ -334,7 +334,7 @@ class DocumentsList(FreezableDataList[Document]):
         :param input_list: the JSON data that defines the list of documents
         :return: None
         """
-        self._items = {item['id']: Document(item) for item in input_list}
+        self._items = {item['properties']['id']: Document(item) for item in input_list}
 
     def append(self, value: Document, overwrite=False) -> None:
         """
