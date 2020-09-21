@@ -10,7 +10,7 @@ of a view. For documentation on how views are represented, see
 from typing import Union
 from pyrsistent import pmap
 from .model import FreezableMmifObject
-from mmif.vocabulary import AnnotationTypesBase
+from mmif.vocabulary import ThingTypesBase, DocumentTypesBase
 
 __all__ = ['Annotation', 'AnnotationProperties', 'Document', 'DocumentProperties', 'Text']
 
@@ -21,20 +21,20 @@ class Annotation(FreezableMmifObject):
     """
 
     def __init__(self, anno_obj: Union[str, dict] = None) -> None:
-        self._type: Union[str, AnnotationTypesBase] = ''
+        self._type: Union[str, ThingTypesBase] = ''
         self.properties: AnnotationProperties = AnnotationProperties()
         self.disallow_additional_properties()
         self._attribute_classes = pmap({'properties': AnnotationProperties})
         super().__init__(anno_obj)
 
     @property
-    def at_type(self) -> Union[str, AnnotationTypesBase]:
+    def at_type(self) -> Union[str, ThingTypesBase]:
         # TODO (krim @ 8/19/20): should we always return string? leaving this to return
         # different types can be confusing for sdk users.
         return self._type
 
     @at_type.setter
-    def at_type(self, at_type: Union[str, AnnotationTypesBase]) -> None:
+    def at_type(self, at_type: Union[str, ThingTypesBase]) -> None:
         self._type = at_type
 
     @property
@@ -72,7 +72,7 @@ class Document(Annotation):
     :param document_obj: the JSON data that defines the document
     """
     def __init__(self, doc_obj: Union[str, dict] = None) -> None:
-        self._type: Union[str, AnnotationTypesBase] = ''
+        self._type: Union[str, DocumentTypesBase] = ''
         self.properties: DocumentProperties = DocumentProperties()
         self.disallow_additional_properties()
         self._attribute_classes = pmap({'properties': DocumentProperties})
