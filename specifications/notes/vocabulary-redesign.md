@@ -179,7 +179,7 @@ We discussed creating a new view with bounding boxes annotation types with a *te
     "contains": {
       "http://mmif.clams.ai/0.1.0/TextDocument": {},
       "http://mmif.clams.ai/0.1.0/Alignment": {} },
-    "app": "http://mmif.clams.ai/apps/tessearct/0.2.1"
+    "app": "http://mmif.clams.ai/apps/tesseract/0.2.1"
   },
   "annotations": [
     { 
@@ -476,7 +476,7 @@ Finally, this alignment simply connects the token and time frame annotations.
 
 What I do not like about this is that every single token needs to define what document it is anchored to. This does however seem to be a necessary result from having more than one text document. The only other option I see is to embed views inside the text document, but that brings its own complexities.
 
-> Note we introcuded *document*  as a non-metadata property for when we refer to multiple text documents from a view. We could avoid this if we require that a view has to be on one document. That may be nice, but we would then have to live with tools like Tessearct creating many many views.
+> Note we introcuded *document*  as a non-metadata property for when we refer to multiple text documents from a view. We could avoid this if we require that a view has to be on one document. That may be nice, but we would then have to live with tools like Tesseract creating many many views.
 >
 > We are now mixing LAPPS and CLAMS types and therefore we get into trouble with the context file set up that we currently have which was to have a LAPPS or CLAMS context with each view. Should think through whether it is possible to keep the two vocabularies separate.
 >

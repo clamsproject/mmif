@@ -15,7 +15,7 @@ We chose to not take this option and this file will be deprecated.
 ```json
 {
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.1.0" },
+    "mmif": "http://mmif.clams.ai/0.1.0" },
 
   "media": [
     {

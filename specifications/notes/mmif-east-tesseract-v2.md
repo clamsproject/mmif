@@ -13,7 +13,7 @@ We chose not to follow this option.
 ```json
 {
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.1.0" },
+    "mmif": "http://mmif.clams.ai/0.1.0" },
 
   "media": [
     {
@@ -26,7 +26,7 @@ We chose not to follow this option.
     { 
       "@type": "http://mmif.clams.ai/0.1.0/TextDocument",
       "metadata": {
-        "tool": "http://mmif.clams.ai/apps/tessearct/0.2.1",
+        "tool": "http://mmif.clams.ai/apps/tesseract/0.2.1",
         "textSource": "v1:bb1"
       },
       "properties": {

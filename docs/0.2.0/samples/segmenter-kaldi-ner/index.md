@@ -180,7 +180,7 @@ Notice how the entity anchors to one of the document created by Kaldi.
 ```json
 {
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.2.0" },
+    "mmif": "http://mmif.clams.ai/0.2.0" },
 
   "documents": [
     {

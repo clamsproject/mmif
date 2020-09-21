@@ -78,7 +78,7 @@ Metadata:
 
 ```json
 {
-  "app": "http://mmif.clams.ai/apps/tessearct/0.2.1",
+  "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
   "contains": {
     "http://mmif.clams.ai/0.1.0/vocabulary/TextDocument": {},
     "http://mmif.clams.ai/0.1.0/vocabulary/Alignment": {} }
@@ -173,7 +173,7 @@ Now each annotation needs to have its own *document* property so we know what do
 ```json
 {
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.2.0" },
+    "mmif": "http://mmif.clams.ai/0.2.0" },
 
   "documents": [
     {
@@ -216,7 +216,7 @@ Now each annotation needs to have its own *document* property so we know what do
     {
       "id": "v2",
       "metadata": {
-        "app": "http://mmif.clams.ai/apps/tessearct/0.2.1",
+        "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
         "contains": {
           "http://mmif.clams.ai/0.1.0/TextDocument": {},
           "http://mmif.clams.ai/0.1.0/Alignment": {} }

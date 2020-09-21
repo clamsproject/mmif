@@ -79,7 +79,7 @@ Metadata:
 
 ```json
 {
-  "app": "http://mmif.clams.ai/apps/tessearct/0.2.1",
+  "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
   "contains": {
     "http://mmif.clams.ai/0.1.0/vocabulary/TextDocument": {},
     "http://mmif.clams.ai/0.1.0/vocabulary/Alignment": {} }

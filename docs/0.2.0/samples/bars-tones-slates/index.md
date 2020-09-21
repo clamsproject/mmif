@@ -28,7 +28,7 @@ Only one annotation is shown for each view, this is to keep the file as small as
 ```json
 {
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.2.0" },
+    "mmif": "http://mmif.clams.ai/0.2.0" },
 
   "documents": [
     {
