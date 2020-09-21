@@ -237,9 +237,17 @@ class MmifObject(object):
         if key in self.reserved_names:
             raise KeyError("can't set item on a reserved name")
         if key in self._named_attributes():
-            self.__dict__[key] = value
+            if self._attribute_classes and key in self._attribute_classes \
+                    and not isinstance(value, (self._attribute_classes[key])):
+                self.__dict__[key] = self._attribute_classes[key](value)
+            else:
+                self.__dict__[key] = value
         else:
-            self._unnamed_attributes[key] = value   # pytype: disable=unsupported-operands
+            if self._attribute_classes and key in self._attribute_classes \
+                    and not isinstance(value, (self._attribute_classes[key])):
+                self._unnamed_attributes[key] = self._attribute_classes[key](value)  # pytype: disable=unsupported-operands
+            else:
+                self._unnamed_attributes[key] = value  # pytype: disable=unsupported-operands
 
     def __getitem__(self, key) -> Union['MmifObject', str, datetime]:
         if key in self._named_attributes():
