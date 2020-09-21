@@ -164,7 +164,7 @@ class Mmif(MmifObject):
         :return: a list of documents matching the requested app name, or an empty list if the app not found
         """
         # TODO (krim @ 9/19/20): what if there are two or more views generated
-        # by the same app (separately)
+        #  by the same app (separately)
         for view in self.views:
             if view.metadata.app == app_id:
                 return view.get_documents()
