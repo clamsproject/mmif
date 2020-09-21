@@ -416,11 +416,15 @@ class DataList(MmifObject, Generic[T]):
         """
         Passes the input data into the internal deserializer.
         """
-        if isinstance(mmif_json, str):
-            mmif_json = json.loads(mmif_json)
-        self._deserialize(mmif_json)
+        super().deserialize(mmif_json)  # pytype: disable=unsupported-operands
 
-    def _deserialize(self, input_dict: dict) -> None:
+    @staticmethod
+    def _load_json(json_list: Union[list, str]) -> list:
+        if type(json_list) is str:
+            json_list = json.loads(json_list)
+        return [MmifObject._load_json(obj) for obj in json_list]
+    
+    def _deserialize(self, input_list: dict) -> None:
         raise NotImplementedError()
 
     def get(self, key: str) -> Optional[T]:
@@ -505,11 +509,6 @@ class DataDict(MmifObject, Generic[T]):
 
     def _serialize(self, *args, **kwargs) -> dict:
         return super()._serialize(self._items)
-
-    def deserialize(self, mmif_json: Union[str, dict]) -> None:
-        if isinstance(mmif_json, str):
-            mmif_json = json.loads(mmif_json)
-        self._deserialize(mmif_json)
 
     def _deserialize(self, input_dict: dict) -> None:
         raise NotImplementedError()
