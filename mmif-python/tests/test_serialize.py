@@ -14,7 +14,7 @@ from mmif.serialize.model import *
 from mmif.serialize.view import ContainsDict
 from pkg_resources import resource_stream
 
-from tests.mmif_examples import *
+# from tests.mmif_examples import *
 
 
 # Flags for skipping tests
@@ -25,35 +25,45 @@ SKIP_SCHEMA = True, "Skipping TestSchema by default"
 class TestMmif(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.examples_json = {i: json.loads(example) for i, example in examples.items() if i.startswith('mmif_')}
+        # self.examples_json = {i: json.loads(example) for i, example in examples.items() if i.startswith('mmif_')}
+        with open('raw.json') as raw_json:
+            json_str = raw_json.read()
+            self.examples_json = {'mmif_example1': json.loads(json_str)}
+            self.examples = {'mmif_example1': json_str,
+                             'doc_example': """{
+                                               "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+                                               "properties": {
+                                                 "id": "td999",
+                                                 "mime": "text/plain",
+                                                 "location": "/var/archive/transcript-1000.txt" }
+                                             }"""
+            }
 
     def test_str_mmif_deserialize(self):
-        for i, example in examples.items():
+        for i, example in self.examples.items():
             if i.startswith('mmif_'):
                 try:
                     mmif_obj = Mmif(example)
                 except ValidationError:
                     self.fail(f"example {i}")
-                except KeyError:
-                    self.fail("didn't swap _ and @")
                 self.assertEqual(mmif_obj.serialize(True), Mmif(mmif_obj.serialize()).serialize(True), f'Failed on {i}')
 
     def test_json_mmif_deserialize(self):
         for i, example in self.examples_json.items():
             try:
                 mmif_obj = Mmif(example)
-                ...
             except ValidationError as ve:
                 self.fail(ve.message)
-            except KeyError:
-                self.fail("didn't swap _ and @")
+            for document in mmif_obj.documents:
+                self.assertIn('_type', document.__dict__)
+            for view in mmif_obj.views:
+                for annotation in view.annotations:
+                    self.assertIn('_type', annotation.__dict__)
             self.assertTrue('id' in list(mmif_obj.views._items.values())[0].__dict__)
-            roundtrip = Mmif(mmif_obj.serialize())
-            self.assertEqual(mmif_obj.serialize(True), roundtrip.serialize(True), f'Failed on {i}')
+            self.assertEqual(mmif_obj.serialize(True), Mmif(json.loads(mmif_obj.serialize())).serialize(True), f'Failed on {i}')
 
     def test_str_vs_json_deserialize(self):
-
-        for i, example in examples.items():
+        for i, example in self.examples.items():
             if not i.startswith('mmif_'):
                 continue
             str_mmif_obj = Mmif(example)
@@ -87,53 +97,27 @@ class TestMmif(unittest.TestCase):
         except ValidationError:
             pass
 
-    def test_document_cannot_have_text_and_location(self):
-        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        m1 = mmif_obj.get_document_by_id('m1')
-        m2 = mmif_obj.get_document_by_id('m2')
-        m1.text = m2.text
-        with pytest.raises(ValidationError) as ve:
-            Mmif(mmif_obj.serialize())
-            assert "validating 'oneOf'" in ve.value
-
     def test_new_view(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(self.examples['mmif_example1'])
         old_view_count = len(mmif_obj.views)
         mmif_obj.new_view()  # just raise exception if this fails
         self.assertEqual(old_view_count+1, len(mmif_obj.views))
-
-    def test_document_metadata(self):
-        document = Document()
-        document.id = 'm999'
-        document.type = "text"
-        document.location = "random_location"
-        document.metadata['source'] = "v10"
-        document.metadata['app'] = "some_sentence_splitter"
-        document.metadata['random_key'] = "random_value"
-        serialized = document.serialize()
-        deserialized = Document(serialized)
-        self.assertEqual(document, deserialized)
-        plain_json = json.loads(serialized)
-        deserialized = Document(plain_json)
-        self.assertEqual(document, deserialized)
-        self.assertEqual({'id', 'type', 'location', 'metadata'}, plain_json.keys())
-        self.assertEqual({'source', 'app', 'random_key'}, plain_json['metadata'].keys())
 
     def test_document_text(self):
         text = "Karen flew to New York."
         en = 'en'
         document = Document()
         document.id = 'm998'
-        document.type = "text"
-        document.text_value = text
-        self.assertEqual(document.text_value, text)
-        document.text_language = en
+        document.at_type = "text"
+        document.properties.text_value = text
+        self.assertEqual(document.properties.text_value, text)
+        document.properties.text_language = en
         serialized = document.serialize()
         plain_json = json.loads(serialized)
         deserialized = Document(serialized)
-        self.assertEqual(deserialized.text_value, text)
-        self.assertEqual(deserialized.text_language, en)
-        self.assertEqual({'@value', '@language'}, plain_json['text'].keys())
+        self.assertEqual(deserialized.properties.text_value, text)
+        self.assertEqual(deserialized.properties.text_language, en)
+        self.assertEqual({'@value', '@language'}, plain_json['properties']['text'].keys())
 
     def test_document_empty_text(self):
         document = Document()
@@ -141,25 +125,26 @@ class TestMmif(unittest.TestCase):
         document.type = "text"
         serialized = document.serialize()
         deserialized = Document(serialized)
-        self.assertEqual(deserialized.text_value, '')
-        self.assertEqual(deserialized.text_language, '')
+        self.assertEqual(deserialized.properties.text_value, '')
+        self.assertEqual(deserialized.properties.text_language, '')
 
     def test_document(self):
-        document = Document(examples['document_ext_video_example'])
+        document = Document(self.examples['doc_example'])
         serialized = document.serialize()
         plain_json = json.loads(serialized)
-        self.assertEqual({'id', 'type', 'location', 'mime'}, plain_json.keys())
+        self.assertEqual({'@type', 'properties'}, plain_json.keys())
+        self.assertEqual({'id', 'location', 'mime'}, plain_json['properties'].keys())
 
     def test_add_documents(self):
-        document_json = json.loads(examples['document_ext_video_example'])
+        document_json = json.loads(self.examples['doc_example'])
         # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
-        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
+        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
         old_documents_count = len(mmif_obj.documents)
         mmif_obj.add_document(Document(document_json))  # just raise exception if this fails
         self.assertEqual(old_documents_count+1, len(mmif_obj.documents))
 
     def test_get_document_by_id(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
+        mmif_obj = Mmif(self.examples['mmif_example1'])
         try:
             # should succeed
             mmif_obj.get_document_by_id('m1')
@@ -173,24 +158,30 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_get_documents_by_view_id(self):
-        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
+        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_documents_in_view('v1')), 1)
         self.assertEqual(mmif_obj.get_documents_in_view('v1')[0],
                          mmif_obj.get_document_by_id('m2'))
         self.assertEqual(len(mmif_obj.get_documents_in_view('xxx')), 0)
-        new_document = Document()
-        new_document.metadata.source = 'v1:bb2'
+        new_document = Document(self.examples['doc_example'])
         mmif_obj.add_document(new_document)
         self.assertEqual(len(mmif_obj.get_documents_in_view('v1')), 2)
 
     def test_get_document_by_metadata(self):
-        mmif_obj = Mmif(examples['mmif_example1'])
-        self.assertEqual(len(mmif_obj.get_documents_by_property("source", "v1:bb1")), 1)
-        self.assertEqual(len(mmif_obj.get_documents_by_property("source", "v3")), 0)
+        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
+        mmif_obj.add_document(Document("""{
+          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
+          "properties": {
+            "id": "m2",
+            "mime": "video/mpeg",
+            "location": "/var/archive/video-003.mp4" }
+        }"""))
+        self.assertEqual(len(mmif_obj.get_documents_by_property("mime", "video/mpeg")), 2)
+        self.assertEqual(len(mmif_obj.get_documents_by_property("mime", "text")), 0)
 
     def test_get_document_by_appid(self):
         tesseract_appid = 'http://apps.clams.io/tesseract/1.2.1'
-        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
+        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 1)
         self.assertEqual(len(mmif_obj.get_documents_by_app('xxx')), 0)
         new_document = Document()
@@ -255,7 +246,7 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(len(mmif_obj.views), 5)
 
     def test_add_document(self):
-        mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
+        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
         med_obj = Document(examples['document_ext_video_example'])
         mmif_obj.add_document(med_obj)
         try:
