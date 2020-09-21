@@ -32,7 +32,7 @@ class Annotation(FreezableMmifObject):
     @property
     def at_type(self) -> Union[str, ThingTypesBase]:
         # TODO (krim @ 8/19/20): should we always return string? leaving this to return
-        # different types can be confusing for sdk users.
+        #  different types can be confusing for sdk users.
         return self._type
 
     @at_type.setter
