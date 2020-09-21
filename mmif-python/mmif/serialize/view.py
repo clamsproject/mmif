@@ -254,7 +254,7 @@ class AnnotationsList(FreezableDataList[Union[Annotation, Document]]):
         :return: None
         """
         self._items = {item['properties']['id']: Document(item)
-                           if item['@type'].endswith("Document") else Annotation(item)
+                       if item['_type'].endswith("Document") else Annotation(item)
                        for item in input_list}
 
     def append(self, value: Union[Annotation, Document], overwrite=False) -> None:
