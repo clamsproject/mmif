@@ -1,7 +1,7 @@
 {
 
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.2.0"
+    "mmif": "http://mmif.clams.ai/0.2.0"
   },
 
   "documents": [
@@ -957,7 +957,7 @@
     {
       "id": "v6",
       "metadata": {
-        "app": "http://mmif.clams.ai/apps/tessearct/0.2.1",
+        "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
         "contains": {
           "http://mmif.clams.ai/0.1.0/TextDocument": {},
           "http://mmif.clams.ai/0.1.0/Alignment": {}
