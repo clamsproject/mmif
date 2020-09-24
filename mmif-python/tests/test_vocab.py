@@ -3,18 +3,7 @@ import json
 from mmif import Mmif, View, __specver__
 from mmif.vocabulary import AnnotationTypes
 from mmif.serialize.model import MmifObjectEncoder
-
-with open('raw.json') as raw_json:
-    JSON_STR = raw_json.read()
-    MMIF_EXAMPLES_JSON = {'mmif_example1': json.loads(JSON_STR)}
-    MMIF_EXAMPLES = {'mmif_example1': JSON_STR}
-    SUB_EXAMPLES = {'doc_example': """{
-                                       "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
-                                       "properties": {
-                                         "id": "td999",
-                                         "mime": "text/plain",
-                                         "location": "/var/archive/transcript-1000.txt" }
-                                     }"""}
+from tests.mmif_examples import *
 
 
 class TestAnnotationTypes(unittest.TestCase):
