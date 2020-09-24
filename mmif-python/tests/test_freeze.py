@@ -6,12 +6,24 @@ import json
 
 from mmif.serialize import *
 from mmif.serialize.model import FreezableMmifObject
-from tests.mmif_examples import *
+from mmif.serialize.view import AnnotationsList
+
+with open('raw.json') as raw_json:
+    JSON_STR = raw_json.read()
+    MMIF_EXAMPLES_JSON = {'mmif_example1': json.loads(JSON_STR)}
+    MMIF_EXAMPLES = {'mmif_example1': JSON_STR}
+    SUB_EXAMPLES = {'doc_example': """{
+                                       "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+                                       "properties": {
+                                         "id": "td999",
+                                         "mime": "text/plain",
+                                         "location": "/var/archive/transcript-1000.txt" }
+                                     }"""}
 
 
 class TestFreezeView(unittest.TestCase):
     def setUp(self) -> None:
-        self.mmif_obj = Mmif(examples['mmif_example2'], frozen=False)
+        self.mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         self.v1: View = self.mmif_obj['v1']
         self.v2: View = self.mmif_obj['v2']
 
@@ -40,7 +52,7 @@ class TestFreezeView(unittest.TestCase):
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
-            self.v1.metadata.contains['Segment'].producer = 'Phil'
+            self.v1.metadata.contains['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'].producer = 'Phil'
             self.fail('able to set attribute of Contain object in frozen View')
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
@@ -52,7 +64,7 @@ class TestFreezeView(unittest.TestCase):
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
-            self.v1.metadata.contains['Segment'] = Contain()
+            self.v1.metadata.contains['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'] = Contain()
             self.fail('able to overwrite values in contains dict after deep freeze')
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
@@ -63,54 +75,48 @@ class TestFreezeView(unittest.TestCase):
 
 class TestFreezeDocument(unittest.TestCase):
     def setUp(self) -> None:
-        self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
+        self.mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
 
-        self.m2: Document = self.mmif_obj['m2']
+        self.m1: Document = self.mmif_obj['m1']
 
     def test_freeze(self):
-        self.m2.freeze()
+        self.m1.freeze()
 
         try:
-            self.m2.id = 'm3'
+            self.m1.id = 'm3'
             self.fail()
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
     def test_deep_freeze(self):
-        self.m2.deep_freeze()
+        self.m1.deep_freeze()
 
         try:
-            self.m2.id = 'm3'
+            self.m1.id = 'm3'
             self.fail("able to set top-level attribute")
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
-            self.m2.metadata.source = 'm1'
+            self.m1.properties.source = 'm1'
             self.fail("able to set lower-level attribute")
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
-            self.m2.text.lang = 'spanish'
+            self.m1.properties.text.lang = 'spanish'
             self.fail('able to bypass immutability with @property setter')
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
-        try:
-            self.m2.subdocuments.append(Subdocument())
-            self.fail('able to append to subdocuments list after deep freeze')
-        except TypeError as te:
-            self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
-
     def test_deep_freeze_returns_true(self):
-        fully_frozen = self.m2.deep_freeze()
+        fully_frozen = self.m1.deep_freeze()
         self.assertTrue(fully_frozen)
 
     def test_invariance_after_freeze(self):
         before = json.loads(self.mmif_obj.serialize())
 
-        self.mmif_obj['m2'].freeze()
+        self.mmif_obj['m1'].freeze()
 
         after = json.loads(self.mmif_obj.serialize())
 
@@ -119,7 +125,7 @@ class TestFreezeDocument(unittest.TestCase):
     def test_invariance_after_deep_freeze(self):
         before = json.loads(self.mmif_obj.serialize())
 
-        self.mmif_obj['m2'].deep_freeze()
+        self.mmif_obj['m1'].deep_freeze()
 
         after = json.loads(self.mmif_obj.serialize())
 
@@ -131,39 +137,39 @@ class TestFreezeDocument(unittest.TestCase):
         logger.setLevel(logging.DEBUG)
         with patch('sys.stdout', new=StringIO()) as fake_out:
             logger.addHandler(logging.StreamHandler(fake_out))
-            self.m2['id'] = 'm3'
+            self.m1['properties']['id'] = 'm3'
         logger.setLevel(old_level)
         self.assertEqual('MmifObject.__setitem__', fake_out.getvalue().split()[2])
 
 
-class TestFreezeSubdocumentsList(unittest.TestCase):
+class TestFreezeAnnotationsList(unittest.TestCase):
     def setUp(self) -> None:
-        self.mmif_obj = Mmif(examples['mmif_example1'], frozen=False)
-        self.subdocuments: SubdocumentsList = self.mmif_obj['m2'].subdocuments
+        self.mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
+        self.annotations: AnnotationsList = self.mmif_obj['v5'].annotations
 
     def test_deep_freeze(self):
-        self.subdocuments['sm1'] = Subdocument({ "id": "sm1", "annotation": "bb1", "text": { "@value": "yelp" }})
-        self.subdocuments.deep_freeze()
+        self.annotations['ann999'] = Annotation({"@type": "Annotation", "properties": {"id": "ann999"}})
+        self.annotations.deep_freeze()
         try:
-            self.subdocuments['sm1']['annotation'] = 'bb2'
+            self.annotations['ann999'].id = 'ann123'
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
     def test_invariance_after_freeze(self):
-        before = json.loads(self.subdocuments.serialize())
+        before = json.loads(self.annotations.serialize())
 
-        self.subdocuments.freeze()
+        self.annotations.freeze()
 
-        after = json.loads(self.subdocuments.serialize())
+        after = json.loads(self.annotations.serialize())
 
         self.assertEqual(before, after)
 
     def test_invariance_after_deep_freeze(self):
-        before = json.loads(self.subdocuments.serialize())
+        before = json.loads(self.annotations.serialize())
 
-        self.subdocuments.deep_freeze()
+        self.annotations.deep_freeze()
 
-        after = json.loads(self.subdocuments.serialize())
+        after = json.loads(self.annotations.serialize())
 
         self.assertEqual(before, after)
 
@@ -173,22 +179,22 @@ class TestFreezeSubdocumentsList(unittest.TestCase):
         logger.setLevel(logging.DEBUG)
         with patch('sys.stdout', new=StringIO()) as fake_out:
             logger.addHandler(logging.StreamHandler(fake_out))
-            self.subdocuments['sub1'] = Subdocument()
+            self.annotations['bb1'] = Annotation()
         logger.setLevel(old_level)
         self.assertEqual('DataList.__setitem__', fake_out.getvalue().split()[2])
 
     def test_freezing_works_for_setitem(self):
-        self.subdocuments.freeze()
+        self.annotations.freeze()
         try:
-            self.subdocuments['sub1'] = Subdocument()
+            self.annotations['bb1'] = Annotation()
             self.fail("was able to setitem")
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
     def test_freezing_works_for_append(self):
-        self.subdocuments.freeze()
+        self.annotations.freeze()
         try:
-            self.subdocuments.append(Subdocument())
+            self.annotations.append(Annotation())
             self.fail('able to append to subdocuments after freeze')
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
@@ -196,9 +202,9 @@ class TestFreezeSubdocumentsList(unittest.TestCase):
 
 class TestFreezeMmif(unittest.TestCase):
     def setUp(self) -> None:
-        self.mmif_obj_unfrozen = Mmif(examples['mmif_example1'], frozen=False)
-        self.mmif_obj_frozen = Mmif(examples['mmif_example1'], frozen=True)
-        self.mmif_obj_default = Mmif(examples['mmif_example1'])
+        self.mmif_obj_unfrozen = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
+        self.mmif_obj_frozen = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=True)
+        self.mmif_obj_default = Mmif(MMIF_EXAMPLES['mmif_example1'])
 
     def test_freeze_mmif(self):
         self.assertFalse(self.mmif_obj_unfrozen.documents.is_frozen())

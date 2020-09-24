@@ -14,33 +14,31 @@ from mmif.serialize.model import *
 from mmif.serialize.view import ContainsDict
 from pkg_resources import resource_stream
 
-# from tests.mmif_examples import *
-
 
 # Flags for skipping tests
 DEBUG = False
 SKIP_SCHEMA = True, "Skipping TestSchema by default"
 
+with open('raw.json') as raw_json:
+    JSON_STR = raw_json.read()
+    MMIF_EXAMPLES = {'mmif_example1': JSON_STR}
+    SUB_EXAMPLES = {'doc_example': """{
+                                       "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+                                       "properties": {
+                                         "id": "td999",
+                                         "mime": "text/plain",
+                                         "location": "/var/archive/transcript-1000.txt" }
+                                     }"""}
+
 
 class TestMmif(unittest.TestCase):
 
     def setUp(self) -> None:
-        # self.examples_json = {i: json.loads(example) for i, example in examples.items() if i.startswith('mmif_')}
-        with open('raw.json') as raw_json:
-            json_str = raw_json.read()
-            self.examples_json = {'mmif_example1': json.loads(json_str)}
-            self.examples = {'mmif_example1': json_str,
-                             'doc_example': """{
-                                               "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
-                                               "properties": {
-                                                 "id": "td999",
-                                                 "mime": "text/plain",
-                                                 "location": "/var/archive/transcript-1000.txt" }
-                                             }"""
-            }
+        self.mmif_examples_json = {'mmif_example1': json.loads(JSON_STR)}
+        
 
     def test_str_mmif_deserialize(self):
-        for i, example in self.examples.items():
+        for i, example in MMIF_EXAMPLES.items():
             if i.startswith('mmif_'):
                 try:
                     mmif_obj = Mmif(example)
@@ -49,7 +47,7 @@ class TestMmif(unittest.TestCase):
                 self.assertEqual(mmif_obj.serialize(True), Mmif(mmif_obj.serialize()).serialize(True), f'Failed on {i}')
 
     def test_json_mmif_deserialize(self):
-        for i, example in self.examples_json.items():
+        for i, example in self.mmif_examples_json.items():
             try:
                 mmif_obj = Mmif(example)
             except ValidationError as ve:
@@ -63,7 +61,7 @@ class TestMmif(unittest.TestCase):
             self.assertEqual(mmif_obj.serialize(True), Mmif(json.loads(mmif_obj.serialize())).serialize(True), f'Failed on {i}')
 
     def test_str_vs_json_deserialize(self):
-        for i, example in self.examples.items():
+        for i, example in MMIF_EXAMPLES.items():
             if not i.startswith('mmif_'):
                 continue
             str_mmif_obj = Mmif(example)
@@ -71,8 +69,8 @@ class TestMmif(unittest.TestCase):
             self.assertEqual(str_mmif_obj.serialize(True), json_mmif_obj.serialize(True), f'Failed on {i}')
 
     def test_bad_mmif_deserialize_no_metadata(self):
-        self.examples_json['mmif_example1'].pop('metadata')
-        json_str = json.dumps(self.examples_json['mmif_example1'])
+        self.mmif_examples_json['mmif_example1'].pop('metadata')
+        json_str = json.dumps(self.mmif_examples_json['mmif_example1'])
         try:
             _ = Mmif(json_str)
             self.fail()
@@ -80,8 +78,8 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_bad_mmif_deserialize_no_documents(self):
-        self.examples_json['mmif_example1'].pop('documents')
-        json_str = json.dumps(self.examples_json['mmif_example1'])
+        self.mmif_examples_json['mmif_example1'].pop('documents')
+        json_str = json.dumps(self.mmif_examples_json['mmif_example1'])
         try:
             _ = Mmif(json_str)
             self.fail()
@@ -89,8 +87,8 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_bad_mmif_deserialize_no_views(self):
-        self.examples_json['mmif_example1'].pop('views')
-        json_str = json.dumps(self.examples_json['mmif_example1'])
+        self.mmif_examples_json['mmif_example1'].pop('views')
+        json_str = json.dumps(self.mmif_examples_json['mmif_example1'])
         try:
             _ = Mmif(json_str)
             self.fail()
@@ -98,7 +96,7 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_new_view(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'])
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         old_view_count = len(mmif_obj.views)
         mmif_obj.new_view()  # just raise exception if this fails
         self.assertEqual(old_view_count+1, len(mmif_obj.views))
@@ -122,29 +120,29 @@ class TestMmif(unittest.TestCase):
     def test_document_empty_text(self):
         document = Document()
         document.id = 'm997'
-        document.type = "text"
+        document.at_type = "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument"
         serialized = document.serialize()
         deserialized = Document(serialized)
         self.assertEqual(deserialized.properties.text_value, '')
         self.assertEqual(deserialized.properties.text_language, '')
 
     def test_document(self):
-        document = Document(self.examples['doc_example'])
+        document = Document(SUB_EXAMPLES['doc_example'])
         serialized = document.serialize()
         plain_json = json.loads(serialized)
         self.assertEqual({'@type', 'properties'}, plain_json.keys())
         self.assertEqual({'id', 'location', 'mime'}, plain_json['properties'].keys())
 
     def test_add_documents(self):
-        document_json = json.loads(self.examples['doc_example'])
+        document_json = json.loads(SUB_EXAMPLES['doc_example'])
         # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
-        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         old_documents_count = len(mmif_obj.documents)
         mmif_obj.add_document(Document(document_json))  # just raise exception if this fails
         self.assertEqual(old_documents_count+1, len(mmif_obj.documents))
 
     def test_get_document_by_id(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'])
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         try:
             # should succeed
             mmif_obj.get_document_by_id('m1')
@@ -158,17 +156,18 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_get_documents_by_view_id(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
-        self.assertEqual(len(mmif_obj.get_documents_in_view('v1')), 1)
-        self.assertEqual(mmif_obj.get_documents_in_view('v1')[0],
-                         mmif_obj.get_document_by_id('m2'))
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
+        self.assertEqual(len(mmif_obj.get_documents_in_view('v6')), 25)
+        self.assertEqual(mmif_obj.get_documents_in_view('v6')[0],
+                         mmif_obj.get_document_by_id('v6:td1'))
+        self.assertEqual(len(mmif_obj.get_documents_in_view('v1')), 0)
         self.assertEqual(len(mmif_obj.get_documents_in_view('xxx')), 0)
-        new_document = Document(self.examples['doc_example'])
+        new_document = Document(SUB_EXAMPLES['doc_example'])
         mmif_obj.add_document(new_document)
-        self.assertEqual(len(mmif_obj.get_documents_in_view('v1')), 2)
+        self.assertEqual(len(mmif_obj.get_documents_in_view('v4')), 1)
 
     def test_get_document_by_metadata(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         mmif_obj.add_document(Document("""{
           "@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
           "properties": {
@@ -183,7 +182,7 @@ class TestMmif(unittest.TestCase):
         # TODO (angus-lherrou @ 9-21-2020): if/when get_documents_by_app
         #  is changed to fetch from multiple views, update this test
         tesseract_appid = 'http://mmif.clams.ai/apps/tesseract/0.2.1'
-        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 25)
         self.assertEqual(len(mmif_obj.get_documents_by_app('xxx')), 0)
         new_document = Document({'@type': 'http://mmif.clams.ai/0.2.0/vocabulary/TextDocument',
@@ -192,17 +191,19 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 26)
 
     def test_get_documents_locations(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'])
-        self.assertEqual(len(mmif_obj.get_documents_locations('image')), 1)
-        self.assertEqual(mmif_obj.get_document_location('image'), "/var/archive/image-0012.jpg")
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        self.assertEqual(1, len(mmif_obj.get_documents_locations('http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument')))
+        self.assertEqual(mmif_obj.get_document_location('http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument'), "/var/archive/video-002.mp4")
+        # TODO (angus-lherrou @ 9-23-2020): no text documents in documents list of raw.json,
+        #  un-comment and fix if we add view searching to these methods
         # text document is there but no location is specified
-        self.assertEqual(len(mmif_obj.get_documents_locations('text')), 0)
-        self.assertEqual(mmif_obj.get_document_location('text'), None)
+        # self.assertEqual(0, len(mmif_obj.get_documents_locations('http://mmif.clams.ai/0.2.0/vocabulary/TextDocument')))
+        # self.assertEqual(mmif_obj.get_document_location('http://mmif.clams.ai/0.2.0/vocabulary/TextDocument'), None)
         # audio document is not there
-        self.assertEqual(len(mmif_obj.get_documents_locations('audio')), 0)
+        self.assertEqual(0, len(mmif_obj.get_documents_locations('http://mmif.clams.ai/0.2.0/vocabulary/AudioDocument')))
 
     def test_get_view_by_id(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'])
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         try:
             _ = mmif_obj.get_view_by_id('v1')
         except KeyError:
@@ -215,16 +216,21 @@ class TestMmif(unittest.TestCase):
             pass
 
     def test_get_all_views_contain(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'])
-        views_len = len(mmif_obj.views)
-        views = mmif_obj.get_all_views_contain('BoundingBox')
-        self.assertEqual(len(views), views_len)
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        views = mmif_obj.get_all_views_contain('http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame')
+        self.assertEqual(4, len(views))
+        views = mmif_obj.get_all_views_contain('http://mmif.clams.ai/0.2.0/vocabulary/TextDocument')
+        self.assertEqual(2, len(views))
+        views = mmif_obj.get_all_views_contain('http://vocab.lappsgrid.org/SemanticTag')
+        self.assertEqual(1, len(views))
+        views = mmif_obj.get_all_views_contain('not_a_type')
+        self.assertEqual(0, len(views))
 
     def test_get_view_contains(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'])
-        view = mmif_obj.get_view_contains('BoundingBox')
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        view = mmif_obj.get_view_contains('http://vocab.lappsgrid.org/SemanticTag')
         self.assertIsNotNone(view)
-        self.assertEqual('v5', view.id)
+        self.assertEqual('v8', view.id)
         view = mmif_obj.get_view_contains('NonExistingType')
         self.assertIsNone(view)
 
@@ -247,8 +253,8 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(len(mmif_obj.views), 5)
 
     def test_add_document(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
-        med_obj = Document(self.examples['doc_example'])
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
+        med_obj = Document(SUB_EXAMPLES['doc_example'])
         mmif_obj.add_document(med_obj)
         try:
             mmif_obj.add_document(med_obj)
@@ -261,9 +267,9 @@ class TestMmif(unittest.TestCase):
             self.fail("raised exception on duplicate ID add when overwrite was set to True")
 
     def test_add_view(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'])
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         view_obj = View()
-        view_obj.id = 'v4'
+        view_obj.id = 'v400'
         mmif_obj.add_view(view_obj)
         try:
             mmif_obj.add_view(view_obj)
@@ -276,7 +282,7 @@ class TestMmif(unittest.TestCase):
             self.fail("raised exception on duplicate ID add when overwrite was set to True")
 
     def test___getitem__(self):
-        mmif_obj = Mmif(self.examples['mmif_example1'])
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         self.assertIsInstance(mmif_obj['m1'], Document)
         self.assertIsInstance(mmif_obj['v5'], View)
         self.assertIsInstance(mmif_obj['v5:bb1'], Annotation)
@@ -292,18 +298,7 @@ class TestMmif(unittest.TestCase):
 class TestMmifObject(unittest.TestCase):
 
     def setUp(self) -> None:
-        with open('raw.json') as raw_json:
-            json_str = raw_json.read()
-            self.examples_json = {'mmif_example1': json.loads(json_str)}
-            self.examples = {'mmif_example1': json_str,
-                             'doc_example': """{
-                                               "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
-                                               "properties": {
-                                                 "id": "td999",
-                                                 "mime": "text/plain",
-                                                 "location": "/var/archive/transcript-1000.txt" }
-                                             }"""
-                             }
+        ...
 
     def test_load_json_on_str(self):
         self.assertTrue("_type" in MmifObject._load_json('{ "@type": "some_type", "@value": "some_value"}').keys())
@@ -333,27 +328,15 @@ class TestMmifObject(unittest.TestCase):
 
     def test_print_mmif(self):
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            mmif_obj = Mmif(self.examples['mmif_example1'])
+            mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
             print(mmif_obj)
-            self.assertEqual(json.loads(self.examples['mmif_example1']), json.loads(fake_out.getvalue()))
+            self.assertEqual(json.loads(MMIF_EXAMPLES['mmif_example1']), json.loads(fake_out.getvalue()))
 
 
 class TestGetItem(unittest.TestCase):
 
     def setUp(self) -> None:
-        with open('raw.json') as raw_json:
-            json_str = raw_json.read()
-            self.examples_json = {'mmif_example1': json.loads(json_str)}
-            self.examples = {'mmif_example1': json_str,
-                             'doc_example': """{
-                                               "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
-                                               "properties": {
-                                                 "id": "td999",
-                                                 "mime": "text/plain",
-                                                 "location": "/var/archive/transcript-1000.txt" }
-                                             }"""
-            }
-        self.mmif_obj = Mmif(self.examples['mmif_example1'])
+        self.mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
 
     def test_mmif_getitem_document(self):
         try:
@@ -375,31 +358,31 @@ class TestGetItem(unittest.TestCase):
 
     def test_mmif_getitem_annotation(self):
         try:
-            v1_bb1 = self.mmif_obj['v1:bb1']
-            self.assertIs(v1_bb1, self.mmif_obj.views.get('v1').annotations.get('bb1'))
+            v1_bb1 = self.mmif_obj['v5:bb1']
+            self.assertIs(v1_bb1, self.mmif_obj.views.get('v5').annotations.get('bb1'))
         except TypeError:
             self.fail("__getitem__ not implemented")
         except KeyError:
-            self.fail("didn't get annotation 'v1:bb1'")
+            self.fail("didn't get annotation 'v5:bb1'")
 
     def test_mmif_fail_getitem_toplevel(self):
         try:
-            _ = self.mmif_obj['v5']
-            self.fail("didn't except on bad getitem")
+            _ = self.mmif_obj['v500']
+            self.fail("didn't raise exception on bad getitem")
         except KeyError:
             pass
 
     def test_mmif_fail_getitem_annotation_no_view(self):
         try:
-            _ = self.mmif_obj['v5:s1']
-            self.fail("didn't except on annotation getitem on bad view")
+            _ = self.mmif_obj['v59:s1']
+            self.fail("didn't raise exception on annotation getitem on bad view")
         except KeyError:
             pass
 
     def test_mmif_fail_getitem_no_annotation(self):
         try:
-            _ = self.mmif_obj['v1:s1']
-            self.fail("didn't except on bad annotation getitem")
+            _ = self.mmif_obj['v1:bb1']
+            self.fail("didn't raise exception on bad annotation getitem")
         except KeyError:
             pass
 
@@ -416,19 +399,8 @@ class TestGetItem(unittest.TestCase):
 class TestView(unittest.TestCase):
 
     def setUp(self) -> None:
-        with open('raw.json') as raw_json:
-            json_str = raw_json.read()
-            self.examples_json = {'mmif_example1': json.loads(json_str)}
-            self.examples = {'mmif_example1': json_str,
-                             'doc_example': """{
-                                               "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
-                                               "properties": {
-                                                 "id": "td999",
-                                                 "mime": "text/plain",
-                                                 "location": "/var/archive/transcript-1000.txt" }
-                                             }"""
-            }
-        self.view_json = self.examples_json['mmif_example1']['views'][0]
+        self.mmif_examples_json = {'mmif_example1': json.loads(JSON_STR)}
+        self.view_json = self.mmif_examples_json['mmif_example1']['views'][0]
         self.view_obj = View(self.view_json)
         self.maxDiff = None
 
@@ -449,7 +421,7 @@ class TestView(unittest.TestCase):
 
     def test_view_metadata(self):
         vmeta = ViewMetadata()
-        vmeta['tool'] = 'fdsa'
+        vmeta['app'] = 'fdsa'
         vmeta['random_key'] = 'random_value'
         serialized = vmeta.serialize()
         deserialized = ViewMetadata(serialized)
@@ -466,11 +438,11 @@ class TestView(unittest.TestCase):
             self.assertEqual(original, new)
 
     def test_add_annotation(self):
-        anno_obj = Annotation(self.examples_json['mmif_example1']['views'][3]['annotations'][2])
+        anno_obj = Annotation(self.mmif_examples_json['mmif_example1']['views'][6]['annotations'][2])
         old_len = len(self.view_obj.annotations)
         self.view_obj.add_annotation(anno_obj)  # raise exception if this fails
         self.assertEqual(old_len+1, len(self.view_obj.annotations))
-        self.assertIn('Token', self.view_obj.metadata.contains)
+        self.assertIn('http://vocab.lappsgrid.org/NamedEntity', self.view_obj.metadata.contains)
         _ = self.view_obj.serialize()  # raise exception if this fails
     
     def test_new_annotation(self):
@@ -482,17 +454,13 @@ class TestAnnotation(unittest.TestCase):
     # TODO (angus-lherrou @ 7/27/2020): testing should include validation for required attrs
     #  once that is implemented (issue #23)
     def setUp(self) -> None:
-        with open('raw.json') as raw_json:
-            json_str = raw_json.read()
-            self.examples_json = {'mmif_example1': json.loads(json_str)}
-            self.examples = {'mmif_example1': json_str}
         self.data = {i: {'string': example,
                          'json': json.loads(example),
                          'mmif': Mmif(example, frozen=False),
                          'annotations': [annotation
                                          for view in json.loads(example)['views']
                                          for annotation in view['annotations']]}
-                     for i, example in self.examples.items()}
+                     for i, example in MMIF_EXAMPLES.items()}
 
     def test_annotation_properties(self):
         props_json = self.data['mmif_example1']['annotations'][0]['properties']
@@ -517,38 +485,34 @@ class TestAnnotation(unittest.TestCase):
                     continue
 
     def test_id(self):
-        anno_obj: Annotation = self.data['mmif_example1']['mmif']['v1:bb1']
+        anno_obj: Annotation = self.data['mmif_example1']['mmif']['v5:bb1']
 
         old_id = anno_obj.id
         self.assertEqual('bb1', old_id)
 
     def test_change_id(self):
-        anno_obj: Annotation = self.data['mmif_example1']['mmif']['v1:bb1']
+        anno_obj: Annotation = self.data['mmif_example1']['mmif']['v5:bb1']
 
-        anno_obj.id = 'bb2'
-        self.assertEqual('bb2', anno_obj.id)
+        anno_obj.id = 'bb200'
+        self.assertEqual('bb200', anno_obj.id)
 
         serialized = json.loads(anno_obj.serialize())
         new_id = serialized['properties']['id']
-        self.assertEqual('bb2', new_id)
+        self.assertEqual('bb200', new_id)
 
         serialized_mmif = json.loads(self.data['mmif_example1']['mmif'].serialize())
-        new_id_from_mmif = serialized_mmif['views'][0]['annotations'][0]['properties']['id']
-        self.assertEqual('bb2', new_id_from_mmif)
+        new_id_from_mmif = serialized_mmif['views'][4]['annotations'][0]['properties']['id']
+        self.assertEqual('bb200', new_id_from_mmif)
 
 
 class TestDocument(unittest.TestCase):
 
     def setUp(self) -> None:
-        with open('raw.json') as raw_json:
-            json_str = raw_json.read()
-            self.examples_json = {'mmif_example1': json.loads(json_str)}
-            self.examples = {'mmif_example1': json_str}
         self.data = {i: {'string': example,
                          'json': json.loads(example),
                          'mmif': Mmif(example, frozen=False),
                          'documents': json.loads(example)['documents']}
-                     for i, example in self.examples.items()}
+                     for i, example in MMIF_EXAMPLES.items()}
 
     def test_init(self):
         for i, datum in self.data.items():
@@ -559,7 +523,7 @@ class TestDocument(unittest.TestCase):
                     self.fail(f"{type(ex)}: {str(ex)}: {i} {document['id']}")
 
     def test_document_properties(self):
-        props_json = self.data['mmif_example1']['documents'][1]['metadata']
+        props_json = self.data['mmif_example1']['documents'][0]['properties']
         props_obj = DocumentProperties(props_json)
         self.assertEqual(props_json, json.loads(props_obj.serialize()))
 
@@ -567,9 +531,9 @@ class TestDocument(unittest.TestCase):
         for i, datum in self.data.items():
             for j, document in enumerate(datum['documents']):
                 try:
-                    document_obj = datum['mmif'].get_document_by_id(document['id'])
+                    document_obj = datum['mmif'].get_document_by_id(document['properties']['id'])
                 except KeyError:
-                    self.fail(f"Document {document['id']} not found in MMIF")
+                    self.fail(f"Document {document['properties']['id']} not found in MMIF")
                 self.assertIsInstance(document_obj, Document)
                 self.assertIsInstance(document_obj.properties, DocumentProperties)
 
@@ -611,11 +575,7 @@ class TestDocument(unittest.TestCase):
 
 class TestDataStructure(unittest.TestCase):
     def setUp(self) -> None:
-        with open('raw.json') as raw_json:
-            json_str = raw_json.read()
-            self.examples_json = {'mmif_example1': json.loads(json_str)}
-            self.examples = {'mmif_example1': json_str}
-        self.mmif_obj = Mmif(self.examples['mmif_example1'], frozen=False)
+        self.mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         self.datalist = self.mmif_obj.views
         self.freezable_datalist = self.mmif_obj.documents
         self.freezable_datadict = self.mmif_obj['v1'].metadata.contains
@@ -631,7 +591,8 @@ class TestDataStructure(unittest.TestCase):
     def test_getitem(self):
         self.assertIs(self.mmif_obj['v1'], self.datalist['v1'])
         self.assertIs(self.mmif_obj['m1'], self.freezable_datalist['m1'])
-        self.assertIs(self.mmif_obj['v1'].metadata.contains['BoundingBox'], self.freezable_datadict['BoundingBox'])
+        self.assertIs(self.mmif_obj['v1'].metadata.contains['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'],
+                      self.freezable_datadict['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'])
 
     def test_getitem_raises(self):
         with self.assertRaises(KeyError):
@@ -668,7 +629,7 @@ class TestDataStructure(unittest.TestCase):
             self.freezable_datalist.append(Document({'@type': 'null', 'properties': {'id': 'm1'}}))
             self.fail('appended without overwrite')
         except KeyError as ke:
-            self.assertEqual('Key m2 already exists', ke.args[0])
+            self.assertEqual('Key m1 already exists', ke.args[0])
 
         try:
             self.freezable_datalist.append(Document({'@type': 'null', 'properties': {'id': 'm1'}}), overwrite=True)
@@ -680,29 +641,29 @@ class TestDataStructure(unittest.TestCase):
     def test_membership(self):
         self.assertIn('v1', self.datalist)
         self.assertIn('m1', self.freezable_datalist)
-        self.assertIn('BoundingBox', self.freezable_datadict)
+        self.assertIn('http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame', self.freezable_datadict)
 
-        self.assertNotIn('v2', self.datalist)
-        self.datalist['v2'] = View({'id': 'v2'})
-        self.assertIn('v2', self.datalist)
+        self.assertNotIn('v200', self.datalist)
+        self.datalist['v200'] = View({'id': 'v200'})
+        self.assertIn('v200', self.datalist)
 
-        self.assertNotIn('m3', self.freezable_datalist)
-        self.freezable_datalist['m3'] = Document({'id': 'm3'})
-        self.assertIn('m3', self.freezable_datalist)
+        self.assertNotIn('m2', self.freezable_datalist)
+        self.freezable_datalist['m2'] = Document({'@type': 'null', 'properties': {'id': 'm2'}})
+        self.assertIn('m2', self.freezable_datalist)
 
         self.assertNotIn('Segment', self.freezable_datadict)
         self.freezable_datadict['Segment'] = Contain({"unit": "milliseconds"})
         self.assertIn('Segment', self.freezable_datadict)
 
     def test_len(self):
-        self.assertEqual(1, len(self.datalist))
-        for i in range(2, 10):
+        self.assertEqual(8, len(self.datalist))
+        for i in range(9, 19):
             self.datalist[f'v{i}'] = View({'id': f'v{i}'})
             self.assertEqual(i, len(self.datalist))
 
-        self.assertEqual(2, len(self.freezable_datalist))
-        for i in range(3, 10):
-            self.freezable_datalist[f'm{i}'] = Document({'id': f'm{i}'})
+        self.assertEqual(1, len(self.freezable_datalist))
+        for i in range(2, 10):
+            self.freezable_datalist[f'm{i}'] = Document({'@type': 'null', 'properties': {'id': f'm{i}'}})
             self.assertEqual(i, len(self.freezable_datalist))
 
         self.assertEqual(1, len(self.freezable_datadict))
@@ -711,21 +672,21 @@ class TestDataStructure(unittest.TestCase):
             self.assertEqual(i, len(self.freezable_datadict))
 
     def test_iter(self):
-        for i in range(2, 10):
+        for i in range(9, 19):
             self.datalist[f'v{i}'] = View({'id': f'v{i}'})
-        for i in range(3, 10):
-            self.freezable_datalist[f'm{i}'] = Document({'id': f'm{i}'})
+        for i in range(2, 10):
+            self.freezable_datalist[f'm{i}'] = Document({'@type': 'null', 'properties': {'id': f'm{i}'}})
         for i in range(2, 10):
             self.freezable_datadict[f'Type{i}'] = Contain({"type": f"i"})
 
-        for expected_index, (actual_index, item) in zip(range(9), enumerate(self.datalist)):
-            self.assertEqual(expected_index, actual_index)
-            self.assertEqual(expected_index+1, int(item['id'][-1]))
+        for expected_index, (actual_index, item) in zip(range(18), enumerate(self.datalist)):
+            self.assertEqual(expected_index, actual_index, "here")
+            self.assertEqual(expected_index+1, int(item['id'][1:]))
         for expected_index, (actual_index, item) in zip(range(9), enumerate(self.freezable_datalist)):
-            self.assertEqual(expected_index, actual_index)
-            self.assertEqual(expected_index+1, int(item['id'][-1]))
+            self.assertEqual(expected_index, actual_index, "no, here")
+            self.assertEqual(expected_index+1, int(item['properties']['id'][1:]))
         for expected_index, (actual_index, item) in zip(range(9), enumerate(self.freezable_datadict.values())):
-            self.assertEqual(expected_index, actual_index)
+            self.assertEqual(expected_index, actual_index, "it's here")
 
     def test_dict_views(self):
         for i in range(2, 10):
@@ -753,7 +714,7 @@ class TestDataStructure(unittest.TestCase):
 
         for i, name in enumerate(self.freezable_datalist.reserved_names):
             try:
-                self.freezable_datalist[name] = Document({'id': f'm{i+1}'})
+                self.freezable_datalist[name] = Document({'@type': 'null', 'properties': {'id': f'm{i+1}'}})
                 self.fail("was able to setitem on reserved name")
             except KeyError as ke:
                 self.assertEqual("can't set item on a reserved name", ke.args[0])
@@ -765,19 +726,12 @@ class TestDataStructure(unittest.TestCase):
             except KeyError as ke:
                 self.assertEqual("can't set item on a reserved name", ke.args[0])
 
-    def test_get_reserved_name(self):
-        self.assertEqual(self.datalist._items, self.datalist['_items'])
-        self.assertEqual(self.datalist.reserved_names, self.datalist['reserved_names'])
-        self.assertEqual(self.freezable_datalist._items, self.freezable_datalist['_items'])
-        self.assertEqual(self.freezable_datalist.reserved_names, self.freezable_datalist['reserved_names'])
-        self.assertEqual(self.freezable_datadict._items, self.freezable_datadict['_items'])
-        self.assertEqual(self.freezable_datadict.reserved_names, self.freezable_datadict['reserved_names'])
-
     def test_get(self):
         self.assertEqual(self.datalist['v1'], self.datalist.get('v1'))
         self.assertEqual(self.freezable_datalist['m1'], self.freezable_datalist.get('m1'))
-        self.assertEqual(self.freezable_datadict['BoundingBox'], self.freezable_datadict.get('BoundingBox'))
-        self.assertIsNone(self.datalist.get('v5'))
+        self.assertEqual(self.freezable_datadict['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'],
+                         self.freezable_datadict.get('http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'))
+        self.assertIsNone(self.datalist.get('v55'))
         self.assertIsNone(self.freezable_datalist.get('m5'))
         self.assertIsNone(self.freezable_datadict.get('Segment'))
 
