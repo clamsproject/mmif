@@ -57,4 +57,5 @@ VERSION:
 	fi
 
 clean: 
-	@rm -rf VERSION VERSION.dev $(artifact) dist $(bdistname).egg-info mmif/res mmif/ver mmif/vocabulary
+	@rm -rf VERSION VERSION.dev $(artifact) dist $(bdistname).egg-info mmif/res mmif/ver mmif/vocabulary \
+	.pytest_cache .pytype coverage.xml htmlcov
