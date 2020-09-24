@@ -12,12 +12,12 @@ def substitute(example_dict: dict) -> dict:
     return dict((k, Template(v).substitute(specver=__specver__)) for k, v in example_dict.items())
 
 
-with open(os.path.join('..',
-                       '..',
-                       'specifications',
-                       'samples',
-                       'everything',
-                       'raw.json')) as raw_json:
+raw_path = os.path.join('..', 'specifications', 'samples', 'everything', 'raw.json')
+
+if os.getcwd().rsplit(os.path.sep)[-1] == 'tests':
+    raw_path = os.path.join('..', raw_path)
+
+with open(raw_path) as raw_json:
     JSON_STR = raw_json.read().replace('0.2.0', '${specver}')
 
 example_templates = dict(
