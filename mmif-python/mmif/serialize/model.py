@@ -101,7 +101,7 @@ class MmifObject(object):
         """
         if self._unnamed_attributes is None:
             raise AttributeError(f"Additional properties are disallowed by {self.__class__}")
-        self._unnamed_attributes[key] = value
+        self._unnamed_attributes[key] = value # pytype: disable=unsupported-operands
 
     def _named_attributes(self) -> Generator[str, None, None]:
         """
@@ -258,9 +258,9 @@ class MmifObject(object):
         else:
             if self._attribute_classes and key in self._attribute_classes \
                     and not isinstance(value, (self._attribute_classes[key])):
-                self.set_additional_property(key, self._attribute_classes[key](value))  # pytype: disable=unsupported-operands
+                self.set_additional_property(key, self._attribute_classes[key](value))
             else:
-                self.set_additional_property(key, value)  # pytype: disable=unsupported-operands
+                self.set_additional_property(key, value)
 
     def __getitem__(self, key) -> Union['MmifObject', str, datetime]:
         if key in self._named_attributes():
