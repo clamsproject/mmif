@@ -13,22 +13,12 @@ from mmif.serialize import *
 from mmif.serialize.model import *
 from mmif.serialize.view import ContainsDict
 from pkg_resources import resource_stream
+from tests.mmif_examples import *
 
 
 # Flags for skipping tests
 DEBUG = False
 SKIP_SCHEMA = True, "Skipping TestSchema by default"
-
-with open('raw.json') as raw_json:
-    JSON_STR = raw_json.read()
-    MMIF_EXAMPLES = {'mmif_example1': JSON_STR}
-    SUB_EXAMPLES = {'doc_example': """{
-                                       "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
-                                       "properties": {
-                                         "id": "td999",
-                                         "mime": "text/plain",
-                                         "location": "/var/archive/transcript-1000.txt" }
-                                     }"""}
 
 
 class TestMmif(unittest.TestCase):
