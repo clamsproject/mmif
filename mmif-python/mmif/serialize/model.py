@@ -90,6 +90,19 @@ class MmifObject(object):
         """
         self._unnamed_attributes = None
 
+    def set_additional_property(self, key: str, value: Any) -> None:
+        """
+        Method to set values in _unnamed_attributes.
+        :param key: the attribute name
+        :param value: the desired value
+        :return: None
+        :raise: AttributeError if additional properties are disallowed
+                by :func:`disallow_additional_properties`
+        """
+        if self._unnamed_attributes is None:
+            raise AttributeError(f"Additional properties are disallowed by {self.__class__}")
+        self._unnamed_attributes[key] = value
+
     def _named_attributes(self) -> Generator[str, None, None]:
         """
         Returns a generator of the names of all of this object's named attributes.
@@ -245,13 +258,15 @@ class MmifObject(object):
         else:
             if self._attribute_classes and key in self._attribute_classes \
                     and not isinstance(value, (self._attribute_classes[key])):
-                self._unnamed_attributes[key] = self._attribute_classes[key](value)  # pytype: disable=unsupported-operands
+                self.set_additional_property(key, self._attribute_classes[key](value))  # pytype: disable=unsupported-operands
             else:
-                self._unnamed_attributes[key] = value  # pytype: disable=unsupported-operands
+                self.set_additional_property(key, value)  # pytype: disable=unsupported-operands
 
     def __getitem__(self, key) -> Union['MmifObject', str, datetime]:
         if key in self._named_attributes():
             return self.__dict__[key]
+        if self._unnamed_attributes is None:
+            raise AttributeError(f"Additional properties are disallowed by {self.__class__}")
         return self._unnamed_attributes[key]
 
 
