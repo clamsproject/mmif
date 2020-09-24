@@ -9,6 +9,7 @@ import hypothesis_jsonschema  # pip install hypothesis-jsonschema
 
 import pytest
 from jsonschema import ValidationError
+from mmif import __specver__
 from mmif.serialize import *
 from mmif.serialize.model import *
 from mmif.serialize.view import ContainsDict
@@ -18,7 +19,7 @@ from tests.mmif_examples import *
 
 # Flags for skipping tests
 DEBUG = False
-SKIP_SCHEMA = True, "Skipping TestSchema by default"
+SKIP_SCHEMA = False, "Skipping TestSchema by default"
 
 
 class TestMmif(unittest.TestCase):
@@ -110,7 +111,7 @@ class TestMmif(unittest.TestCase):
     def test_document_empty_text(self):
         document = Document()
         document.id = 'm997'
-        document.at_type = "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument"
+        document.at_type = f"http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument"
         serialized = document.serialize()
         deserialized = Document(serialized)
         self.assertEqual(deserialized.properties.text_value, '')
@@ -159,12 +160,12 @@ class TestMmif(unittest.TestCase):
     def test_get_document_by_metadata(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         mmif_obj.add_document(Document("""{
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
+          "@type": "http://mmif.clams.ai/%s/vocabulary/VideoDocument",
           "properties": {
             "id": "m2",
             "mime": "video/mpeg",
             "location": "/var/archive/video-003.mp4" }
-        }"""))
+        }""" % __specver__))
         self.assertEqual(len(mmif_obj.get_documents_by_property("mime", "video/mpeg")), 2)
         self.assertEqual(len(mmif_obj.get_documents_by_property("mime", "text")), 0)
 
@@ -175,22 +176,22 @@ class TestMmif(unittest.TestCase):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 25)
         self.assertEqual(len(mmif_obj.get_documents_by_app('xxx')), 0)
-        new_document = Document({'@type': 'http://mmif.clams.ai/0.2.0/vocabulary/TextDocument',
+        new_document = Document({'@type': f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument',
                                  'properties': {'id': 'td999', 'text': {"@value": "HI"}}})
         mmif_obj['v6'].add_document(new_document)
         self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 26)
 
     def test_get_documents_locations(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
-        self.assertEqual(1, len(mmif_obj.get_documents_locations('http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument')))
-        self.assertEqual(mmif_obj.get_document_location('http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument'), "/var/archive/video-002.mp4")
+        self.assertEqual(1, len(mmif_obj.get_documents_locations(f'http://mmif.clams.ai/{__specver__}/vocabulary/VideoDocument')))
+        self.assertEqual(mmif_obj.get_document_location(f'http://mmif.clams.ai/{__specver__}/vocabulary/VideoDocument'), "/var/archive/video-002.mp4")
         # TODO (angus-lherrou @ 9-23-2020): no text documents in documents list of raw.json,
         #  un-comment and fix if we add view searching to these methods
         # text document is there but no location is specified
-        # self.assertEqual(0, len(mmif_obj.get_documents_locations('http://mmif.clams.ai/0.2.0/vocabulary/TextDocument')))
-        # self.assertEqual(mmif_obj.get_document_location('http://mmif.clams.ai/0.2.0/vocabulary/TextDocument'), None)
+        # self.assertEqual(0, len(mmif_obj.get_documents_locations(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument')))
+        # self.assertEqual(mmif_obj.get_document_location(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument'), None)
         # audio document is not there
-        self.assertEqual(0, len(mmif_obj.get_documents_locations('http://mmif.clams.ai/0.2.0/vocabulary/AudioDocument')))
+        self.assertEqual(0, len(mmif_obj.get_documents_locations(f'http://mmif.clams.ai/{__specver__}/vocabulary/AudioDocument')))
 
     def test_get_view_by_id(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
@@ -207,9 +208,9 @@ class TestMmif(unittest.TestCase):
 
     def test_get_all_views_contain(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
-        views = mmif_obj.get_all_views_contain('http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame')
+        views = mmif_obj.get_all_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame')
         self.assertEqual(4, len(views))
-        views = mmif_obj.get_all_views_contain('http://mmif.clams.ai/0.2.0/vocabulary/TextDocument')
+        views = mmif_obj.get_all_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument')
         self.assertEqual(2, len(views))
         views = mmif_obj.get_all_views_contain('http://vocab.lappsgrid.org/SemanticTag')
         self.assertEqual(1, len(views))
@@ -581,8 +582,8 @@ class TestDataStructure(unittest.TestCase):
     def test_getitem(self):
         self.assertIs(self.mmif_obj['v1'], self.datalist['v1'])
         self.assertIs(self.mmif_obj['m1'], self.freezable_datalist['m1'])
-        self.assertIs(self.mmif_obj['v1'].metadata.contains['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'],
-                      self.freezable_datadict['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'])
+        self.assertIs(self.mmif_obj['v1'].metadata.contains[f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame'],
+                      self.freezable_datadict[f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame'])
 
     def test_getitem_raises(self):
         with self.assertRaises(KeyError):
@@ -631,7 +632,7 @@ class TestDataStructure(unittest.TestCase):
     def test_membership(self):
         self.assertIn('v1', self.datalist)
         self.assertIn('m1', self.freezable_datalist)
-        self.assertIn('http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame', self.freezable_datadict)
+        self.assertIn(f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame', self.freezable_datadict)
 
         self.assertNotIn('v200', self.datalist)
         self.datalist['v200'] = View({'id': 'v200'})
@@ -719,8 +720,8 @@ class TestDataStructure(unittest.TestCase):
     def test_get(self):
         self.assertEqual(self.datalist['v1'], self.datalist.get('v1'))
         self.assertEqual(self.freezable_datalist['m1'], self.freezable_datalist.get('m1'))
-        self.assertEqual(self.freezable_datadict['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'],
-                         self.freezable_datadict.get('http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'))
+        self.assertEqual(self.freezable_datadict[f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame'],
+                         self.freezable_datadict.get(f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame'))
         self.assertIsNone(self.datalist.get('v55'))
         self.assertIsNone(self.freezable_datalist.get('m5'))
         self.assertIsNone(self.freezable_datadict.get('Segment'))

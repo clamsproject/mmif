@@ -1,5 +1,6 @@
 import unittest
 import json
+
 from mmif import Mmif, View, __specver__
 from mmif.vocabulary import AnnotationTypes
 from mmif.serialize.model import MmifObjectEncoder
@@ -22,7 +23,7 @@ class TestAnnotationTypes(unittest.TestCase):
         view_obj: View = mmif_obj.get_view_by_id('v1')
         view_obj.new_annotation('p1', AnnotationTypes.Polygon)
         view_obj.new_annotation('bb2', AnnotationTypes.TimeFrame)
-        self.assertEqual(list(view_obj.metadata.contains.keys()), ['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame', f'http://mmif.clams.ai/{__specver__}/vocabulary/Polygon'])
+        self.assertEqual(list(view_obj.metadata.contains.keys()), [f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame', f'http://mmif.clams.ai/{__specver__}/vocabulary/Polygon'])
 
     def test_serialize_within_mmif(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
