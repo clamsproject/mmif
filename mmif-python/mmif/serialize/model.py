@@ -465,11 +465,11 @@ class DataList(MmifObject, Generic[T]):
     def append(self, value, overwrite):
         raise NotImplementedError()
 
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> T:
         if key not in self.reserved_names:
             return self._items.__getitem__(key)
         else:
-            return self.__dict__[key]
+            raise KeyError("Don't use __getitem__ to access a reserved name")
 
     def __setitem__(self, key: str, value: T):
         if key not in self.reserved_names:
@@ -534,11 +534,11 @@ class DataDict(MmifObject, Generic[T]):
     def values(self):
         return self._items.values()
 
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> T:
         if key not in self.reserved_names:
             return self._items.__getitem__(key)
         else:
-            return self.__dict__[key]
+            raise KeyError("Don't use __getitem__ to access a reserved name")
 
     def __setitem__(self, key: str, value: T):
         if key not in self.reserved_names:

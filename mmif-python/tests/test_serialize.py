@@ -614,6 +614,14 @@ class TestDataStructure(unittest.TestCase):
         self.assertIs(self.mmif_obj['m1'], self.freezable_datalist['m1'])
         self.assertIs(self.mmif_obj['v1'].metadata.contains['BoundingBox'], self.freezable_datadict['BoundingBox'])
 
+    def test_getitem_raises(self):
+        with self.assertRaises(KeyError):
+            _ = self.datalist['reserved_names']
+        with self.assertRaises(KeyError):
+            _ = self.freezable_datalist['_items']
+        with self.assertRaises(KeyError):
+            _ = self.freezable_datadict['_attribute_classes']
+
     def test_append(self):
         self.assertTrue('v2' not in self.datalist._items)
         self.datalist.append(View({'id': 'v2'}))
