@@ -4,6 +4,7 @@ from io import StringIO
 from unittest.mock import patch
 import json
 
+from mmif import __specver__
 from mmif.serialize import *
 from mmif.serialize.model import FreezableMmifObject
 from mmif.serialize.view import AnnotationsList
@@ -41,7 +42,7 @@ class TestFreezeView(unittest.TestCase):
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
-            self.v1.metadata.contains['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'].producer = 'Phil'
+            self.v1.metadata.contains[f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame'].producer = 'Phil'
             self.fail('able to set attribute of Contain object in frozen View')
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
@@ -53,7 +54,7 @@ class TestFreezeView(unittest.TestCase):
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
 
         try:
-            self.v1.metadata.contains['http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame'] = Contain()
+            self.v1.metadata.contains[f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame'] = Contain()
             self.fail('able to overwrite values in contains dict after deep freeze')
         except TypeError as te:
             self.assertEqual("frozen FreezableMmifObject should be immutable", te.args[0])
