@@ -37,7 +37,7 @@ The top-level structure of a MMIF file is as follows:
 ```json
 {
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.2.0" },
+    "mmif": "http://mmif.clams.ai/0.2.0" },
   "documents": [ ],
   "views": [ ]
 }
@@ -195,17 +195,17 @@ Here is an other example of a view containing two bounding boxes created by the 
     "app": "http://apps.clams.io/east/1.0.4",
     "timestamp": "2020-05-27T12:23:45",
     "contains": {
-      "http://miff.clams.ai/0.2.0/vocabulary/BoundingBox": {
+      "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox": {
         "document": "image3",
         "unit": "pixels" } },
   },
   "annotations": [
-      { "@type": "http://miff.clams.ai/0.2.0/vocabulary/BoundingBox",
+      { "@type": "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox",
         "properties": {
           "id": "bb0",
           "coordinates": [[10,20], [60,20], [10,50], [60,50]] }
       },
-      { "@type": "http://miff.clams.ai/0.2.0/vocabulary/BoundingBox",
+      { "@type": "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox",
         "properties": {
           "id": "bb1",
           "coordinates": [[90,40], [110,40], [90,80], [110,80]] }
@@ -270,7 +270,7 @@ Tesseract will then add a view to this MMIF document that contains a text docume
 {
   "id": "v2",
   "metadata": {
-    "app": "http://mmif.clams.ai/apps/tessearct/0.2.1",
+    "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
     "contains": {
       "http://mmif.clams.ai/0.1.0/TextDocument": {},
       "http://mmif.clams.ai/0.1.0/Alignment": {} },
@@ -337,7 +337,7 @@ The image with the dog in the previous section just had a bounding box for the p
 {
   "id": "v2",
   "metadata": {
-    "app": "http://mmif.clams.ai/apps/tessearct/0.2.1",
+    "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
     "contains": {
       "http://mmif.clams.ai/0.1.0/vocabulary/TextDocument": {},
       "http://mmif.clams.ai/0.1.0/vocabulary/Alignment": {} },
@@ -414,7 +414,7 @@ Notice how the document to which the *SemanticTag* annotations point is not expr
 
 
 
-## 2. MIFF and the Vocabularies
+## 2. MMIF and the Vocabularies
 
 The structure of MMIF files is defined in the [schema](schema/mmif.json)  and described in this document. But the semantics of what is expressed in the views are determined by the [CLAMS Vocabulary](vocabulary). Each annotation in a view has two fields: *@type* and *properties*. The value of the first one is typically an annotation type from the vocabulary. Here is a *BoundingBox* annotation as an example:
 
@@ -465,7 +465,7 @@ The CLAMS Platform does not require that a URL like [https://schema.org/Clip](ht
 
 
 
-## 3. MIFF Examples
+## 3. MMIF Examples
 
 To finish off this document we provide some examples of complete MMIF documents:
 
