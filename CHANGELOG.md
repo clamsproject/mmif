@@ -11,6 +11,11 @@ This file documents changes made to the specification as well as changes to the 
 
 - Changed the SDK to work with the specifications in `spec-0.2.0`.
 
+## Version spec-0.2.1 − 2020-09-25
+
+- Removed the `@contexts` and the `mediumMetadata` from the MMIF context. This would usually not be a patch-level change but for just this occasion we decided it was.
+- Fixed a variety of spelling errors in the sample MMIF documents and specifications.
+
 
 ## Version spec-0.2.0 − 2020-09-11
 
