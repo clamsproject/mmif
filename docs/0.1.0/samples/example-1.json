@@ -1,8 +1,8 @@
 {
-	"@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+	"@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
 
 	"metadata": {
-		"mmif": "http://mmif.clams.ai/0.1.0",
+		"mmif": "http://miff.clams.ai/0.1.0",
 		"contains": {
 			"http://mmif.clams.ai/vocabulary/0.1.0/TimeFrame": ["v1", "v2"],
 			"http://vocab.lappsgrid.org/Token": ["v3"]

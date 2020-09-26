@@ -41,7 +41,7 @@ Annotations are always stored separately from the media. They can be directly li
 
 ```json
 {
-  "@context": "http://mmif.clams.ai/0.1.0/context/mmif.json",
+  "@context": "http://mmif.clams.ai/0.1.0/context/miff.json",
   "metadata": { },
   "media": [ ],
   "views": [ ]
@@ -54,7 +54,7 @@ The following sub sections describe the values of these four properties.
 
 ### 1.1. The *@context* property
 
-In JSON-LD, keys used in the various dictionaries, including the top-level dictionary show in section 1, need to be associated with a full URI. To keep the files from overflowing with full URIs we can use a context file that defines how short names like *media* can be expanded to a full URI like http://mmif.clams.ai/0.1.0/vocab/mmif/media. The value here is the fixed URL http://mmif.clams.ai/0.1.0/context/mmif.json which is a JSON-LD context document that points to the MMIF vocabulary URI http://mmif.clams.ai/0.1.0/vocab/mmif. This vocabulary defines the full of the keys used in the overal MMIF file, which includes the three keys in the example in section 1above (*metadata*, *media* and *views*) as well as many others that will be introduced below (*text*, *annotations*, *properties*, etcetera). It does not include elements from the semantic vocabularies of CLAMS and LAPPS, we will return to those later when we talk about annotations in views.
+In JSON-LD, keys used in the various dictionaries, including the top-level dictionary show in section 1, need to be associated with a full URI. To keep the files from overflowing with full URIs we can use a context file that defines how short names like *media* can be expanded to a full URI like http://mmif.clams.ai/0.1.0/vocab/mmif/media. The value here is the fixed URL http://mmif.clams.ai/0.1.0/context/miff.json which is a JSON-LD context document that points to the MMIF vocabulary URI http://mmif.clams.ai/0.1.0/vocab/mmif. This vocabulary defines the full of the keys used in the overal MMIF file, which includes the three keys in the example in section 1above (*metadata*, *media* and *views*) as well as many others that will be introduced below (*text*, *annotations*, *properties*, etcetera). It does not include elements from the semantic vocabularies of CLAMS and LAPPS, we will return to those later when we talk about annotations in views.
 
 
 
@@ -65,7 +65,7 @@ Includes any metadata associated with the file. Not heavily used for now, but we
 ```json
 {
   "metadata": {
-    "mmif": "http://mmif.clams.ai/0.1.0"
+    "mmif": "http://miff.clams.ai/0.1.0"
   }
 }
 ```
@@ -232,7 +232,7 @@ Here is an other example of a view containing two bounding boxes created by the 
   "id": "v1",
   "metadata": {
     "contains": {
-      "http://mmif.clams.ai/0.1.0/vocabulary/BoundingBox": {
+      "http://miff.clams.ai/0.1.0/vocabulary/BoundingBox": {
         "unit": "pixels" }
     },
     "medium": "image3",
@@ -240,12 +240,12 @@ Here is an other example of a view containing two bounding boxes created by the 
     "tool": "http://tools.clams.io/east/1.0.4"
   },
   "annotations": [
-      { "@type": "http://mmif.clams.ai/0.1.0/vocabulary/BoundingBox",
+      { "@type": "http://miff.clams.ai/0.1.0/vocabulary/BoundingBox",
         "properties": {
           "id": "bb0",
           "coordinates": [[10,20], [60,20], [10,50], [60,50]] }
       },
-      { "@type": "http://mmif.clams.ai/0.1.0/vocabulary/BoundingBox",
+      { "@type": "http://miff.clams.ai/0.1.0/vocabulary/BoundingBox",
         "properties": {
           "id": "bb1",
           "coordinates": [[90,40], [110,40], [90,80], [110,80]] }
@@ -346,7 +346,7 @@ The media set as a whole can be referred to with "m2", and the submedia by conca
 
 
 
-## 2. MMIF and the CLAMS Vocabulary
+## 2. MIFF and the CLAMS Vocabulary
 
 The structure of MMIF files is defined in the schema at  http://mmif.clams.ai/0.1.0/schema/mmif.json and described in this document. But the semantics of what is expressed in the views are determined by the CLAMS Vocabulary at http://mmif.clams.ai/0.1.0/vocabulary.
 
@@ -385,7 +385,7 @@ Annotations in a MMIF file can also refer to the LAPPS Vocabulary at [http://voc
 
 
 
-## 3. MMIF Examples
+## 3. MIFF Examples
 
 The first example is at [samples/example-1.json](samples/example-1.json). It contains two media, one pointing at a video and the other at a transcript. For the first medium there are two views, one with bars-and-tone annotations and one with slate annotations. For the second medium there is one view with the results of a tokenizer. This example file, while minimal, has everything required by MMIF. A few things to note:
 
