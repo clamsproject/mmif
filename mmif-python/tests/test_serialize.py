@@ -19,7 +19,7 @@ from tests.mmif_examples import *
 
 # Flags for skipping tests
 DEBUG = False
-SKIP_SCHEMA = True, "Skipping TestSchema by default"
+SKIP_SCHEMA = False, "Not skipping TestSchema by default"
 
 
 class TestMmif(unittest.TestCase):
