@@ -8,3 +8,4 @@ lxml
 sphinx
 autodoc
 sphinx-rtd-theme
+twine

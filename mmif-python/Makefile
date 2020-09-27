@@ -1,6 +1,7 @@
 # check for dependencies
-deps = curl jq git python3 pytype pytest
+deps = curl jq git python3 pytype pytest /bin/bash
 check_deps := $(foreach dep,$(deps), $(if $(shell which $(dep)),some string,$(error "No $(dep) in PATH!")))
+SHELL := /bin/bash
 
 # constants
 sdistname = mmif-python
@@ -23,7 +24,7 @@ increase_dev = $(call macro,$(1)).$(call micro,$(1)).$(call patch,$(1)).dev$$(($
 
 all: VERSION test build
 
-develop: clean devversion test devsdist
+develop: devversion test devsdist
 	python3 setup.py develop --uninstall
 	python3 setup.py develop
 	twine upload --repository-url http://morbius.cs-i.brandeis.edu:8081/repository/pypi-develop/ \
@@ -53,9 +54,13 @@ test: devversion build
 devversion: VERSION.dev VERSION; cat VERSION
 version: VERSION; cat VERSION
 
-VERSION.dev: upstreamver := $(shell curl -s -X GET 'http://morbius.cs-i.brandeis.edu:8081/service/rest/v1/search?name=$(sdistname)' | jq '. | .items[].version' -r | sort | tail -n 1)
+VERSION.dev: devver := $(shell curl -s -X GET 'http://morbius.cs-i.brandeis.edu:8081/service/rest/v1/search?name=$(sdistname)' | jq '. | .items[].version' -r | sort | tail -n 1)
+VERSION.dev: specver := $(shell git tag | grep spec- | sed 's/spec-//g' | sort | tail -n 1)
 VERSION.dev:
-	@if [[ $(upstreamver) == *.dev* ]]; then echo $(call increase_dev,$(upstreamver)) ; else echo $(call add_dev,$(call increase_patch, $(upstreamver))); fi > VERSION.dev
+	@if [ $(call macro,$(devver)) = $(call macro,$(specver)) ] && [ $(call micro,$(devver)) = $(call micro,$(specver)) ] ; \
+	then if [[ $(devver) == *.dev* ]]; then echo $(call increase_dev,$(devver)) ; else echo $(call add_dev,$(call increase_patch, $(devver))); fi ; \
+	else echo $(call add_dev,$(specver)) ; fi \
+	> VERSION.dev
 
 VERSION: version := $(shell git tag | grep py- | cut -d'-' -f 2 | sort -r | head -n 1)
 VERSION:
