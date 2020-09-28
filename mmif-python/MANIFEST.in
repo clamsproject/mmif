@@ -1,6 +1,4 @@
 # only copied in sdist and be used when building
 include ./VERSION
 include ./requirements.txt
-# also copied during `build` (including bdist_*) by include_package_data=True in setup.py
-graft mmif/res
 

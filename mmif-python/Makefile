@@ -20,11 +20,11 @@ add_dev = $(call macro,$(1)).$(call micro,$(1)).$(call patch,$(1)).dev1
 split_dev = $(word 2,$(subst .dev,$(space),$(1)))
 increase_dev = $(call macro,$(1)).$(call micro,$(1)).$(call patch,$(1)).dev$$(($(call split_dev,$(1))+1))
 
-.PHONY: all clean test develop testupload upload sdist version devversion
+.PHONY: all clean test develop testupload upload sdist version devversion pipdeps pipdevdeps
 
-all: VERSION test build
+all: version pipdevdeps test build
 
-develop: devversion test devsdist
+develop: devversion pipdevdeps devsdist test
 	python3 setup.py develop --uninstall
 	python3 setup.py develop
 	twine upload --repository-url http://morbius.cs-i.brandeis.edu:8081/repository/pypi-develop/ \
@@ -47,9 +47,15 @@ build/lib/mmif:
 	python3 setup.py build
 
 # invoking `test` without a VERSION file will generated a dev version - this ensures `make test` runs unmanned
-test: devversion build
+test: devversion pipdeps
 	pytype mmif/
 	python3 -m pytest --doctest-modules --cov=mmif
+
+pipdevdeps:
+	pip install -r requirements.dev
+
+pipdeps:
+	pip install -r requirements.txt
 
 devversion: VERSION.dev VERSION; cat VERSION
 version: VERSION; cat VERSION
@@ -71,7 +77,7 @@ VERSION:
 	fi
 
 distclean:
-	@rm -rf dist
+	@rm -rf dist build/lib/mmif build/bdist*
 clean: distclean
 	@rm -rf VERSION VERSION.dev build/lib/mmif $(bdistname).egg-info mmif/res mmif/ver mmif/vocabulary \
 	.pytest_cache .pytype coverage.xml htmlcov
