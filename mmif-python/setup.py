@@ -8,12 +8,11 @@ from typing import Union
 
 import setuptools.command.build_py
 import setuptools.command.develop
-import yaml
 
 
 name = "mmif-python"
 version_fname = "VERSION"
-
+cmdclass = {}
 
 # Used to have `import mmif` that imported `mmif` directory as a sibling, not `mmif` site-package,
 # but that created a circular dependency (importing `mmif` requires packages in "requirements.txt")
@@ -26,9 +25,13 @@ mmif_schema_res_oriname = 'schema/mmif.json'
 mmif_schema_res_name = 'mmif.json'
 mmif_vocab_res_oriname = 'vocabulary/clams.vocabulary.yaml'
 mmif_vocab_res_name = 'clams.vocabulary.yaml'
-# this is only necessary when not using setuptools/distribute
-from sphinx.setup_command import BuildDoc
-# cmdclass = {'build_sphinx': BuildDoc}
+
+try:
+    from sphinx.setup_command import BuildDoc
+    cmdclass['build_sphinx'] = BuildDoc
+except ImportError:
+    print('WARNING: sphinx not available, not building docs')
+
 
 def do_not_edit_warning(dirname):
     with open(pjoin(dirname, 'do-not-edit.txt'), 'w') as warning:
@@ -148,6 +151,7 @@ def prep_ext_files(setuptools_cmd):
         write_res_file(res_dir, mmif_vocab_res_name, get_file_contents_at_tag(gittag, mmif_vocab_res_oriname))
 
         # write vocabulary enum
+        import yaml
         yaml_file = io.BytesIO(get_file_contents_at_tag(gittag, mmif_vocab_res_oriname))
         clams_types = [t['name'] for t in list(yaml.safe_load_all(yaml_file.read()))]
         generate_vocabulary(spec_version, clams_types, 'vocabulary_files')
@@ -164,14 +168,12 @@ class SdistCommand(setuptools.command.sdist.sdist):
 
 
 @prep_ext_files
-class BuildCommand(setuptools.command.build_py.build_py):
-    pass
-
-
-@prep_ext_files
 class DevelopCommand(setuptools.command.develop.develop):
     pass
 
+
+cmdclass['sdist'] = SdistCommand
+cmdclass['develop'] = DevelopCommand
 
 with open('README.md') as readme:
     long_desc = readme.read()
@@ -189,12 +191,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://mmif.clams.ai",
     packages=setuptools.find_packages(),
-    cmdclass={
-        'sdist': SdistCommand,
-        'develop': DevelopCommand,
-        'build_py': BuildCommand,
-        'build_sphinx': BuildDoc,
-    },
+    cmdclass=cmdclass,
     # this is for *building*, building (build, bdist_*) doesn't get along with MANIFEST.in
     # so using this param explicitly is much safer implementation
     package_data={
