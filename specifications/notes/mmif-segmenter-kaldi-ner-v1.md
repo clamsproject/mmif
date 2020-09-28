@@ -12,7 +12,7 @@ Notice how the entity recognizer ran over the documents in the Kaldi view.
 ```json
 {
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.1.0" },
+    "mmif": "http://mmif.clams.ai/0.1.0" },
 
   "documents": [
     {

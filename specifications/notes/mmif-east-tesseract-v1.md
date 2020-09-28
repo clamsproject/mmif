@@ -11,7 +11,7 @@ Notice how the view created by Tesseract contains a text document.
 ```json
 {
   "metadata": {
-    "mmif": "http://miff.clams.ai/0.1.0" },
+    "mmif": "http://mmif.clams.ai/0.1.0" },
 
   "media": [
     {
@@ -49,7 +49,7 @@ Notice how the view created by Tesseract contains a text document.
       "metadata": {
         "contains": {
           "http://mmif.clams.ai/0.1.0/TextDocument": {} },
-        "app": "http://mmif.clams.ai/apps/tessearct/0.2.1"
+        "app": "http://mmif.clams.ai/apps/tesseract/0.2.1"
       },
       "annotations": [
         { 
