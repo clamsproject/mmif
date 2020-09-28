@@ -198,7 +198,7 @@ setuptools.setup(
     # this is for *building*, building (build, bdist_*) doesn't get along with MANIFEST.in
     # so using this param explicitly is much safer implementation
     package_data={
-        'mmif': ['res/*'],
+        'mmif': [f'{mmif_res_pkg}/*', f'{mmif_ver_pkg}/*', f'{mmif_vocabulary_pkg}/*'],
     },
     install_requires=requires,
     extras_require={
