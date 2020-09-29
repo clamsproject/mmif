@@ -9,15 +9,29 @@ from typing import Union
 import setuptools.command.build_py
 import setuptools.command.develop
 
-import mmif  # this imports `mmif` directory as a sibling, not `mmif` site-package
-import yaml
 
 name = "mmif-python"
 version_fname = "VERSION"
+cmdclass = {}
 
-# this is only necessary when not using setuptools/distribute
-from sphinx.setup_command import BuildDoc
-# cmdclass = {'build_sphinx': BuildDoc}
+# Used to have `import mmif` that imported `mmif` directory as a sibling, not `mmif` site-package,
+# but that created a circular dependency (importing `mmif` requires packages in "requirements.txt")
+# so we copy or move relevant package level variables used in the pre-build stage to here
+mmif_name = "mmif"
+mmif_res_pkg = 'res'
+mmif_ver_pkg = 'ver'
+mmif_vocabulary_pkg = 'vocabulary'
+mmif_schema_res_oriname = 'schema/mmif.json'
+mmif_schema_res_name = 'mmif.json'
+mmif_vocab_res_oriname = 'vocabulary/clams.vocabulary.yaml'
+mmif_vocab_res_name = 'clams.vocabulary.yaml'
+
+try:
+    from sphinx.setup_command import BuildDoc
+    cmdclass['build_sphinx'] = BuildDoc
+except ImportError:
+    print('WARNING: sphinx not available, not building docs')
+
 
 def do_not_edit_warning(dirname):
     with open(pjoin(dirname, 'do-not-edit.txt'), 'w') as warning:
@@ -64,7 +78,7 @@ def generate_vocabulary(spec_version, clams_types, source_path):
         'document_types': ['DocumentTypesBase', 'DocumentTypes']
     }
     vocabulary_dir = generate_subpack(
-        mmif.__name__, mmif._vocabulary_pkg,
+        mmif_name, mmif_vocabulary_pkg,
         '\n'.join(
             f"from .{mod_name} import {class_name}"
             for mod_name, classes in types.items()
@@ -110,7 +124,7 @@ def write_res_file(res_dir: str, res_name: str, res_data: Union[bytes, str]):
     res_file.close()
 
 
-# note that `VERSION` file will not included in bdist - bdist should already have `mmif._ver_pkg` properly set
+# note that `VERSION` file will not included in s/bdist - s/bdist should already have `mmif_ver_pkg` properly generated
 if os.path.exists(version_fname):
     with open(version_fname, 'r') as version_f:
         version = version_f.read().strip()
@@ -127,20 +141,18 @@ def prep_ext_files(setuptools_cmd):
         gittag = get_matching_gittag(version) if '.dev' not in version else "HEAD"
         spec_version = gittag.split('-')[-1]
         # making resources into a python package so that `pkg_resources` can access resource files
-        res_dir = generate_subpack(mmif.__name__, mmif._res_pkg)
+        res_dir = generate_subpack(mmif_name, mmif_res_pkg)
 
-        # the above will generate a new version value based on VERSION file
-        # but as `mmif` package is already imported at the top,
-        # mmif.__version__ is not updated, and that's why we use the value of
-        # `version` instead of `mmif.__version__` in the below when calling `setuptools.setup`
-        generate_subpack(mmif.__name__, mmif._ver_pkg, f'__version__ = "{version}"\n__specver__ = "{spec_version}"')
+        # the following will generate a new version value based on VERSION file
+        generate_subpack(mmif_name, mmif_ver_pkg, f'__version__ = "{version}"\n__specver__ = "{spec_version}"')
 
         # and write resource files
-        write_res_file(res_dir, mmif._schema_res_name, get_file_contents_at_tag(gittag, mmif._schema_res_oriname))
-        write_res_file(res_dir, mmif._vocab_res_name, get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+        write_res_file(res_dir, mmif_schema_res_name, get_file_contents_at_tag(gittag, mmif_schema_res_oriname))
+        write_res_file(res_dir, mmif_vocab_res_name, get_file_contents_at_tag(gittag, mmif_vocab_res_oriname))
 
         # write vocabulary enum
-        yaml_file = io.BytesIO(get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
+        import yaml
+        yaml_file = io.BytesIO(get_file_contents_at_tag(gittag, mmif_vocab_res_oriname))
         clams_types = [t['name'] for t in list(yaml.safe_load_all(yaml_file.read()))]
         generate_vocabulary(spec_version, clams_types, 'vocabulary_files')
 
@@ -156,14 +168,12 @@ class SdistCommand(setuptools.command.sdist.sdist):
 
 
 @prep_ext_files
-class BuildCommand(setuptools.command.build_py.build_py):
-    pass
-
-
-@prep_ext_files
 class DevelopCommand(setuptools.command.develop.develop):
     pass
 
+
+cmdclass['sdist'] = SdistCommand
+cmdclass['develop'] = DevelopCommand
 
 with open('README.md') as readme:
     long_desc = readme.read()
@@ -181,16 +191,11 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://mmif.clams.ai",
     packages=setuptools.find_packages(),
-    cmdclass={
-        'sdist': SdistCommand,
-        'develop': DevelopCommand,
-        'build_py': BuildCommand,
-        'build_sphinx': BuildDoc,
-    },
+    cmdclass=cmdclass,
     # this is for *building*, building (build, bdist_*) doesn't get along with MANIFEST.in
     # so using this param explicitly is much safer implementation
     package_data={
-        'mmif': ['res/*'],
+        'mmif': [f'{mmif_res_pkg}/*', f'{mmif_ver_pkg}/*', f'{mmif_vocabulary_pkg}/*'],
     },
     install_requires=requires,
     extras_require={

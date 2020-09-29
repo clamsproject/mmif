@@ -3,8 +3,10 @@ hypothesis-jsonschema
 pytest>=6
 pytest-cov
 pytype
+pyyaml
 bs4
 lxml
 sphinx
 autodoc
 sphinx-rtd-theme
+twine
