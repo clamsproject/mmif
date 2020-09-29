@@ -4,7 +4,5 @@ from .mmif import __all__ as mmif_all
 from .mmif import *
 from .view import __all__ as view_all
 from .view import *
-from .medium import __all__ as med_all
-from .medium import *
 
-__all__ = anno_all + mmif_all + view_all + med_all
+__all__ = anno_all + mmif_all + view_all

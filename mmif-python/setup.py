@@ -52,13 +52,41 @@ def generate_vocab_enum(spec_version, clams_types, source_path) -> str:
 
 
 def generate_vocabulary(spec_version, clams_types, source_path):
-    types = {'annotation_types.py': ['AnnotationTypesBase', 'AnnotationTypes'],
-             'media_types.py': ['MediaTypes']}
-    vocabulary_dir = generate_subpack(mmif.__name__, mmif._vocabulary_pkg,
-                                      '\n'.join(f"from .{fname.split('.')[0]} import {cname}" for fname, cnames in types.items() for cname in cnames)+'\n')
+    """
+    :param spec_version:
+    :param clams_types: the tree
+    :param source_path: the directory of source txt files
+    :return:
+    """
+    types = {
+        'thing_types': ['ThingTypesBase', 'ThingType'],
+        'annotation_types': ['AnnotationTypesBase', 'AnnotationTypes'],
+        'document_types': ['DocumentTypesBase', 'DocumentTypes']
+    }
+    vocabulary_dir = generate_subpack(
+        mmif.__name__, mmif._vocabulary_pkg,
+        '\n'.join(
+            f"from .{mod_name} import {class_name}"
+            for mod_name, classes in types.items()
+            for class_name in classes
+        )+'\n'
+    )
 
-    vocab_enum = generate_vocab_enum(spec_version, clams_types, source_path)
-    write_res_file(vocabulary_dir, 'annotation_types.py', vocab_enum)
+    type_lists = {
+        # extract document types (hacky for now, improve later)
+        'document_types': [t for t in clams_types if 'Document' in t],
+
+        # extract annotation types
+        'annotation_types': [t for t in clams_types if 'Document' not in t and t != 'Thing'],
+
+        # extract thing type
+        'thing_types': clams_types[:1]
+    }
+
+    for mod_name, type_list in type_lists.items():
+        enum_contents = generate_vocab_enum(spec_version, type_list, os.path.join(source_path, mod_name+'.txt'))
+        write_res_file(vocabulary_dir, mod_name+'.py', enum_contents)
+
     return vocabulary_dir
 
 
@@ -114,9 +142,7 @@ def prep_ext_files(setuptools_cmd):
         # write vocabulary enum
         yaml_file = io.BytesIO(get_file_contents_at_tag(gittag, mmif._vocab_res_oriname))
         clams_types = [t['name'] for t in list(yaml.safe_load_all(yaml_file.read()))]
-        vocabulary_dir = generate_vocabulary(spec_version, clams_types, os.path.join('vocabulary_files', 'annotation_types.txt'))
-        with open(os.path.join('vocabulary_files', 'media_types.txt')) as media_types_file:
-            write_res_file(vocabulary_dir, 'media_types.py', media_types_file.read())
+        generate_vocabulary(spec_version, clams_types, 'vocabulary_files')
 
         ori_run(self)
 
