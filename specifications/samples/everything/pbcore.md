@@ -27,23 +27,27 @@ The PBCore to be created has a top-level *pbcoreDescriptionDocument* element:
 </pbcoreDescriptionDocument>
 ```
 
-Within this top-level element we may add the following sub elements: *pbcoreAssetDate*, *pbcoreTitle*, *pbcoreContributor*, *pbcoreSubject*, *pbcoreAnnotation* and *pbcorePart*. The examples below for the MMIF example file [raw.json](raw.json) are based on the descriptions in [http://pbcore.org/elements](http://pbcore.org/elements) and feedback from Kevin.
+Within this top-level element we may add the following sub elements: *pbcoreAssetDate*, *pbcoreTitle*, *pbcoreContributor*, *pbcoreSubject*, *pbcoreAnnotation* and *pbcoreDescription*. The examples below for the MMIF example file [raw.json](raw.json) are based on the descriptions in [http://pbcore.org/elements](http://pbcore.org/elements) and feedback from Kevin.
 
-To map the MMIF <u>time frames</u> we need a need an element that allows us to express the type and the start and end times. The only one I can see that is not obviously intended for other uses is *pbcorePart*. It does require a couple of seb elements that are not really relevant for us:
+To map the MMIF <u>time frames</u> we need a need an element that allows us to express the type and the start and end times. The only one I can see that is not obviously intended for other uses is *pbcoreDescription* (in an earlier version of this document I used *pbcorePart* which is really not appropriate).
 
 ```xml
-<pbcorePart startTime="0" endTime="2600" partType="bars-and-tone">
-  <pbcoreIdentifier source=""/>
-  <pbcoreTitle/>
-  <pbcoreDescription/>
-</pbcorePart>
-
-<pbcorePart startTime="2700" endTime="5300" partType="slate">
-  <pbcoreIdentifier source=""/>
-  <pbcoreTitle/>
-  <pbcoreDescription/>
-</pbcorePart>
+<pbcoreDescription descriptionType="bars-and-tone" startTime="0" endTime="2600" />
+<pbcoreDescription descriptionType="slate" startTime="2700" endTime="5300" />
 ```
+
+One question I have here is whether the attribute values for start and end can be milliseconds from the beginning of the video.
+
+It was suggested that as an alternative we could use *instantiationTimeStart*, which can be repetaed:
+
+```xml
+<instantiationTimeStart annotation="bars-and-tone-start">0</instantiationTimeStart>
+<instantiationTimeStart annotation="bars-and-tone-end">2600</instantiationTimeStart>
+<instantiationTimeStart annotation="slate-start">2700</instantiationTimeStart>
+<instantiationTimeStart annotation="slate-end">5300</instantiationTimeStart>
+```
+
+This looks rather forced to me and would also require using a *pbcoreInstantiationDocument* toplevel tag I think, so I will for now dismiss this summarily.
 
 The <u>semantic tags</u> in MMIF have direct and unproblematic mappings to PBCore elements:
 
@@ -91,7 +95,7 @@ For the <u>named entities</u> we can use *pbcoreSubject*:
                startTime="21000" endTime="21000">New York</pbcoreSubject>
 ```
 
-I am not sure how to spin the attributes so this here is my best guesstimate.
+I am not sure how to spin the attributes so this here is my best guesstimate. Note that "Jim Lehrer" shows up both as a contributor and as a subject, the former because he was mentioned in the slate and the latter because his name was used in the transcript.
 
 The subject type is "entity" for all of these, the *annotation* attribute is used to store the category of the named entity, and the *ref* property is used to refer to some external authoritative source.
 
@@ -119,7 +123,9 @@ Finally, here is all the above in one XML file, adding some identifier that we g
   <pbcoreSubject subjectType="entity" annotation="Location" ref="SOME_REF"
                  startTime="21000" endTime="21000">New York</pbcoreSubject>
 
-  <pbcoreDescription/>
+  <pbcoreDescription descriptionType="bars-and-tone" startTime="0" endTime="2600" />
+
+  <pbcoreDescription descriptionType="slate" startTime="2700" endTime="5300" />
 
   <pbcoreContributor>
     <contributor>Jim Lehrer</contributor>
@@ -130,18 +136,6 @@ Finally, here is all the above in one XML file, adding some identifier that we g
     <contributor>Sara Just</contributor>
     <contributorRole>Producer</contributorRole>
   </pbcoreContributor>
-
-  <pbcorePart startTime="0" endTime="2600" partType="bars-and-tone">
-    <pbcoreIdentifier source=""/>
-    <pbcoreTitle/>
-    <pbcoreDescription/>
-  </pbcorePart>
-
-  <pbcorePart startTime="2700" endTime="5300" partType="slate">
-    <pbcoreIdentifier source=""/>
-    <pbcoreTitle/>
-    <pbcoreDescription/>
-  </pbcorePart>
 
 </pbcoreDescriptionDocument>
 ```
