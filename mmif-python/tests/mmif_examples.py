@@ -218,10 +218,10 @@ example_templates = dict(
 }
 """,
     mmif_example4="""{
-  "@context": "http://mmif.clams.ai/${specver}/context/miff.json",
+  "@context": "http://mmif.clams.ai/${specver}/context/mmif.json",
 
   "metadata": {
-    "mmif": "http://miff.clams.ai/${specver}",
+    "mmif": "http://mmif.clams.ai/${specver}",
     "contains": {
       "http://mmif.clams.ai/vocabulary/${specver}/TimeFrame": ["v1", "v2"],
       "http://vocab.lappsgrid.org/Token": ["v3"]
