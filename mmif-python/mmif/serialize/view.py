@@ -32,7 +32,7 @@ class View(FreezableMmifObject):
     :param view_obj: the JSON data that defines the view
     """
 
-    def __init__(self, view_obj: Union[str, dict] = None) -> None:
+    def __init__(self, view_obj: Union[bytes, str, dict] = None) -> None:
         self.id: str = ''
         self.metadata: ViewMetadata = ViewMetadata()
         self.annotations: AnnotationsList = AnnotationsList()
@@ -149,7 +149,7 @@ class ViewMetadata(FreezableMmifObject):
     :param viewmetadata_obj: the JSON data that defines the metadata
     """
 
-    def __init__(self, viewmetadata_obj: Union[str, dict] = None) -> None:
+    def __init__(self, viewmetadata_obj: Union[bytes, str, dict] = None) -> None:
         self.document: str = ''
         self.timestamp: Optional[datetime] = None
         self.app: str = ''
@@ -219,7 +219,7 @@ class Contain(FreezableMmifObject):
     :param contain_obj: the metadata that defines this object
     """
 
-    def __init__(self, contain_obj: Union[str, dict] = None) -> None:
+    def __init__(self, contain_obj: Union[bytes, str, dict] = None) -> None:
         # TODO (krim @ 8/19/20): rename `producer` to `app` maybe?
         self.producer: str = ''
         self.gen_time: Optional[datetime] = None
