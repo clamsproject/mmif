@@ -3,9 +3,11 @@ import json
 from io import StringIO
 from unittest.mock import patch
 
+import mmif
 from hypothesis import given, settings, HealthCheck  # pip install hypothesis
 import hypothesis_jsonschema  # pip install hypothesis-jsonschema
 
+import pytest
 from jsonschema import ValidationError
 from mmif import __specver__
 from mmif.serialize import *
