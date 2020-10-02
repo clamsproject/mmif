@@ -77,7 +77,9 @@ class MmifObject(object):
     _unnamed_attributes: Optional[dict]
     _attribute_classes: PMap = m()  # Mapping: str -> Type
 
-    def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
+    def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
+        if isinstance(mmif_obj, bytes):
+            mmif_obj = mmif_obj.decode('utf8')
         if not hasattr(self, '_unnamed_attributes'):
             self._unnamed_attributes = {}
         if mmif_obj is not None:
@@ -411,7 +413,7 @@ class DataList(MmifObject, Generic[T]):
 
     :param Union[str, list] mmif_obj: the data that the list contains
     """
-    def __init__(self, mmif_obj: Union[str, list] = None):
+    def __init__(self, mmif_obj: Union[bytes, str, list] = None):
         self.reserved_names = self.reserved_names.add('_items')
         self._items: Dict[str, T] = dict()
         self.disallow_additional_properties()
@@ -514,7 +516,7 @@ class FreezableDataList(FreezableMmifObject, DataList[T]):
 
 
 class DataDict(MmifObject, Generic[T]):
-    def __init__(self, mmif_obj: Union[str, dict] = None):
+    def __init__(self, mmif_obj: Union[bytes, str, dict] = None):
         self.reserved_names = self.reserved_names.add('_items')
         self._items: Dict[str, T] = dict()
         self.disallow_additional_properties()

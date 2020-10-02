@@ -26,7 +26,11 @@ class TestMmif(unittest.TestCase):
 
     def setUp(self) -> None:
         self.mmif_examples_json = {'mmif_example1': json.loads(JSON_STR)}
-        
+
+    def test_init_from_bytes(self):
+        mmif_from_str = Mmif(JSON_STR)
+        mmif_from_bytes = Mmif(JSON_STR.encode('utf8'))
+        self.assertEqual(mmif_from_str, mmif_from_bytes)
 
     def test_str_mmif_deserialize(self):
         for i, example in MMIF_EXAMPLES.items():
@@ -398,8 +402,11 @@ class TestView(unittest.TestCase):
     def test_init(self):
         view_from_json = View(self.view_json)
         view_from_str = View(json.dumps(self.view_json))
+        view_from_bytes = View(json.dumps(self.view_json).encode('utf-8'))
         self.assertEqual(view_from_str, view_from_json)
+        self.assertEqual(view_from_str, view_from_bytes)
         self.assertEqual(json.loads(view_from_json.serialize()), json.loads(view_from_str.serialize()))
+        self.assertEqual(json.loads(view_from_bytes.serialize()), json.loads(view_from_str.serialize()))
 
     def test_annotation_order_preserved(self):
         view_serial = self.view_obj.serialize()

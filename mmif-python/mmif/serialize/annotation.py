@@ -20,7 +20,7 @@ class Annotation(FreezableMmifObject):
     MmifObject that represents an annotation in a MMIF view.
     """
 
-    def __init__(self, anno_obj: Union[str, dict] = None) -> None:
+    def __init__(self, anno_obj: Union[bytes, str, dict] = None) -> None:
         self._type: Union[str, ThingTypesBase] = ''
         if 'properties' not in self.__dict__:  # don't overwrite DocumentProperties on super() call
             self.properties: AnnotationProperties = AnnotationProperties()
@@ -73,7 +73,7 @@ class Document(Annotation):
 
     :param document_obj: the JSON data that defines the document
     """
-    def __init__(self, doc_obj: Union[str, dict] = None) -> None:
+    def __init__(self, doc_obj: Union[bytes, str, dict] = None) -> None:
         self._type: Union[str, DocumentTypesBase] = ''
         self.properties: DocumentProperties = DocumentProperties()
         self.disallow_additional_properties()
@@ -97,7 +97,7 @@ class AnnotationProperties(FreezableMmifObject):
     :param mmif_obj: the JSON data that defines the properties
     """
 
-    def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
+    def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
         self.id: str = ''
         super().__init__(mmif_obj)
 
@@ -110,7 +110,7 @@ class DocumentProperties(AnnotationProperties):
     :param mmif_obj: the JSON data that defines the properties
     """
 
-    def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
+    def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
         self.mime: str = ''
         self.location: str = ''
         self.text: Text = Text()
@@ -136,7 +136,7 @@ class DocumentProperties(AnnotationProperties):
 
 class Text(FreezableMmifObject):
 
-    def __init__(self, text_obj: Union[str, dict] = None) -> None:
+    def __init__(self, text_obj: Union[bytes, str, dict] = None) -> None:
         self._value: str = ''
         self._language: str = ''
         self.disallow_additional_properties()
