@@ -18,8 +18,8 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements.dev
         echo "codecov.dev" > VERSION
-        python setup.py build
-        python -m pytest --cov=mmif/ --cov-report=xml
+        python setup.py sdist
+        python -m pytest --doctest-modules --cov=mmif/ --cov-report=xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:

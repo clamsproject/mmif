@@ -11,7 +11,7 @@ from typing import Dict, Union, Optional
 import dateutil.parser
 from pyrsistent import pmap
 
-from .annotation import Annotation
+from .annotation import Annotation, Document
 from .model import FreezableMmifObject, FreezableDataList, FreezableDataDict
 from mmif.vocabulary import AnnotationTypesBase
 
@@ -32,8 +32,7 @@ class View(FreezableMmifObject):
     :param view_obj: the JSON data that defines the view
     """
 
-    def __init__(self, view_obj: Union[str, dict] = None) -> None:
-        self._context: str = ''
+    def __init__(self, view_obj: Union[bytes, str, dict] = None) -> None:
         self.id: str = ''
         self.metadata: ViewMetadata = ViewMetadata()
         self.annotations: AnnotationsList = AnnotationsList()
@@ -96,11 +95,34 @@ class View(FreezableMmifObject):
         self.new_contain(annotation.at_type)
         return annotation
 
+    def add_document(self, document: Document, overwrite=False) -> Annotation:
+        """
+        Appends a Document object to the annotations list.
+
+        Fails if there is already a document with the same ID in the annotations list.
+
+        :param document: the Document object to add
+        :param overwrite: if set to True, will overwrite
+                          an existing view with the same ID
+        :return: None
+        """
+        return self.add_annotation(document, overwrite)
+
+    def get_documents(self):
+        return [annotation for annotation in self.annotations if annotation.is_document()]
+
+    def get_document_by_id(self, doc_id) -> Document:
+        doc_found = self.annotations.get(doc_id)
+        if doc_found is None or not isinstance(doc_found, Document):
+            raise KeyError(f"{doc_id} not found in view {self.id}.")
+        else:
+            return doc_found
+
     def __getitem__(self, key: str) -> 'Annotation':
         """
         getitem implementation for View.
 
-        >>> obj = View('''{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"medium": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}''')
+        >>> obj = View('''{"id": "v1","metadata": {"contains": {"BoundingBox": {"unit": "pixels"}},"document": "m1","tool": "http://tools.clams.io/east/1.0.4"},"annotations": [{"@type": "BoundingBox","properties": {"id": "bb1","coordinates": [[90,40], [110,40], [90,50], [110,50]] }}]}''')
         >>> type(obj['bb1'])
         <class 'mmif.serialize.annotation.Annotation'>
         >>> obj['asdf']
@@ -120,7 +142,6 @@ class View(FreezableMmifObject):
         return anno_result
 
 
-
 class ViewMetadata(FreezableMmifObject):
     """
     ViewMetadata object that represents the ``metadata`` object within a MMIF view.
@@ -128,8 +149,8 @@ class ViewMetadata(FreezableMmifObject):
     :param viewmetadata_obj: the JSON data that defines the metadata
     """
 
-    def __init__(self, viewmetadata_obj: Union[str, dict] = None) -> None:
-        self.medium: str = ''
+    def __init__(self, viewmetadata_obj: Union[bytes, str, dict] = None) -> None:
+        self.document: str = ''
         self.timestamp: Optional[datetime] = None
         self.app: str = ''
         self.contains: ContainsDict = ContainsDict()
@@ -198,7 +219,7 @@ class Contain(FreezableMmifObject):
     :param contain_obj: the metadata that defines this object
     """
 
-    def __init__(self, contain_obj: Union[str, dict] = None) -> None:
+    def __init__(self, contain_obj: Union[bytes, str, dict] = None) -> None:
         # TODO (krim @ 8/19/20): rename `producer` to `app` maybe?
         self.producer: str = ''
         self.gen_time: Optional[datetime] = None
@@ -217,12 +238,12 @@ class Contain(FreezableMmifObject):
             self.gen_time = dateutil.parser.isoparse(self.gen_time)
 
 
-class AnnotationsList(FreezableDataList[Annotation]):
+class AnnotationsList(FreezableDataList[Union[Annotation, Document]]):
     """
     AnnotationsList object that implements :class:`mmif.serialize.model.DataList`
     for :class:`mmif.serialize.annotation.Annotation`.
     """
-    _items: Dict[str, Annotation]
+    _items: Dict[str, Union[Annotation, Document]]
 
     def _deserialize(self, input_list: list) -> None:
         """
@@ -232,9 +253,11 @@ class AnnotationsList(FreezableDataList[Annotation]):
         :param input_list: the JSON data that defines the list of annotations
         :return: None
         """
-        self._items = {item['properties']['id']: Annotation(item) for item in input_list}
+        self._items = {item['properties']['id']: Document(item)
+                       if item['_type'].endswith("Document") else Annotation(item)
+                       for item in input_list}
 
-    def append(self, value: Annotation, overwrite=False) -> None:
+    def append(self, value: Union[Annotation, Document], overwrite=False) -> None:
         """
         Appends an annotation to the list.
 

@@ -77,7 +77,9 @@ class MmifObject(object):
     _unnamed_attributes: Optional[dict]
     _attribute_classes: PMap = m()  # Mapping: str -> Type
 
-    def __init__(self, mmif_obj: Union[str, dict] = None) -> None:
+    def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
+        if isinstance(mmif_obj, bytes):
+            mmif_obj = mmif_obj.decode('utf8')
         if not hasattr(self, '_unnamed_attributes'):
             self._unnamed_attributes = {}
         if mmif_obj is not None:
@@ -89,6 +91,19 @@ class MmifObject(object):
         of unnamed attributes after initialization.
         """
         self._unnamed_attributes = None
+
+    def set_additional_property(self, key: str, value: Any) -> None:
+        """
+        Method to set values in _unnamed_attributes.
+        :param key: the attribute name
+        :param value: the desired value
+        :return: None
+        :raise: AttributeError if additional properties are disallowed
+                by :func:`disallow_additional_properties`
+        """
+        if self._unnamed_attributes is None:
+            raise AttributeError(f"Additional properties are disallowed by {self.__class__}")
+        self._unnamed_attributes[key] = value # pytype: disable=unsupported-operands
 
     def _named_attributes(self) -> Generator[str, None, None]:
         """
@@ -107,7 +122,7 @@ class MmifObject(object):
         """
         return json.dumps(self._serialize(), indent=2 if pretty else None, cls=MmifObjectEncoder)
 
-    def _serialize(self, alt_container: Dict = None) -> Union[None, dict]:
+    def _serialize(self, alt_container: Dict = None) -> dict:
         """
         Maps a MMIF object to a plain python dict object,
         rewriting internal keys that start with '_' to
@@ -237,13 +252,23 @@ class MmifObject(object):
         if key in self.reserved_names:
             raise KeyError("can't set item on a reserved name")
         if key in self._named_attributes():
-            self.__dict__[key] = value
+            if self._attribute_classes and key in self._attribute_classes \
+                    and not isinstance(value, (self._attribute_classes[key])):
+                self.__dict__[key] = self._attribute_classes[key](value)
+            else:
+                self.__dict__[key] = value
         else:
-            self._unnamed_attributes[key] = value   # pytype: disable=unsupported-operands
+            if self._attribute_classes and key in self._attribute_classes \
+                    and not isinstance(value, (self._attribute_classes[key])):
+                self.set_additional_property(key, self._attribute_classes[key](value))
+            else:
+                self.set_additional_property(key, value)
 
     def __getitem__(self, key) -> Union['MmifObject', str, datetime]:
         if key in self._named_attributes():
             return self.__dict__[key]
+        if self._unnamed_attributes is None:
+            raise AttributeError(f"Additional properties are disallowed by {self.__class__}")
         return self._unnamed_attributes[key]
 
 
@@ -383,12 +408,12 @@ class MmifObjectEncoder(json.JSONEncoder):
 class DataList(MmifObject, Generic[T]):
     """
     The DataList class is an abstraction that represents the
-    various lists found in a MMIF file, such as media, submedia,
+    various lists found in a MMIF file, such as documents, subdocuments,
     views, and annotations.
 
     :param Union[str, list] mmif_obj: the data that the list contains
     """
-    def __init__(self, mmif_obj: Union[str, list] = None):
+    def __init__(self, mmif_obj: Union[bytes, str, list] = None):
         self.reserved_names = self.reserved_names.add('_items')
         self._items: Dict[str, T] = dict()
         self.disallow_additional_properties()
@@ -408,11 +433,15 @@ class DataList(MmifObject, Generic[T]):
         """
         Passes the input data into the internal deserializer.
         """
-        if isinstance(mmif_json, str):
-            mmif_json = json.loads(mmif_json)
-        self._deserialize(mmif_json)
+        super().deserialize(mmif_json)  # pytype: disable=unsupported-operands
 
-    def _deserialize(self, input_dict: dict) -> None:
+    @staticmethod
+    def _load_json(json_list: Union[list, str]) -> list:
+        if type(json_list) is str:
+            json_list = json.loads(json_list)
+        return [MmifObject._load_json(obj) for obj in json_list]
+    
+    def _deserialize(self, input_list: dict) -> None:
         raise NotImplementedError()
 
     def get(self, key: str) -> Optional[T]:
@@ -453,11 +482,11 @@ class DataList(MmifObject, Generic[T]):
     def append(self, value, overwrite):
         raise NotImplementedError()
 
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> T:
         if key not in self.reserved_names:
             return self._items.__getitem__(key)
         else:
-            return self.__dict__[key]
+            raise KeyError("Don't use __getitem__ to access a reserved name")
 
     def __setitem__(self, key: str, value: T):
         if key not in self.reserved_names:
@@ -487,7 +516,7 @@ class FreezableDataList(FreezableMmifObject, DataList[T]):
 
 
 class DataDict(MmifObject, Generic[T]):
-    def __init__(self, mmif_obj: Union[str, dict] = None):
+    def __init__(self, mmif_obj: Union[bytes, str, dict] = None):
         self.reserved_names = self.reserved_names.add('_items')
         self._items: Dict[str, T] = dict()
         self.disallow_additional_properties()
@@ -497,11 +526,6 @@ class DataDict(MmifObject, Generic[T]):
 
     def _serialize(self, *args, **kwargs) -> dict:
         return super()._serialize(self._items)
-
-    def deserialize(self, mmif_json: Union[str, dict]) -> None:
-        if isinstance(mmif_json, str):
-            mmif_json = json.loads(mmif_json)
-        self._deserialize(mmif_json)
 
     def _deserialize(self, input_dict: dict) -> None:
         raise NotImplementedError()
@@ -527,11 +551,11 @@ class DataDict(MmifObject, Generic[T]):
     def values(self):
         return self._items.values()
 
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> T:
         if key not in self.reserved_names:
             return self._items.__getitem__(key)
         else:
-            return self.__dict__[key]
+            raise KeyError("Don't use __getitem__ to access a reserved name")
 
     def __setitem__(self, key: str, value: T):
         if key not in self.reserved_names:
