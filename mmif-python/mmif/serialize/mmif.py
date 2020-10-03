@@ -32,7 +32,7 @@ class Mmif(MmifObject):
 
     view_prefix: ClassVar[str] = 'v_'
 
-    def __init__(self, mmif_obj: Union[str, dict] = None, *, validate: bool = True, frozen: bool = True) -> None:
+    def __init__(self, mmif_obj: Union[bytes, str, dict] = None, *, validate: bool = True, frozen: bool = True) -> None:
         self.metadata: MmifMetadata = MmifMetadata()
         self.documents: DocumentsList = DocumentsList()
         self.views: ViewsList = ViewsList()
@@ -49,7 +49,7 @@ class Mmif(MmifObject):
             self.freeze_views()
 
     @staticmethod
-    def validate(json_str: Union[str, dict]) -> None:
+    def validate(json_str: Union[bytes, str, dict]) -> None:
         """
         Validates a MMIF JSON object against the MMIF Schema.
         Note that this method operates before processing by MmifObject._load_str,
@@ -62,6 +62,8 @@ class Mmif(MmifObject):
         # NOTE that schema file first needs to be copied to resources directory
         # this is automatically done via setup.py, so for users this shouldn't be a matter
 
+        if isinstance(json_str, bytes):
+            json_str = json_str.decode('utf8')
         schema_res = resource_stream(f'{mmif.__name__}.{mmif._res_pkg}', mmif._schema_res_name)
         schema = json.load(schema_res)
         schema_res.close()
@@ -303,7 +305,7 @@ class MmifMetadata(MmifObject):
     :param metadata_obj: the JSON data
     """
 
-    def __init__(self, metadata_obj: Union[str, dict] = None) -> None:
+    def __init__(self, metadata_obj: Union[bytes, str, dict] = None) -> None:
         super().__init__(metadata_obj)
 
 
