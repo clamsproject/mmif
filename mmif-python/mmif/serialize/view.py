@@ -13,7 +13,7 @@ from pyrsistent import pmap
 
 from .annotation import Annotation, Document
 from .model import FreezableMmifObject, FreezableDataList, FreezableDataDict
-from mmif.vocabulary import AnnotationTypesBase
+from mmif.vocabulary import ThingTypesBase
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
@@ -43,7 +43,7 @@ class View(FreezableMmifObject):
         })
         super().__init__(view_obj)
 
-    def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
+    def new_contain(self, at_type: Union[str, ThingTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         """
         Adds a new element to the ``contains`` metadata.
 
@@ -53,7 +53,7 @@ class View(FreezableMmifObject):
         """
         return self.metadata.new_contain(at_type, contain_dict)
 
-    def new_annotation(self, aid: str, at_type: Union[str, AnnotationTypesBase], overwrite=False) -> 'Annotation':
+    def new_annotation(self, aid: str, at_type: Union[str, ThingTypesBase], overwrite=False) -> 'Annotation':
         """
         Generates a new :class:`mmif.serialize.annotation.Annotation`
         object and adds it to the current view.
@@ -189,7 +189,7 @@ class ViewMetadata(FreezableMmifObject):
                 break
         return exists
 
-    def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
+    def new_contain(self, at_type: Union[str, ThingTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         """
         Adds a new element to the ``contains`` dictionary.
 
@@ -197,7 +197,7 @@ class ViewMetadata(FreezableMmifObject):
         :param contain_dict: any metadata associated with the annotation type
         :return: the generated :class:`Contain` object
         """
-        if isinstance(at_type, AnnotationTypesBase):
+        if isinstance(at_type, ThingTypesBase):
             exists = self._find_match_hotfix(at_type.name) or self._find_match_hotfix(at_type.value)
             final_key = at_type.value
         else:
