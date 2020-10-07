@@ -261,6 +261,12 @@ class TestMmif(unittest.TestCase):
         except KeyError:
             self.fail("raised exception on duplicate ID add when overwrite was set to True")
 
+    def test_empty_source_mmif(self):
+        mmif_obj = Mmif(validate=False, frozen=False)
+        med_obj = Document(SUB_EXAMPLES['doc_example'])
+        mmif_obj.add_document(med_obj)
+        Mmif.validate(str(mmif_obj))
+
     def test_add_view(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         view_obj = View()
