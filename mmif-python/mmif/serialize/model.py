@@ -81,13 +81,13 @@ class MmifObject(object):
     reserved_names: PSet = s('reserved_names', '_unnamed_attributes', '_attribute_classes', '_required_attributes')
     _unnamed_attributes: Optional[dict]
     _attribute_classes: PMap = m()  # Mapping: str -> Type
-    _required_attributes: List[str]
+    _required_attributes: PVector
 
     def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
         if isinstance(mmif_obj, bytes):
             mmif_obj = mmif_obj.decode('utf8')
         if not hasattr(self, '_required_attributes'):
-            self._required_attributes = []
+            self._required_attributes = pvector()
         if not hasattr(self, '_unnamed_attributes'):
             self._unnamed_attributes = {}
         if mmif_obj is not None:

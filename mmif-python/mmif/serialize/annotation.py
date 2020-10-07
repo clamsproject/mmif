@@ -8,7 +8,7 @@ of a view. For documentation on how views are represented, see
 """
 
 from typing import Union
-from pyrsistent import pmap
+from pyrsistent import pmap, pvector
 from .model import FreezableMmifObject
 from mmif.vocabulary import ThingTypesBase, DocumentTypesBase
 
@@ -27,7 +27,7 @@ class Annotation(FreezableMmifObject):
         self.disallow_additional_properties()
         if 'properties' not in self._attribute_classes:
             self._attribute_classes = pmap({'properties': AnnotationProperties})
-        self._required_attributes = ["_type", "properties"]
+        self._required_attributes = pvector(["_type", "properties"])
         super().__init__(anno_obj)
 
     @property
@@ -100,7 +100,7 @@ class AnnotationProperties(FreezableMmifObject):
 
     def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
         self.id: str = ''
-        self._required_attributes = ["id"]
+        self._required_attributes = pvector(["id"])
         super().__init__(mmif_obj)
 
 
@@ -142,7 +142,7 @@ class Text(FreezableMmifObject):
         self._value: str = ''
         self._language: str = ''
         self.disallow_additional_properties()
-        self._required_attributes = ["_value"]
+        self._required_attributes = pvector(["_value"])
         super().__init__(text_obj)
 
     @property

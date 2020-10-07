@@ -9,7 +9,7 @@ data that was previously present in the MMIF file.
 from datetime import datetime
 from typing import Dict, Union, Optional
 import dateutil.parser
-from pyrsistent import pmap
+from pyrsistent import pmap, pvector
 
 from .annotation import Annotation, Document
 from .model import FreezableMmifObject, FreezableDataList, FreezableDataDict
@@ -41,7 +41,7 @@ class View(FreezableMmifObject):
             'metadata': ViewMetadata,
             'annotations': AnnotationsList
         })
-        self._required_attributes = ["id", "metadata", "annotations"]
+        self._required_attributes = pvector(["id", "metadata", "annotations"])
         super().__init__(view_obj)
 
     def new_contain(self, at_type: Union[str, ThingTypesBase], contain_dict: dict = None) -> Optional['Contain']:
@@ -155,7 +155,7 @@ class ViewMetadata(FreezableMmifObject):
         self.timestamp: Optional[datetime] = None
         self.app: str = ''
         self.contains: ContainsDict = ContainsDict()
-        self._required_attributes = ["app", "contains"]
+        self._required_attributes = pvector(["app", "contains"])
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:

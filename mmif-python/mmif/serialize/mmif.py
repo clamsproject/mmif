@@ -13,7 +13,7 @@ import jsonschema.validators
 from pkg_resources import resource_stream
 
 import mmif
-from pyrsistent import pmap
+from pyrsistent import pmap, pvector
 
 from .view import View
 from .annotation import Annotation, Document
@@ -43,7 +43,7 @@ class Mmif(MmifObject):
             'documents': DocumentsList,
             'views': ViewsList
         })
-        self._required_attributes = ["metadata", "documents", "views"]
+        self._required_attributes = pvector(["metadata", "documents", "views"])
         super().__init__(mmif_obj)
         if frozen:
             self.freeze_documents()
@@ -309,7 +309,7 @@ class MmifMetadata(MmifObject):
     def __init__(self, metadata_obj: Union[bytes, str, dict] = None) -> None:
         # TODO (krim @ 10/7/20): there could be a better name and a better way to give a value to this
         self.mmif: str = f"http://mmif.clams.ai/{mmif.__specver__}"
-        self._required_attributes = ["mmif"]
+        self._required_attributes = pvector(["mmif"])
         super().__init__(metadata_obj)
 
 
