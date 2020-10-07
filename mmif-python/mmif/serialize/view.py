@@ -41,6 +41,7 @@ class View(FreezableMmifObject):
             'metadata': ViewMetadata,
             'annotations': AnnotationsList
         })
+        self._required_attributes = ["id", "metadata", "annotations"]
         super().__init__(view_obj)
 
     def new_contain(self, at_type: Union[str, ThingTypesBase], contain_dict: dict = None) -> Optional['Contain']:
@@ -154,6 +155,7 @@ class ViewMetadata(FreezableMmifObject):
         self.timestamp: Optional[datetime] = None
         self.app: str = ''
         self.contains: ContainsDict = ContainsDict()
+        self._required_attributes = ["app", "contains"]
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:

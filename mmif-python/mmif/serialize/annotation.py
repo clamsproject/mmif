@@ -27,6 +27,7 @@ class Annotation(FreezableMmifObject):
         self.disallow_additional_properties()
         if 'properties' not in self._attribute_classes:
             self._attribute_classes = pmap({'properties': AnnotationProperties})
+        self._required_attributes = ["_type", "properties"]
         super().__init__(anno_obj)
 
     @property
@@ -99,6 +100,7 @@ class AnnotationProperties(FreezableMmifObject):
 
     def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
         self.id: str = ''
+        self._required_attributes = ["id"]
         super().__init__(mmif_obj)
 
 
@@ -140,6 +142,7 @@ class Text(FreezableMmifObject):
         self._value: str = ''
         self._language: str = ''
         self.disallow_additional_properties()
+        self._required_attributes = ["_value"]
         super().__init__(text_obj)
 
     @property

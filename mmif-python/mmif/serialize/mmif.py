@@ -43,6 +43,7 @@ class Mmif(MmifObject):
             'documents': DocumentsList,
             'views': ViewsList
         })
+        self._required_attributes = ["metadata", "documents", "views"]
         super().__init__(mmif_obj)
         if frozen:
             self.freeze_documents()
@@ -306,6 +307,9 @@ class MmifMetadata(MmifObject):
     """
 
     def __init__(self, metadata_obj: Union[bytes, str, dict] = None) -> None:
+        # TODO (krim @ 10/7/20): there could be a better name and a better way to give a value to this
+        self.mmif: str = f"http://mmif.clams.ai/{mmif.__specver__}"
+        self._required_attributes = ["mmif"]
         super().__init__(metadata_obj)
 
 
