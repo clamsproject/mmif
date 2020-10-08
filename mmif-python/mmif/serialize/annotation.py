@@ -30,6 +30,12 @@ class Annotation(FreezableMmifObject):
         self._required_attributes = pvector(["_type", "properties"])
         super().__init__(anno_obj)
 
+    def is_type(self, type: Union[str, ThingTypesBase]) -> bool:
+        """
+        Check if the @type of this object matches.
+        """
+        return str(self.at_type) == str(type)
+
     @property
     def at_type(self) -> Union[str, ThingTypesBase]:
         # TODO (krim @ 8/19/20): should we always return string? leaving this to return

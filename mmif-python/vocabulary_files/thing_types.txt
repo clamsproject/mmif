@@ -5,6 +5,9 @@ from enum import Enum
 
 class ThingTypesBase(Enum):
     def _serialize(self):
+        return str(self)
+
+    def __str__(self):
         return self.value
 
 

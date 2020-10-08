@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import List, Union, Optional, Dict, ClassVar
 
 import jsonschema.validators
+from mmif import DocumentTypes
 from pkg_resources import resource_stream
 
 import mmif
@@ -158,6 +159,27 @@ class Mmif(MmifObject):
             return view.get_documents()
         else:
             return []
+
+    def get_documents_by_type(self, doc_type: Union[str, DocumentTypes]) -> List[Document]:
+        """
+        Method to get all documents object queries by its originated app name.
+
+        :param doc_type: the type of documents to search for, must be one of ``Document`` type defined in the CLAMS vocabulary.
+        :return: a list of documents matching the requested type, or an empty list if none found.
+        """
+        docs = []
+        # as only `TextDocument`s are allowed in view:annotations list
+        if str(doc_type) == str(DocumentTypes.TextDocument):
+            for view in self.views:
+                for doc in view.get_documents():
+                    # TODO (krim @ 9/19/20): we can have a reserved_name in `Document` to store parent view id,
+                    # instead of changing the doc ID
+                    # TODO (krim @ 9/19/20): colon should be stored as a constant with a proper name
+                    if ":" not in doc.id:
+                        doc.id = f"{view.id}:{doc.id}"
+                    docs.append(doc)
+        docs.extend([document for document in self.documents if document.is_type(doc_type)])
+        return docs
 
     def get_documents_by_app(self, app_id: str) -> List[Document]:
         """

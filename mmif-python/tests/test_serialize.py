@@ -11,6 +11,7 @@ import pytest
 from jsonschema import ValidationError
 from mmif import __specver__
 from mmif.serialize import *
+from mmif.vocabulary import DocumentTypes
 from mmif.serialize.model import *
 from mmif.serialize.view import ContainsDict
 from pkg_resources import resource_stream
@@ -184,6 +185,13 @@ class TestMmif(unittest.TestCase):
                                  'properties': {'id': 'td999', 'text': {"@value": "HI"}}})
         mmif_obj['v6'].add_document(new_document)
         self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 26)
+
+    def test_get_documents_by_type(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
+        # probably the worst way of testing...
+        self.assertEqual(len(mmif_obj.get_documents_by_type(DocumentTypes.VideoDocument)), 1)
+        self.assertEqual(len(mmif_obj.get_documents_by_type(DocumentTypes.TextDocument)), 26)
+
 
     def test_get_documents_locations(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
