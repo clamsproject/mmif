@@ -208,7 +208,6 @@ class ViewMetadata(FreezableMmifObject):
 
         if not exists:
             new_contain = Contain(contain_dict)
-            new_contain.gen_time = datetime.now()
             self.contains[final_key] = new_contain
             return new_contain
 
