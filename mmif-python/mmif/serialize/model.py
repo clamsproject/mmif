@@ -78,7 +78,14 @@ class MmifObject(object):
      an ID value automatically generated, based on its parent object.
     """
     
-    reserved_names: PSet = s('reserved_names', '_unnamed_attributes', '_attribute_classes', '_required_attributes')
+    reserved_names: PSet = s('reserved_names',
+                             '_unnamed_attributes',
+                             '_attribute_classes',
+                             '_required_attributes',
+                             # used in freezable subclasses
+                             '_frozen',
+                             # used in Document class to store parent view id
+                             '_parent_view_id')
     _unnamed_attributes: Optional[dict]
     _attribute_classes: PMap = m()  # Mapping: str -> Type
     _required_attributes: PVector
@@ -283,7 +290,6 @@ class MmifObject(object):
 
 
 class FreezableMmifObject(MmifObject):
-    reserved_names = MmifObject.reserved_names.add('_frozen')
 
     def __init__(self, *args, **kwargs) -> None:
         self._frozen = False

@@ -107,6 +107,7 @@ class View(FreezableMmifObject):
                           an existing view with the same ID
         :return: None
         """
+        document.parent = self.id
         return self.add_annotation(document, overwrite)
 
     def get_documents(self):
