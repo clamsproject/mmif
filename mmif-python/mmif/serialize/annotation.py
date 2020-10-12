@@ -30,6 +30,12 @@ class Annotation(FreezableMmifObject):
         self._required_attributes = pvector(["_type", "properties"])
         super().__init__(anno_obj)
 
+    def is_type(self, type: Union[str, ThingTypesBase]) -> bool:
+        """
+        Check if the @type of this object matches.
+        """
+        return str(self.at_type) == str(type)
+
     @property
     def at_type(self) -> Union[str, ThingTypesBase]:
         # TODO (krim @ 8/19/20): should we always return string? leaving this to return
@@ -75,11 +81,22 @@ class Document(Annotation):
     :param document_obj: the JSON data that defines the document
     """
     def __init__(self, doc_obj: Union[bytes, str, dict] = None) -> None:
+        self._parent_view_id = ''
         self._type: Union[str, DocumentTypesBase] = ''
         self.properties: DocumentProperties = DocumentProperties()
         self.disallow_additional_properties()
         self._attribute_classes = pmap({'properties': DocumentProperties})
         super().__init__(doc_obj)
+
+    @property
+    def parent(self) -> str:
+        return self._parent_view_id
+
+    @parent.setter
+    def parent(self, parent_view_id: str) -> None:
+        # I want to make this to accept `View` object as an input too,
+        # but import `View` will break the code due to circular imports
+        self._parent_view_id = parent_view_id
 
     @property
     def location(self) -> str:

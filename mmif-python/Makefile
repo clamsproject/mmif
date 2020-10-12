@@ -42,7 +42,7 @@ $(artifact):
 	python3 setup.py build
 
 # invoking `test` without a VERSION file will generated a dev version - this ensures `make test` runs unmanned
-test: devversion 
+test: devversion package
 	pip install -r requirements.dev
 	pip install -r requirements.txt
 	pytype $(packagename)
@@ -64,11 +64,22 @@ increase_dev = $(call macro,$(1)).$(call micro,$(1)).$(call patch,$(1)).dev$$(($
 devversion: VERSION.dev VERSION; cat VERSION
 version: VERSION; cat VERSION
 
-VERSION.dev: devver := $(shell curl -s -X GET 'http://morbius.cs-i.brandeis.edu:8081/service/rest/v1/search?name=$(sdistname)' | jq '. | .items[].version' -r | sort | tail -n 1)
+	# pyver = latest `py-` tag
+	# devver = max(latest-on-morbius-pypi, pyver + 0.0.1) (this comparison is IMPORTANT)
+	# specver = latest `spec-` tag
+	# if devver == specver (in terms of major & minor): 
+	# 	if devver == *dev*:
+	# 		return devver + 0.0.0.dev1
+	# 	else
+	# 		return concat(devver, ".dev1")
+	# else: 
+	# 	return concat(specver, ".dev1")
+VERSION.dev: pyver := $(shell git tag | grep py- | sed 's/py-//g' | sort | tail -n 1)
+VERSION.dev: devver := $(shell cat <(curl -s -X GET 'http://morbius.cs-i.brandeis.edu:8081/service/rest/v1/search?name=$(sdistname)' | jq '. | .items[].version' -r) <(echo $(call increase_patch,$(pyver))) | sort -V | tail -n 1)
 VERSION.dev: specver := $(shell git tag | grep spec- | sed 's/spec-//g' | sort | tail -n 1)
 VERSION.dev:
 	@if [ $(call macro,$(devver)) = $(call macro,$(specver)) ] && [ $(call micro,$(devver)) = $(call micro,$(specver)) ] ; \
-	then if [[ $(devver) == *.dev* ]]; then echo $(call increase_dev,$(devver)) ; else echo $(call add_dev,$(call increase_patch, $(devver))); fi ; \
+	then if [[ $(devver) == *.dev* ]]; then echo $(call increase_dev,$(devver)) ; else echo $(call add_dev,$(devver)); fi ; \
 	else echo $(call add_dev,$(specver)) ; fi \
 	> VERSION.dev
 

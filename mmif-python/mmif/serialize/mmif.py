@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import List, Union, Optional, Dict, ClassVar
 
 import jsonschema.validators
+from mmif import DocumentTypes
 from pkg_resources import resource_stream
 
 import mmif
@@ -159,6 +160,20 @@ class Mmif(MmifObject):
         else:
             return []
 
+    def get_documents_by_type(self, doc_type: Union[str, DocumentTypes]) -> List[Document]:
+        """
+        Method to get all documents where the type matches a particular document type, which should be one of the CLAMS document types.
+
+        :param doc_type: the type of documents to search for, must be one of ``Document`` type defined in the CLAMS vocabulary.
+        :return: a list of documents matching the requested type, or an empty list if none found.
+        """
+        docs = []
+        # although only `TextDocument`s are allowed in view:annotations list, this implementation is more future-proof
+        for view in self.views:
+            docs.extend([document for document in view.get_documents() if document.is_type(doc_type)])
+        docs.extend([document for document in self.documents if document.is_type(doc_type)])
+        return docs
+
     def get_documents_by_app(self, app_id: str) -> List[Document]:
         """
         Method to get all documents object queries by its originated app name.
@@ -166,12 +181,11 @@ class Mmif(MmifObject):
         :param app_id: the app name to search for
         :return: a list of documents matching the requested app name, or an empty list if the app not found
         """
-        # TODO (krim @ 9/19/20): what if there are two or more views generated
-        #  by the same app (separately)
+        docs = []
         for view in self.views:
             if view.metadata.app == app_id:
-                return view.get_documents()
-        return []
+                docs.extend(view.get_documents())
+        return docs
 
     def get_documents_by_property(self, prop_key: str, prop_value: str) -> List[Document]:
         """
@@ -185,11 +199,6 @@ class Mmif(MmifObject):
         for view in self.views:
             for doc in view.get_documents():
                 if doc.properties[prop_key] == prop_value:
-                    # TODO (krim @ 9/19/20): we can have a reserved_name in `Document` to store parent view id,
-                    # instead of changing the doc ID
-                    # TODO (krim @ 9/19/20): colon should be stored as a constant with a proper name
-                    if ":" not in doc.id:
-                        doc.id = f"{view.id}:{doc.id}"
                     docs.append(doc)
         docs.extend([document for document in self.documents if document.properties[prop_key] == prop_value])
         return docs
