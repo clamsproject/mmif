@@ -14,6 +14,7 @@ from mmif import DocumentTypes
 from pkg_resources import resource_stream
 
 import mmif
+from mmif import ThingTypesBase, DocumentTypes
 from pyrsistent import pmap, pvector
 
 from .view import View
@@ -203,7 +204,7 @@ class Mmif(MmifObject):
         docs.extend([document for document in self.documents if document.properties[prop_key] == prop_value])
         return docs
 
-    def get_documents_locations(self, m_type: str) -> List[str]:
+    def get_documents_locations(self, m_type: Union[DocumentTypes, str]) -> List[str]:
         """
         This method returns the file paths of documents of given type.
         Only top-level documents have locations, so we only check them.
@@ -211,9 +212,9 @@ class Mmif(MmifObject):
         :param m_type: the type to search for
         :return: a list of the values of the location fields in the corresponding documents
         """
-        return [document.location for document in self.documents if document.at_type == m_type and len(document.location) > 0]
+        return [document.location for document in self.documents if document.is_type(m_type) and len(document.location) > 0]
 
-    def get_document_location(self, m_type: str) -> str:
+    def get_document_location(self, m_type: Union[DocumentTypes, str]) -> str:
         """
         Method to get the location of *first* document of given type.
 
@@ -254,7 +255,7 @@ class Mmif(MmifObject):
             raise KeyError("{} view not found".format(req_view_id))
         return result
 
-    def get_all_views_contain(self, at_type: str) -> List[View]:
+    def get_all_views_contain(self, at_type: Union[ThingTypesBase, str]) -> List[View]:
         """
         Returns the list of all views in the MMIF if a given type
         type is present in that view's 'contains' metadata.
@@ -262,9 +263,9 @@ class Mmif(MmifObject):
         :param at_type: the type to check for
         :return: the list of views that contain the type
         """
-        return [view for view in self.views if at_type in view.metadata.contains]
+        return [view for view in self.views if str(at_type) in view.metadata.contains]
 
-    def get_view_contains(self, at_type: str) -> Optional[View]:
+    def get_view_contains(self, at_type: Union[ThingTypesBase, str]) -> Optional[View]:
         """
         Returns the last view appended that contains the given
         type in its 'contains' metadata.
@@ -275,7 +276,7 @@ class Mmif(MmifObject):
         # will return the *latest* view
         # works as of python 3.6+ (checked by setup.py) because dicts are deterministically ordered by insertion order
         for view in reversed(self.views):
-            if at_type in view.metadata.contains:
+            if str(at_type) in view.metadata.contains:
                 return view
         return None
 
