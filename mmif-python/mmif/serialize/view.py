@@ -43,6 +43,9 @@ class View(FreezableMmifObject):
         })
         self._required_attributes = pvector(["id", "metadata", "annotations"])
         super().__init__(view_obj)
+        for item in self.annotations:
+            if isinstance(item, Document):
+                item.parent = self.id
 
     def new_contain(self, at_type: Union[str, ThingTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         """

@@ -467,6 +467,10 @@ class TestView(unittest.TestCase):
         self.view_obj.new_annotation('relation1', 'Relation')  # raise exception if this fails
         self.assertIn('Relation', self.view_obj.metadata.contains)
 
+    def test_parent(self):
+        mmif_obj = Mmif(self.mmif_examples_json['mmif_example1'])
+        self.assertTrue(all(doc.parent == v.id for v in mmif_obj.views for doc in mmif_obj.get_documents_in_view(v.id)))
+
 
 class TestAnnotation(unittest.TestCase):
     # TODO (angus-lherrou @ 7/27/2020): testing should include validation for required attrs
