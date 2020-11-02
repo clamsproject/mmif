@@ -18,7 +18,7 @@ from pyrsistent import pvector, m, pmap, s, PVector, PMap, PSet, thaw
 from datetime import datetime
 
 from deepdiff import DeepDiff
-from typing import Union, Any, Dict, Optional, TypeVar, Generic, Type, Generator, Iterator
+from typing import Union, Any, Dict, Optional, TypeVar, Generic, Type, Generator, Iterator, List
 
 T = TypeVar('T')
 
@@ -41,18 +41,23 @@ class MmifObject(object):
     an actual representation with a JSON formatted string or equivalent
     `dict` object argument.
 
-    This superclass has two specially designed instance variables, and these
+    This superclass has three specially designed instance variables, and these
     variable names cannot be used as attribute names for MMIF objects.
 
-    1. _unnamed_attributes
-       only can be either None or an empty dictionary. If it's set to None,
+    1. _unnamed_attributes:
+       Only can be either None or an empty dictionary. If it's set to None,
        it means the class won't take any ``Additional Attributes`` in the JSON
        schema sense. If it's a dict, users can throw any k-v pairs to the
        class, EXCEPT for the reserved two key names.
     2. _attribute_classes:
-       this is a dict from a key name to a specific python class to use for
+       This is a dict from a key name to a specific python class to use for
        deserialize the value. Note that a key name in this dict does NOT
        have to be a *named* attribute, but is recommended to be one.
+    3. _required_attributes:
+       This is a simple list of names of attributes that are required in the object.
+       When serialize, an object will skip its *empty* (e.g. zero-length, or None)
+       attributes unless they are in this list. Otherwise, the serialized JSON
+       string would have empty representations (e.g. ``""``, ``[]``).
 
     # TODO (krim @ 8/17/20): this dict is however, a duplicate with the type hints in the class definition.
     Maybe there is a better way to utilize type hints (e.g. getting them as a programmatically), but for now
@@ -73,13 +78,23 @@ class MmifObject(object):
      an ID value automatically generated, based on its parent object.
     """
     
-    reserved_names: PSet = s('reserved_names', '_unnamed_attributes', '_attribute_classes')
+    reserved_names: PSet = s('reserved_names',
+                             '_unnamed_attributes',
+                             '_attribute_classes',
+                             '_required_attributes',
+                             # used in freezable subclasses
+                             '_frozen',
+                             # used in Document class to store parent view id
+                             '_parent_view_id')
     _unnamed_attributes: Optional[dict]
     _attribute_classes: PMap = m()  # Mapping: str -> Type
+    _required_attributes: PVector
 
     def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
         if isinstance(mmif_obj, bytes):
             mmif_obj = mmif_obj.decode('utf8')
+        if not hasattr(self, '_required_attributes'):
+            self._required_attributes = pvector()
         if not hasattr(self, '_unnamed_attributes'):
             self._unnamed_attributes = {}
         if mmif_obj is not None:
@@ -148,7 +163,9 @@ class MmifObject(object):
             # means _unnamed_attributes is None, so nothing unnamed would be serialized
             pass
         for k, v in self.__dict__.items():
-            if k in self.reserved_names or self.is_empty(v):
+            if k in self.reserved_names:
+                continue
+            if k not in self._required_attributes and self.is_empty(v):
                 continue
             if isinstance(v, (PSet, PVector, PMap)):
                 v = thaw(v)
@@ -221,10 +238,10 @@ class MmifObject(object):
     def _deserialize(self, input_dict: dict) -> None:
         """
         Maps a plain python dict object to a MMIF object.
-        If a subclass needs special treatment during the mapping, it needs to
+        If a subclass needs a special treatment during the mapping, it needs to
         override this method.
 
-        This defalt method won't work for generic types (e.g. List[X], Dict[X, Y]).
+        This default method won't work for generic types (e.g. List[X], Dict[X, Y]).
         For now, lists are abstracted as DataList and dicts are abstracted as XXXMedata classes.
         However, if an attribute uses a generic type (e.g. view_metadata.contains: Dict[str, Contain])
         that class should override _deserialize of its own.
@@ -273,7 +290,6 @@ class MmifObject(object):
 
 
 class FreezableMmifObject(MmifObject):
-    reserved_names = MmifObject.reserved_names.add('_frozen')
 
     def __init__(self, *args, **kwargs) -> None:
         self._frozen = False

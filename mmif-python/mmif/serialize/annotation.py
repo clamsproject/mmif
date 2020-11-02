@@ -8,7 +8,7 @@ of a view. For documentation on how views are represented, see
 """
 
 from typing import Union
-from pyrsistent import pmap
+from pyrsistent import pmap, pvector
 from .model import FreezableMmifObject
 from mmif.vocabulary import ThingTypesBase, DocumentTypesBase
 
@@ -27,7 +27,14 @@ class Annotation(FreezableMmifObject):
         self.disallow_additional_properties()
         if 'properties' not in self._attribute_classes:
             self._attribute_classes = pmap({'properties': AnnotationProperties})
+        self._required_attributes = pvector(["_type", "properties"])
         super().__init__(anno_obj)
+
+    def is_type(self, type: Union[str, ThingTypesBase]) -> bool:
+        """
+        Check if the @type of this object matches.
+        """
+        return str(self.at_type) == str(type)
 
     @property
     def at_type(self) -> Union[str, ThingTypesBase]:
@@ -74,11 +81,22 @@ class Document(Annotation):
     :param document_obj: the JSON data that defines the document
     """
     def __init__(self, doc_obj: Union[bytes, str, dict] = None) -> None:
+        self._parent_view_id = ''
         self._type: Union[str, DocumentTypesBase] = ''
         self.properties: DocumentProperties = DocumentProperties()
         self.disallow_additional_properties()
         self._attribute_classes = pmap({'properties': DocumentProperties})
         super().__init__(doc_obj)
+
+    @property
+    def parent(self) -> str:
+        return self._parent_view_id
+
+    @parent.setter
+    def parent(self, parent_view_id: str) -> None:
+        # I want to make this to accept `View` object as an input too,
+        # but import `View` will break the code due to circular imports
+        self._parent_view_id = parent_view_id
 
     @property
     def location(self) -> str:
@@ -99,6 +117,7 @@ class AnnotationProperties(FreezableMmifObject):
 
     def __init__(self, mmif_obj: Union[bytes, str, dict] = None) -> None:
         self.id: str = ''
+        self._required_attributes = pvector(["id"])
         super().__init__(mmif_obj)
 
 
@@ -140,6 +159,7 @@ class Text(FreezableMmifObject):
         self._value: str = ''
         self._language: str = ''
         self.disallow_additional_properties()
+        self._required_attributes = pvector(["_value"])
         super().__init__(text_obj)
 
     @property

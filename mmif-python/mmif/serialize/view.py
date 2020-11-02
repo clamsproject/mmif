@@ -9,11 +9,11 @@ data that was previously present in the MMIF file.
 from datetime import datetime
 from typing import Dict, Union, Optional
 import dateutil.parser
-from pyrsistent import pmap
+from pyrsistent import pmap, pvector
 
 from .annotation import Annotation, Document
 from .model import FreezableMmifObject, FreezableDataList, FreezableDataDict
-from mmif.vocabulary import AnnotationTypesBase
+from mmif.vocabulary import ThingTypesBase
 
 
 __all__ = ['View', 'ViewMetadata', 'Contain']
@@ -41,9 +41,10 @@ class View(FreezableMmifObject):
             'metadata': ViewMetadata,
             'annotations': AnnotationsList
         })
+        self._required_attributes = pvector(["id", "metadata", "annotations"])
         super().__init__(view_obj)
 
-    def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
+    def new_contain(self, at_type: Union[str, ThingTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         """
         Adds a new element to the ``contains`` metadata.
 
@@ -53,7 +54,7 @@ class View(FreezableMmifObject):
         """
         return self.metadata.new_contain(at_type, contain_dict)
 
-    def new_annotation(self, aid: str, at_type: Union[str, AnnotationTypesBase], overwrite=False) -> 'Annotation':
+    def new_annotation(self, aid: str, at_type: Union[str, ThingTypesBase], overwrite=False) -> 'Annotation':
         """
         Generates a new :class:`mmif.serialize.annotation.Annotation`
         object and adds it to the current view.
@@ -106,6 +107,7 @@ class View(FreezableMmifObject):
                           an existing view with the same ID
         :return: None
         """
+        document.parent = self.id
         return self.add_annotation(document, overwrite)
 
     def get_documents(self):
@@ -154,6 +156,7 @@ class ViewMetadata(FreezableMmifObject):
         self.timestamp: Optional[datetime] = None
         self.app: str = ''
         self.contains: ContainsDict = ContainsDict()
+        self._required_attributes = pvector(["app", "contains"])
         super().__init__(viewmetadata_obj)
 
     def _deserialize(self, input_dict: dict) -> None:
@@ -189,7 +192,7 @@ class ViewMetadata(FreezableMmifObject):
                 break
         return exists
 
-    def new_contain(self, at_type: Union[str, AnnotationTypesBase], contain_dict: dict = None) -> Optional['Contain']:
+    def new_contain(self, at_type: Union[str, ThingTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         """
         Adds a new element to the ``contains`` dictionary.
 
@@ -197,7 +200,7 @@ class ViewMetadata(FreezableMmifObject):
         :param contain_dict: any metadata associated with the annotation type
         :return: the generated :class:`Contain` object
         """
-        if isinstance(at_type, AnnotationTypesBase):
+        if isinstance(at_type, ThingTypesBase):
             exists = self._find_match_hotfix(at_type.name) or self._find_match_hotfix(at_type.value)
             final_key = at_type.value
         else:
@@ -206,7 +209,6 @@ class ViewMetadata(FreezableMmifObject):
 
         if not exists:
             new_contain = Contain(contain_dict)
-            new_contain.gen_time = datetime.now()
             self.contains[final_key] = new_contain
             return new_contain
 

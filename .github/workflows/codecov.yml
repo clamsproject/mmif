@@ -1,4 +1,4 @@
-name: Codecov action for *any* branch 
+name: test and send code coverage to codecov.io
 on: [push]
 jobs:
   run:
@@ -7,9 +7,10 @@ jobs:
       OS: linux
       PYTHON: '3.6'
     steps:
-    - uses: actions/checkout@master
+    - name: checkout the repo 
+      uses: actions/checkout@v2
     - name: Setup Python
-      uses: actions/setup-python@master
+      uses: actions/setup-python@v2
       with:
         python-version: 3.6
     - name: Run test and generate coverage report

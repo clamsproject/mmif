@@ -11,6 +11,7 @@ import pytest
 from jsonschema import ValidationError
 from mmif import __specver__
 from mmif.serialize import *
+from mmif.vocabulary import DocumentTypes
 from mmif.serialize.model import *
 from mmif.serialize.view import ContainsDict
 from pkg_resources import resource_stream
@@ -130,11 +131,14 @@ class TestMmif(unittest.TestCase):
 
     def test_add_documents(self):
         document_json = json.loads(SUB_EXAMPLES['doc_example'])
-        # TODO (angus-lherrou @ 8/5/2020): check for ID uniqueness once implemented, e.g. in PR #60
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         old_documents_count = len(mmif_obj.documents)
         mmif_obj.add_document(Document(document_json))  # just raise exception if this fails
         self.assertEqual(old_documents_count+1, len(mmif_obj.documents))
+        view_obj = mmif_obj.get_view_by_id('v1')
+        doc_obj = Document(document_json)
+        view_obj.add_document(doc_obj)
+        self.assertEqual(doc_obj.parent, view_obj.id)
 
     def test_get_document_by_id(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
@@ -174,8 +178,6 @@ class TestMmif(unittest.TestCase):
         self.assertEqual(len(mmif_obj.get_documents_by_property("mime", "text")), 0)
 
     def test_get_documents_by_app(self):
-        # TODO (angus-lherrou @ 9-21-2020): if/when get_documents_by_app
-        #  is changed to fetch from multiple views, update this test
         tesseract_appid = 'http://mmif.clams.ai/apps/tesseract/0.2.1'
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
         self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 25)
@@ -184,6 +186,18 @@ class TestMmif(unittest.TestCase):
                                  'properties': {'id': 'td999', 'text': {"@value": "HI"}}})
         mmif_obj['v6'].add_document(new_document)
         self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 26)
+        new_view = mmif_obj.new_view()
+        new_view.metadata.app = tesseract_appid
+        new_view.new_contain(DocumentTypes.TextDocument)
+        new_view.add_document(new_document)
+        self.assertEqual(len(mmif_obj.get_documents_by_app(tesseract_appid)), 27)
+
+    def test_get_documents_by_type(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'], frozen=False)
+        # probably the worst way of testing...
+        self.assertEqual(len(mmif_obj.get_documents_by_type(DocumentTypes.VideoDocument)), 1)
+        self.assertEqual(len(mmif_obj.get_documents_by_type(DocumentTypes.TextDocument)), 26)
+
 
     def test_get_documents_locations(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
@@ -260,6 +274,12 @@ class TestMmif(unittest.TestCase):
             mmif_obj.add_document(med_obj, overwrite=True)
         except KeyError:
             self.fail("raised exception on duplicate ID add when overwrite was set to True")
+
+    def test_empty_source_mmif(self):
+        mmif_obj = Mmif(validate=False, frozen=False)
+        med_obj = Document(SUB_EXAMPLES['doc_example'])
+        mmif_obj.add_document(med_obj)
+        Mmif.validate(str(mmif_obj))
 
     def test_add_view(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
