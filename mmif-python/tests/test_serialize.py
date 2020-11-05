@@ -14,6 +14,7 @@ from mmif.serialize import *
 from mmif.vocabulary import DocumentTypes
 from mmif.serialize.model import *
 from mmif.serialize.view import ContainsDict
+from mmif.vocabulary import AnnotationTypes, DocumentTypes
 from pkg_resources import resource_stream
 from tests.mmif_examples import *
 
@@ -231,6 +232,12 @@ class TestMmif(unittest.TestCase):
         views = mmif_obj.get_all_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument')
         self.assertEqual(2, len(views))
         views = mmif_obj.get_all_views_contain('http://vocab.lappsgrid.org/SemanticTag')
+        self.assertEqual(1, len(views))
+        views = mmif_obj.get_all_views_contain([
+            AnnotationTypes.TimeFrame.value,
+            DocumentTypes.TextDocument.value,
+            AnnotationTypes.Alignment.value
+        ])
         self.assertEqual(1, len(views))
         views = mmif_obj.get_all_views_contain('not_a_type')
         self.assertEqual(0, len(views))
