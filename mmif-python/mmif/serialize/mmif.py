@@ -71,7 +71,7 @@ class Mmif(MmifObject):
         schema_res = resource_stream(f'{mmif.__name__}.{mmif._res_pkg}', mmif._schema_res_name)
         schema = json.load(schema_res)
         schema_res.close()
-        if type(json_str) == str:
+        if isinstance(json_str, str):
             json_str = json.loads(json_str)
         jsonschema.validate(json_str, schema)
 
@@ -264,7 +264,7 @@ class Mmif(MmifObject):
         :param at_types: a list of types or just a type to check for
         :return: the list of views that contain the type
         """
-        if type(at_types) == str or type(at_types) == ThingTypesBase:
+        if isinstance(at_types, str) or isinstance(at_types, ThingTypesBase):
             return [view for view in self.views if str(at_types) in view.metadata.contains]
         else:
             return [view for view in self.views
@@ -281,7 +281,7 @@ class Mmif(MmifObject):
         # will return the *latest* view
         # works as of python 3.6+ (checked by setup.py) because dicts are deterministically ordered by insertion order
         for view in reversed(self.views):
-            if type(at_types) == str or type(at_types) == ThingTypesBase:
+            if isinstance(at_types, str) or isinstance(at_types, ThingTypesBase):
                 if str(at_types) in view.metadata.contains:
                     return view
             else:
