@@ -20,6 +20,7 @@ from pyrsistent import pmap, pvector
 from .view import View
 from .annotation import Annotation, Document
 from .model import MmifObject, DataList, FreezableDataList
+from mmif.vocabulary import AnnotationTypes, DocumentTypes
 
 __all__ = ['Mmif']
 
@@ -70,7 +71,7 @@ class Mmif(MmifObject):
         schema_res = resource_stream(f'{mmif.__name__}.{mmif._res_pkg}', mmif._schema_res_name)
         schema = json.load(schema_res)
         schema_res.close()
-        if type(json_str) == str:
+        if isinstance(json_str, str):
             json_str = json.loads(json_str)
         jsonschema.validate(json_str, schema)
 
@@ -255,29 +256,37 @@ class Mmif(MmifObject):
             raise KeyError("{} view not found".format(req_view_id))
         return result
 
-    def get_all_views_contain(self, at_type: Union[ThingTypesBase, str]) -> List[View]:
+    def get_all_views_contain(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> List[View]:
         """
-        Returns the list of all views in the MMIF if a given type
-        type is present in that view's 'contains' metadata.
+        Returns the list of all views in the MMIF if given types
+        are present in that view's 'contains' metadata.
 
-        :param at_type: the type to check for
+        :param at_types: a list of types or just a type to check for
         :return: the list of views that contain the type
         """
-        return [view for view in self.views if str(at_type) in view.metadata.contains]
+        if isinstance(at_types, str) or isinstance(at_types, ThingTypesBase):
+            return [view for view in self.views if str(at_types) in view.metadata.contains]
+        else:
+            return [view for view in self.views
+                    if all(map(lambda x: str(x) in view.metadata.contains, at_types))]
 
-    def get_view_contains(self, at_type: Union[ThingTypesBase, str]) -> Optional[View]:
+    def get_view_contains(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> Optional[View]:
         """
         Returns the last view appended that contains the given
-        type in its 'contains' metadata.
+        types in its 'contains' metadata.
 
-        :param at_type: the type to check for
+        :param at_types: a list of types or just a type to check for
         :return: the view, or None if the type is not found
         """
         # will return the *latest* view
         # works as of python 3.6+ (checked by setup.py) because dicts are deterministically ordered by insertion order
         for view in reversed(self.views):
-            if str(at_type) in view.metadata.contains:
-                return view
+            if isinstance(at_types, str) or isinstance(at_types, ThingTypesBase):
+                if str(at_types) in view.metadata.contains:
+                    return view
+            else:
+                if all(map(lambda x: str(x) in view.metadata.contains, at_types)):
+                    return view
         return None
 
     def __getitem__(self, item: str) -> Union[Document, View, Annotation]:

@@ -14,6 +14,7 @@ from mmif.serialize import *
 from mmif.vocabulary import DocumentTypes
 from mmif.serialize.model import *
 from mmif.serialize.view import ContainsDict
+from mmif.vocabulary import AnnotationTypes, DocumentTypes
 from pkg_resources import resource_stream
 from tests.mmif_examples import *
 
@@ -226,11 +227,17 @@ class TestMmif(unittest.TestCase):
 
     def test_get_all_views_contain(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
-        views = mmif_obj.get_all_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TimeFrame')
+        views = mmif_obj.get_all_views_contain(AnnotationTypes.TimeFrame)
         self.assertEqual(4, len(views))
         views = mmif_obj.get_all_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument')
         self.assertEqual(2, len(views))
         views = mmif_obj.get_all_views_contain('http://vocab.lappsgrid.org/SemanticTag')
+        self.assertEqual(1, len(views))
+        views = mmif_obj.get_all_views_contain([
+            AnnotationTypes.TimeFrame,
+            DocumentTypes.TextDocument.value,
+            AnnotationTypes.Alignment.value
+        ])
         self.assertEqual(1, len(views))
         views = mmif_obj.get_all_views_contain('not_a_type')
         self.assertEqual(0, len(views))
@@ -240,6 +247,13 @@ class TestMmif(unittest.TestCase):
         view = mmif_obj.get_view_contains('http://vocab.lappsgrid.org/SemanticTag')
         self.assertIsNotNone(view)
         self.assertEqual('v8', view.id)
+        view = mmif_obj.get_view_contains([
+            AnnotationTypes.TimeFrame,
+            DocumentTypes.TextDocument.value,
+            AnnotationTypes.Alignment.value
+        ])
+        self.assertIsNotNone(view)
+        self.assertEqual('v4', view.id)
         view = mmif_obj.get_view_contains('NonExistingType')
         self.assertIsNone(view)
 
