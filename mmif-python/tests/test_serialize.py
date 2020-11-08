@@ -485,6 +485,21 @@ class TestView(unittest.TestCase):
         mmif_obj = Mmif(self.mmif_examples_json['mmif_example1'])
         self.assertTrue(all(doc.parent == v.id for v in mmif_obj.views for doc in mmif_obj.get_documents_in_view(v.id)))
 
+    def test_get_annotations(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        # simple search by at_type
+        annotations = list(mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame))
+        self.assertEqual(len(annotations), 2)
+        # at_type + property
+        annotations = list(mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame, frameType='speech'))
+        self.assertEqual(len(annotations), 1)
+        # just property
+        annotations = list(mmif_obj['v3'].get_annotations(frameType='speech'))
+        self.assertEqual(len(annotations), 1)
+        # at_type + annotation metadata
+        annotations = list(mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame, unit='milliseconds'))
+        self.assertEqual(len(annotations), 2)
+
 
 class TestAnnotation(unittest.TestCase):
     # TODO (angus-lherrou @ 7/27/2020): testing should include validation for required attrs
