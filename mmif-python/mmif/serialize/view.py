@@ -129,7 +129,7 @@ class View(FreezableMmifObject):
             at_type_metadata = self.metadata.contains[str(at_type)]
         for annotation in self.annotations:
             if not at_type:
-                if all(map(lambda kv: prop_check(kv[0], kv[1], annotation.properties), properties.items())):
+                if all(map(lambda kv: prop_check(kv[0], kv[1], annotation.properties, self.metadata.contains[str(annotation.at_type)]), properties.items())):
                     yield annotation
             if at_type and str(annotation.at_type) == str(at_type):
                 if all(map(lambda kv: prop_check(kv[0], kv[1], annotation.properties, at_type_metadata), properties.items())):
