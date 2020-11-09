@@ -256,12 +256,36 @@ class Mmif(MmifObject):
             raise KeyError("{} view not found".format(req_view_id))
         return result
 
+    def get_alignments(self, at_type1: Union[str, ThingTypesBase], at_type2: Union[str, ThingTypesBase]) -> Dict[str, List[Annotation]]:
+        """
+        Finds views where alignments between two given annotation types occurred.
+
+        :return: a dict that keyed by view IDs (str) and has lists of alignment Annotation objects as values.
+        """
+        v_and_a = {}
+        for alignment_view in self.get_all_views_contain(AnnotationTypes.Alignment):
+            alignments = []
+            # TODO (krim @ 11/7/20): maybe Alignment can have metadata on what types are aligned?
+            for alignment in alignment_view.get_annotations(AnnotationTypes.Alignment):
+                aligned_types = set()
+                for ann_id in [alignment.properties['target'], alignment.properties['source']]:
+                    if ':' in ann_id:
+                        view_id, ann_id = ann_id.split(':')
+                        aligned_types.add(str(self[view_id][ann_id].at_type))
+                    else:
+                        aligned_types.add(str(alignment_view[ann_id].at_type))
+                if str(at_type1) in aligned_types and str(at_type2) in aligned_types:
+                    alignments.append(alignment)
+            if len(alignments) > 0:
+                v_and_a[alignment_view.id] = alignments
+        return v_and_a
+
     def get_all_views_contain(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> List[View]:
         """
         Returns the list of all views in the MMIF if given types
         are present in that view's 'contains' metadata.
 
-        :param at_types: a list of types or just a type to check for
+        :param at_types: a list of types or just a type to check for. When given more than one types, all types must be found.
         :return: the list of views that contain the type
         """
         if isinstance(at_types, str) or isinstance(at_types, ThingTypesBase):
@@ -275,7 +299,7 @@ class Mmif(MmifObject):
         Returns the last view appended that contains the given
         types in its 'contains' metadata.
 
-        :param at_types: a list of types or just a type to check for
+        :param at_types: a list of types or just a type to check for. When given more than one types, all types must be found.
         :return: the view, or None if the type is not found
         """
         # will return the *latest* view

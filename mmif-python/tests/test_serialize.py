@@ -257,6 +257,22 @@ class TestMmif(unittest.TestCase):
         view = mmif_obj.get_view_contains('NonExistingType')
         self.assertIsNone(view)
 
+    def test_get_alignments(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        views_and_alignments = mmif_obj.get_alignments(DocumentTypes.TextDocument, AnnotationTypes.TimeFrame)
+        self.assertEqual(1, len(views_and_alignments))
+        self.assertTrue('v4' in views_and_alignments)
+        self.assertEqual(1, len(views_and_alignments['v4']))
+        views_and_alignments = mmif_obj.get_alignments("http://vocab.lappsgrid.org/Token", AnnotationTypes.TimeFrame)
+        self.assertEqual(1, len(views_and_alignments))
+        self.assertTrue('v4' in views_and_alignments)
+        self.assertEqual(28, len(views_and_alignments['v4']))
+        views_and_alignments = mmif_obj.get_alignments(DocumentTypes.TextDocument, AnnotationTypes.BoundingBox)
+        self.assertEqual(1, len(views_and_alignments))
+        self.assertTrue('v6' in views_and_alignments)
+
+
+
     def test_new_view_id(self):
         p = Mmif.view_prefix
         mmif_obj = Mmif(validate=False)
