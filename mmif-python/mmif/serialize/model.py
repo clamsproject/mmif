@@ -283,8 +283,9 @@ class MmifObject(object):
 
     def __contains__(self, key: str) -> bool:
         try:
-            return key in self._named_attributes() or key in self._unnamed_attributes
-        except AttributeError:
+            self.__getitem__(key)
+            return True
+        except (TypeError, AttributeError, KeyError):
             return False
 
     def __getitem__(self, key) -> Union['MmifObject', str, datetime]:

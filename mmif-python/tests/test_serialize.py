@@ -229,11 +229,11 @@ class TestMmif(unittest.TestCase):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         views = mmif_obj.get_all_views_contain(AnnotationTypes.TimeFrame)
         self.assertEqual(4, len(views))
-        views = mmif_obj.get_all_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument')
+        views = mmif_obj.get_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument')
         self.assertEqual(2, len(views))
         views = mmif_obj.get_all_views_contain('http://vocab.lappsgrid.org/SemanticTag')
         self.assertEqual(1, len(views))
-        views = mmif_obj.get_all_views_contain([
+        views = mmif_obj.get_views_contain([
             AnnotationTypes.TimeFrame,
             DocumentTypes.TextDocument.value,
             AnnotationTypes.Alignment.value
@@ -338,6 +338,12 @@ class TestMmif(unittest.TestCase):
         mmif_obj.add_view(a_view)
         with self.assertRaises(KeyError):
             _ = mmif_obj['m1']
+
+    def test___contains__(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        self.assertTrue('views' in mmif_obj)
+        self.assertTrue('v5' in mmif_obj)
+        self.assertFalse('v432402' in mmif_obj)
 
 
 class TestMmifObject(unittest.TestCase):
@@ -515,6 +521,10 @@ class TestView(unittest.TestCase):
         # at_type + annotation metadata
         annotations = list(mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame, unit='milliseconds'))
         self.assertEqual(len(annotations), 2)
+        # non-existing annotations
+        with pytest.raises(StopIteration):
+            annotations = mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame, unit='seconds')
+            next(annotations)
 
 
 class TestAnnotation(unittest.TestCase):

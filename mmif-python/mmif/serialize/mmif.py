@@ -294,6 +294,12 @@ class Mmif(MmifObject):
             return [view for view in self.views
                     if all(map(lambda x: str(x) in view.metadata.contains, at_types))]
 
+    def get_views_contain(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> List[View]:
+        """
+        An alias to `get_all_views_contain` method.
+        """
+        return self.get_all_views_contain(at_types)
+
     def get_view_contains(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> Optional[View]:
         """
         Returns the last view appended that contains the given
