@@ -257,6 +257,16 @@ class TestMmif(unittest.TestCase):
         view = mmif_obj.get_view_contains('NonExistingType')
         self.assertIsNone(view)
 
+    def test_get_views_for_document(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        # top-level document
+        self.assertEqual(5, len(mmif_obj.get_views_for_document('m1')))
+        # generated document
+        self.assertEqual(2, len(mmif_obj.get_views_for_document('v4:td1')))
+        # non-existing document
+        self.assertEqual(0, len(mmif_obj.get_views_for_document('m321321')))
+
+
     def test_get_alignments(self):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         views_and_alignments = mmif_obj.get_alignments(DocumentTypes.TextDocument, AnnotationTypes.TimeFrame)

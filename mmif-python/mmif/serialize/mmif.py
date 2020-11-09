@@ -280,6 +280,33 @@ class Mmif(MmifObject):
                 v_and_a[alignment_view.id] = alignments
         return v_and_a
 
+    def get_views_for_document(self, doc_id: str):
+        """
+        Returns the list of all views that have annotations anchored on a particular document.
+        Note that when the document is insids a view (generated during the pipeline's running),
+        doc_id must be prefixed with the view_id.
+        """
+        views = []
+        for view in self.views:
+            annotations = view.get_annotations(document=doc_id)
+            try:
+                next(annotations)
+                views.append(view)
+            except StopIteration:
+                # search failed by the full doc_id string, now try trimming the view_id from the string and re-do the search
+                if ':' in doc_id:
+                    vid, did = doc_id.split(':')
+                    if view.id == vid:
+                        annotations = view.get_annotations(document=did)
+                        try:
+                            next(annotations)
+                            views.append(view)
+                        except StopIteration:
+                            # both search failed, give up and move to next view
+                            pass
+        return views
+
+
     def get_all_views_contain(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> List[View]:
         """
         Returns the list of all views in the MMIF if given types
