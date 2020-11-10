@@ -229,11 +229,11 @@ class TestMmif(unittest.TestCase):
         mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
         views = mmif_obj.get_all_views_contain(AnnotationTypes.TimeFrame)
         self.assertEqual(4, len(views))
-        views = mmif_obj.get_all_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument')
+        views = mmif_obj.get_views_contain(f'http://mmif.clams.ai/{__specver__}/vocabulary/TextDocument')
         self.assertEqual(2, len(views))
         views = mmif_obj.get_all_views_contain('http://vocab.lappsgrid.org/SemanticTag')
         self.assertEqual(1, len(views))
-        views = mmif_obj.get_all_views_contain([
+        views = mmif_obj.get_views_contain([
             AnnotationTypes.TimeFrame,
             DocumentTypes.TextDocument.value,
             AnnotationTypes.Alignment.value
@@ -256,6 +256,32 @@ class TestMmif(unittest.TestCase):
         self.assertEqual('v4', view.id)
         view = mmif_obj.get_view_contains('NonExistingType')
         self.assertIsNone(view)
+
+    def test_get_views_for_document(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        # top-level document
+        self.assertEqual(5, len(mmif_obj.get_views_for_document('m1')))
+        # generated document
+        self.assertEqual(2, len(mmif_obj.get_views_for_document('v4:td1')))
+        # non-existing document
+        self.assertEqual(0, len(mmif_obj.get_views_for_document('m321321')))
+
+
+    def test_get_alignments(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        views_and_alignments = mmif_obj.get_alignments(DocumentTypes.TextDocument, AnnotationTypes.TimeFrame)
+        self.assertEqual(1, len(views_and_alignments))
+        self.assertTrue('v4' in views_and_alignments)
+        self.assertEqual(1, len(views_and_alignments['v4']))
+        views_and_alignments = mmif_obj.get_alignments("http://vocab.lappsgrid.org/Token", AnnotationTypes.TimeFrame)
+        self.assertEqual(1, len(views_and_alignments))
+        self.assertTrue('v4' in views_and_alignments)
+        self.assertEqual(28, len(views_and_alignments['v4']))
+        views_and_alignments = mmif_obj.get_alignments(DocumentTypes.TextDocument, AnnotationTypes.BoundingBox)
+        self.assertEqual(1, len(views_and_alignments))
+        self.assertTrue('v6' in views_and_alignments)
+
+
 
     def test_new_view_id(self):
         p = Mmif.view_prefix
@@ -322,6 +348,12 @@ class TestMmif(unittest.TestCase):
         mmif_obj.add_view(a_view)
         with self.assertRaises(KeyError):
             _ = mmif_obj['m1']
+
+    def test___contains__(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        self.assertTrue('views' in mmif_obj)
+        self.assertTrue('v5' in mmif_obj)
+        self.assertFalse('v432402' in mmif_obj)
 
 
 class TestMmifObject(unittest.TestCase):
@@ -484,6 +516,25 @@ class TestView(unittest.TestCase):
     def test_parent(self):
         mmif_obj = Mmif(self.mmif_examples_json['mmif_example1'])
         self.assertTrue(all(doc.parent == v.id for v in mmif_obj.views for doc in mmif_obj.get_documents_in_view(v.id)))
+
+    def test_get_annotations(self):
+        mmif_obj = Mmif(MMIF_EXAMPLES['mmif_example1'])
+        # simple search by at_type
+        annotations = list(mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame))
+        self.assertEqual(len(annotations), 2)
+        # at_type + property
+        annotations = list(mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame, frameType='speech'))
+        self.assertEqual(len(annotations), 1)
+        # just property
+        annotations = list(mmif_obj['v3'].get_annotations(frameType='speech'))
+        self.assertEqual(len(annotations), 1)
+        # at_type + annotation metadata
+        annotations = list(mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame, unit='milliseconds'))
+        self.assertEqual(len(annotations), 2)
+        # non-existing annotations
+        with pytest.raises(StopIteration):
+            annotations = mmif_obj['v3'].get_annotations(AnnotationTypes.TimeFrame, unit='seconds')
+            next(annotations)
 
 
 class TestAnnotation(unittest.TestCase):
