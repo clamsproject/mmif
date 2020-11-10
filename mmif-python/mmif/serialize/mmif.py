@@ -20,6 +20,7 @@ from pyrsistent import pmap, pvector
 from .view import View
 from .annotation import Annotation, Document
 from .model import MmifObject, DataList, FreezableDataList
+from mmif.vocabulary import AnnotationTypes, DocumentTypes
 
 __all__ = ['Mmif']
 
@@ -70,7 +71,7 @@ class Mmif(MmifObject):
         schema_res = resource_stream(f'{mmif.__name__}.{mmif._res_pkg}', mmif._schema_res_name)
         schema = json.load(schema_res)
         schema_res.close()
-        if type(json_str) == str:
+        if isinstance(json_str, str):
             json_str = json.loads(json_str)
         jsonschema.validate(json_str, schema)
 
@@ -255,29 +256,94 @@ class Mmif(MmifObject):
             raise KeyError("{} view not found".format(req_view_id))
         return result
 
-    def get_all_views_contain(self, at_type: Union[ThingTypesBase, str]) -> List[View]:
+    def get_alignments(self, at_type1: Union[str, ThingTypesBase], at_type2: Union[str, ThingTypesBase]) -> Dict[str, List[Annotation]]:
         """
-        Returns the list of all views in the MMIF if a given type
-        type is present in that view's 'contains' metadata.
+        Finds views where alignments between two given annotation types occurred.
 
-        :param at_type: the type to check for
+        :return: a dict that keyed by view IDs (str) and has lists of alignment Annotation objects as values.
+        """
+        v_and_a = {}
+        for alignment_view in self.get_all_views_contain(AnnotationTypes.Alignment):
+            alignments = []
+            # TODO (krim @ 11/7/20): maybe Alignment can have metadata on what types are aligned?
+            for alignment in alignment_view.get_annotations(AnnotationTypes.Alignment):
+                aligned_types = set()
+                for ann_id in [alignment.properties['target'], alignment.properties['source']]:
+                    if ':' in ann_id:
+                        view_id, ann_id = ann_id.split(':')
+                        aligned_types.add(str(self[view_id][ann_id].at_type))
+                    else:
+                        aligned_types.add(str(alignment_view[ann_id].at_type))
+                if str(at_type1) in aligned_types and str(at_type2) in aligned_types:
+                    alignments.append(alignment)
+            if len(alignments) > 0:
+                v_and_a[alignment_view.id] = alignments
+        return v_and_a
+
+    def get_views_for_document(self, doc_id: str):
+        """
+        Returns the list of all views that have annotations anchored on a particular document.
+        Note that when the document is insids a view (generated during the pipeline's running),
+        doc_id must be prefixed with the view_id.
+        """
+        views = []
+        for view in self.views:
+            annotations = view.get_annotations(document=doc_id)
+            try:
+                next(annotations)
+                views.append(view)
+            except StopIteration:
+                # search failed by the full doc_id string, now try trimming the view_id from the string and re-do the search
+                if ':' in doc_id:
+                    vid, did = doc_id.split(':')
+                    if view.id == vid:
+                        annotations = view.get_annotations(document=did)
+                        try:
+                            next(annotations)
+                            views.append(view)
+                        except StopIteration:
+                            # both search failed, give up and move to next view
+                            pass
+        return views
+
+
+    def get_all_views_contain(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> List[View]:
+        """
+        Returns the list of all views in the MMIF if given types
+        are present in that view's 'contains' metadata.
+
+        :param at_types: a list of types or just a type to check for. When given more than one types, all types must be found.
         :return: the list of views that contain the type
         """
-        return [view for view in self.views if str(at_type) in view.metadata.contains]
+        if isinstance(at_types, str) or isinstance(at_types, ThingTypesBase):
+            return [view for view in self.views if str(at_types) in view.metadata.contains]
+        else:
+            return [view for view in self.views
+                    if all(map(lambda x: str(x) in view.metadata.contains, at_types))]
 
-    def get_view_contains(self, at_type: Union[ThingTypesBase, str]) -> Optional[View]:
+    def get_views_contain(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> List[View]:
+        """
+        An alias to `get_all_views_contain` method.
+        """
+        return self.get_all_views_contain(at_types)
+
+    def get_view_contains(self, at_types: Union[ThingTypesBase, str, List[Union[str, ThingTypesBase]]]) -> Optional[View]:
         """
         Returns the last view appended that contains the given
-        type in its 'contains' metadata.
+        types in its 'contains' metadata.
 
-        :param at_type: the type to check for
+        :param at_types: a list of types or just a type to check for. When given more than one types, all types must be found.
         :return: the view, or None if the type is not found
         """
         # will return the *latest* view
         # works as of python 3.6+ (checked by setup.py) because dicts are deterministically ordered by insertion order
         for view in reversed(self.views):
-            if str(at_type) in view.metadata.contains:
-                return view
+            if isinstance(at_types, str) or isinstance(at_types, ThingTypesBase):
+                if str(at_types) in view.metadata.contains:
+                    return view
+            else:
+                if all(map(lambda x: str(x) in view.metadata.contains, at_types)):
+                    return view
         return None
 
     def __getitem__(self, item: str) -> Union[Document, View, Annotation]:

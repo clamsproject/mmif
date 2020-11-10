@@ -7,7 +7,7 @@ data that was previously present in the MMIF file.
 """
 
 from datetime import datetime
-from typing import Dict, Union, Optional
+from typing import Dict, Union, Optional, Generator
 import dateutil.parser
 from pyrsistent import pmap, pvector
 
@@ -43,6 +43,9 @@ class View(FreezableMmifObject):
         })
         self._required_attributes = pvector(["id", "metadata", "annotations"])
         super().__init__(view_obj)
+        for item in self.annotations:
+            if isinstance(item, Document):
+                item.parent = self.id
 
     def new_contain(self, at_type: Union[str, ThingTypesBase], contain_dict: dict = None) -> Optional['Contain']:
         """
@@ -109,6 +112,28 @@ class View(FreezableMmifObject):
         """
         document.parent = self.id
         return self.add_annotation(document, overwrite)
+
+    def get_annotations(self, at_type: Union[str, ThingTypesBase] = None, **properties) -> Generator[Annotation, None, None]:
+        """
+        Look for certain annotations in this view, specified by parameters
+
+        :param at_type: @type of the annotations to look for. When this is None, any @type will match.
+        :param properties: properties of the annotations to look for.
+        When given more than one property, all properties must match.
+        Note that some annotation properties (annotation type medata) are specified in the `contains` view metadata
+        """
+        def prop_check(k, v, *props):
+            return any(k in prop and prop[k] == v for prop in props)
+
+        if at_type:
+            at_type_metadata = self.metadata.contains[str(at_type)]
+        for annotation in self.annotations:
+            if not at_type:
+                if all(map(lambda kv: prop_check(kv[0], kv[1], annotation.properties, self.metadata.contains[str(annotation.at_type)]), properties.items())):
+                    yield annotation
+            if at_type and str(annotation.at_type) == str(at_type):
+                if all(map(lambda kv: prop_check(kv[0], kv[1], annotation.properties, at_type_metadata), properties.items())):
+                    yield annotation
 
     def get_documents(self):
         return [annotation for annotation in self.annotations if annotation.is_document()]
