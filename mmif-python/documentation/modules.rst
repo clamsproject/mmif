@@ -1,3 +1,5 @@
+.. _apidoc:
+
 mmif package
 ============
 
