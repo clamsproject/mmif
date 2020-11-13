@@ -70,5 +70,6 @@ def linkcode_resolve(domain, info):
     if not info['module']:
         return None
     filename = info['module'].replace('.', '/')
-    return f"https://github.com/clamsproject/clams-python/tree/master/{filename}/__init__.py"
+    # TODO (krim): it's not trivial to recover the file path from a module name
+    return f"https://github.com/clamsproject/mmif/tree/master/mmif-python/{filename}.py"
 
