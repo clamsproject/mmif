@@ -110,11 +110,11 @@ class MmifObject(object):
     def set_additional_property(self, key: str, value: Any) -> None:
         """
         Method to set values in _unnamed_attributes.
+
         :param key: the attribute name
         :param value: the desired value
         :return: None
-        :raise: AttributeError if additional properties are disallowed
-                by :func:`disallow_additional_properties`
+        :raise: AttributeError if additional properties are disallowed by :func:`disallow_additional_properties`
         """
         if self._unnamed_attributes is None:
             raise AttributeError(f"Additional properties are disallowed by {self.__class__}")

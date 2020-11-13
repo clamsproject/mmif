@@ -118,9 +118,7 @@ class View(FreezableMmifObject):
         Look for certain annotations in this view, specified by parameters
 
         :param at_type: @type of the annotations to look for. When this is None, any @type will match.
-        :param properties: properties of the annotations to look for.
-        When given more than one property, all properties must match.
-        Note that some annotation properties (annotation type medata) are specified in the `contains` view metadata
+        :param properties: properties of the annotations to look for. When given more than one property, all properties must match. Note that some annotation properties (annotation type medata) are specified in the `contains` view metadata
         """
         def prop_check(k, v, *props):
             return any(k in prop and prop[k] == v for prop in props)
