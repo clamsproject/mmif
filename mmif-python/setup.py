@@ -216,11 +216,11 @@ setuptools.setup(
     ],
     command_options={
         'build_sphinx': {
-            #  'source_dir': ('setup.py', 'doc'), 
+            'source_dir': ('setup.py', 'documentation'), 
             'project': ('setup.py', name),
             'version': ('setup.py', version),
             #  'release': ('setup.py', release),
-            'build_dir': ('setup.py', '_build'),
+            'build_dir': ('setup.py', 'documentation/_build'),
             'builder': ('setup.py', 'html'),
             }
         }

@@ -85,5 +85,5 @@ mmif-python/VERSION*
 !vocabulary/rdf/bin/*.jar
 
 # sphinx/autodoc files
-/mmif-python/_build/
+/mmif-python/documentation/_build/
 

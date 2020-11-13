@@ -1,12 +1,20 @@
 Welcome to mmif-python's documentation!
 =======================================
 
+.. mdinclude:: ../README.md
 
 .. toctree::
-   :maxdepth: 5
-   :caption: Contents:
+  :maxdepth: 2
+  :caption: Contents
 
-   sphinx/modules
+  introduction
+  consumer-tutorial
+
+.. toctree::
+  :maxdepth: 2
+  :caption: API documentation:
+
+  modules
 
 
 Indices and tables
