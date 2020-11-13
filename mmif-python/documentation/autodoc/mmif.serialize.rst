@@ -9,14 +9,6 @@ mmif.serialize.annotation module
    :undoc-members:
    :show-inheritance:
 
-mmif.serialize.medium module
-----------------------------
-
-.. automodule:: mmif.serialize.medium
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 mmif.serialize.mmif module
 --------------------------
 
