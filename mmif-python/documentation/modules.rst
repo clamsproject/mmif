@@ -4,5 +4,5 @@ mmif package
 .. toctree::
    :maxdepth: 4
 
-   mmif.serialize
-   mmif.vocabulary
+   autodoc/mmif.serialize
+   autodoc/mmif.vocabulary

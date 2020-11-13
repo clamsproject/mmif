@@ -6,7 +6,7 @@ Welcome to mmif-python's documentation!
    :maxdepth: 5
    :caption: Contents:
 
-   sphinx/modules
+   modules
 
 
 Indices and tables

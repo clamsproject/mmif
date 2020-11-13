@@ -17,6 +17,7 @@ testcaches = .hypothesis .pytest_cache .pytype coverage.xml htmlcov .coverage
 .PHONY: test
 .PHONY: develop
 .PHONY: publish
+.PHONY: docs
 .PHONY: package
 .PHONY: devversion
 
@@ -32,6 +33,11 @@ publish: distclean version package test
 	twine upload -u __token__ -p $$PYPITOKEN dist/$(sdistname)-`cat VERSION`.tar.gz ; \
 	twine upload --repository-url http://morbius.cs-i.brandeis.edu:8081/repository/pypi-develop/ \
 		-u clamsuploader -p $$CLAMSUPLOADERPASSWORD dist/$(sdistname)-`cat VERSION`.tar.gz
+
+docs: package
+	rm -rf documentation/_build docs
+	python3 setup.py build_sphinx -a
+	mv documentation/_build/html docs
 
 package: VERSION
 	pip install -r requirements.dev
