@@ -6,10 +6,17 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 
 This file documents changes made to the specification as well as changes to the Python SDK. Changes to the former are listed under section headers named `spec-X.Y.Z` and changes to the latter in headers named `py-X.Y.Z`.
 
+Version names used to start with `spec-` because the SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
-## Version py-0.2.0 − In Progress
 
-- Changed the SDK to work with the specifications in `spec-0.2.0`.
+
+
+## Version 0.2.2 − 2020-12-03
+
+- Fixed typos in the MMIF sample files.
+- Updated documentation.
+- Added notes on MMIF to PBCore mapping
+- Removed all Python SDK code, which now lives at [https://github.com/clamsproject/mmif-python](https://github.com/clamsproject/mmif-python).
 
 ## Version spec-0.2.1 − 2020-09-28
 
