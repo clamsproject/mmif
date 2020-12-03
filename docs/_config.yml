@@ -21,6 +21,7 @@ navbar-links:
   CLAMS: "https://www.clams.ai"
   VERSIONS: 
     ## add a new line *at the top* of this list when new version is released
+    - 0.2.2: '0.2.2'
     - 0.2.1: '0.2.1'
     - 0.2.0: "0.2.0"
     - 0.1.0: "0.1.0"

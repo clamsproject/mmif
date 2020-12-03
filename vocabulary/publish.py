@@ -13,10 +13,10 @@ repository. If the output directory exists then files in it will be overwritten.
 
 This copies the specifications, schema and the vocabulary:
 
-- Some files from /specifications will be copied to ../docs/VERSION, including
+- Some files from ../specifications will be copied to ../docs/VERSION, including
   the index file which will be copied to ../docs/VERSION/index.md.
 
-- Some of the JSON schema in /schema are copied to ../docs/VERSION/schema
+- Some of the JSON schema in ../schema are copied to ../docs/VERSION/schema
 
 - The vocabulary specifications in clams.vocabulary.yaml are used to write
   webpages to ../docs/VERSION/vocabulary.
@@ -413,7 +413,6 @@ def setup(out_dir, vocab_dir, schema_dir, context_dir):
         os.makedirs(css_dir)
     shutil.copy('lappsstyle.css', css_dir)
     compile_index_md('../specifications/index.md', out_dir)
-    shutil.copy('../specifications/versioning.md', out_dir)
     shutil.copy('../specifications/pi78oGjdT.jpg', out_dir)
     shutil.copy('../specifications/pi78oGjdT-annotated.jpg', out_dir)
     samples_in = '../specifications/samples'
