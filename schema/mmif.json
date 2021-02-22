@@ -126,6 +126,10 @@
         "end": {
           "type": "integer",
           "minimum": -1
+        },
+        "location": {
+          "type": "string", 
+          "format": "uri"
         }
       },
       "required": [
