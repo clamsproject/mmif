@@ -61,14 +61,14 @@ Here is an example document list with a video and its transcript:
       "properties": {
         "id": "m1",
         "mime": "video/mpeg",
-        "location": "/var/archive/video-0012.mp4" }
+        "location": "file:///var/archive/video-0012.mp4" }
     },
     {
       "@type": "http://mmif.clams.ai/0.2.2/vocabulary/TextDocument",
       "properties": {
         "id": "m2",
         "mime": "text/plain",
-        "location": "/var/archive/transcript-0012.txt" }
+        "location": "file:///var/archive/transcript-0012.txt" }
     }
   ]
 }
@@ -76,7 +76,7 @@ Here is an example document list with a video and its transcript:
 
 The *@type* key has a special meaning in JSON-LD and it is used to define the type of a datastructure. In MMIF, the value should be a URL that points to a description of the type of document. Above we have a video and a text document and those types are described at [http://mmif.clams.ai/0.2.2/vocabulary/VideoDocument](vocabulary/VideoDocument) and [http://mmif.clams.ai/0.2.2/vocabulary/TextDocument](vocabulary/TextDocument) respectively. Currently, four document types are defined: *VideoDocument*, *TextDocument*, *ImageDocument* and *AudioDocument*.
 
-The description also lists the properties that can be used for a type, and above we have the *id*, *mime* and *location* properties, used for the document identifier, its MIME type and the location of the document, which is a URL or a local path to a file. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the *text* property in LIF, which is a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* key and optionally a *@language* key:
+The description also lists the properties that can be used for a type, and above we have the *id*, *mime* and *location* properties, used for the document identifier, its MIME type and the location of the document, which is a URL. Should the document be a local file, `file:` scheme must be used. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the *text* property in LIF, which is a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* key and optionally a *@language* key:
 
 ``` json
 {
@@ -86,7 +86,7 @@ The description also lists the properties that can be used for a type, and above
       "properties": {
         "id": "m1",
         "mime": "video/mpeg",
-        "location": "/var/archive/video-0012.mp4" }
+        "location": "file:///var/archive/video-0012.mp4" }
     },
     {
       "@type": "http://mmif.clams.ai/0.2.2/vocabulary/TextDocument",
@@ -238,7 +238,7 @@ The result of this processing is a MMIF document with an image document and a vi
       "properties": {
         "id": "m1",
         "mime": "image/jpeg",
-        "location": "/var/archive/image-0012.jpg" }
+        "location": "file:///var/archive/image-0012.jpg" }
     }
   ],
   "views": [
