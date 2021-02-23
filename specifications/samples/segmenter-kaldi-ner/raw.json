@@ -8,7 +8,7 @@
       "properties": {
         "id": "m1",
         "mime": "audio/mpeg",
-        "location": "/var/archive/audio-002.mp3"
+        "location": "file:///var/archive/audio-002.mp3"
       }
     }
   ],

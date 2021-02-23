@@ -10,7 +10,7 @@
       "properties": {
         "id": "m1",
         "mime": "video/mpeg",
-        "location": "/var/archive/video-002.mp4" }
+        "location": "file:///var/archive/video-002.mp4" }
     }
   ],
 
@@ -112,7 +112,7 @@
           "properties": {
             "id": "td1",
             "mime": "text/plain",
-            "location": "/var/archive/transcript-002.txt" }
+            "location": "file:///var/archive/transcript-002.txt" }
         },
         {
           "@type": "http://mmif.clams.ai/0.2.0/vocabulary/Alignment",
