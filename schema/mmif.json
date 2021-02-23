@@ -52,6 +52,9 @@
         },
         "contains": {
           "type": "object"
+        },
+        "parameters": {
+          "type": "object"
         }
       },
       "required": [
