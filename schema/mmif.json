@@ -81,7 +81,7 @@
           "type": "string"
         },
         "metadata": {
-          "type": "#/definitions/viewMetadata"
+          "$ref": "#/definitions/viewMetadata"
         },
         "annotations": {
           "type": "array",
