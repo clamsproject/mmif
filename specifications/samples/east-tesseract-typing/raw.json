@@ -8,7 +8,7 @@
       "properties": {
         "id": "m1",
         "mime": "image/jpeg",
-        "location": "/var/archive/image-fido-barks.jpg"
+        "location": "file:///var/archive/image-fido-barks.jpg"
       }
     }
   ],

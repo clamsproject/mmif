@@ -5,19 +5,19 @@
     {
       "id": "0",
       "type": "audio-video",
-      "location": "/var/archive/cpb-aacip-507-fj2988397d.mp4",
+      "location": "file:///var/archive/cpb-aacip-507-fj2988397d.mp4",
       "metadata": {}
     },
     {
       "id": "1",
       "type": "text",
-      "location": "/var/archive/cpb-aacip-507-fj2988397d.lab",
+      "location": "file:///var/archive/cpb-aacip-507-fj2988397d.lab",
       "metadata": {}
     },
     {
       "id": "2",
       "type": "audio-only",
-      "location": "/var/archive/cpb-aacip-507-fj2988397d.wav",
+      "location": "file:///var/archive/cpb-aacip-507-fj2988397d.wav",
       "metadata": {}
     }
   ],
