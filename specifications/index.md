@@ -49,7 +49,7 @@ The *metadata* property stores metadata associated with the file. It is not heav
 
 ### 1.1. The *documents* property
 
-We assume that when a MMIF document is initialized it is given a list of media and each of these media is either an external file or a text string. These media are all imported into the MMIF file as documents of a certain type and the specifications for each medium/document in stored in the *documents* list. This list is read-only and cannot be extended after initialization. There are no limits on how many documents or how many documents of a certain type are in the list, but typically there will be just a few documents in there.
+We assume that when a MMIF document is initialized it is given a list of media and each of these media is either an external file or a text string. These media are all imported into the MMIF file as documents of a certain type and the specifications for each medium/document is stored in the *documents* list. This list is read-only and cannot be extended after initialization. There are no limits on how many documents and how many documents of what types are in the list, but typically there will be just a few documents in there.
 
 Here is an example document list with a video and its transcript:
 
@@ -76,7 +76,7 @@ Here is an example document list with a video and its transcript:
 
 The *@type* key has a special meaning in JSON-LD and it is used to define the type of a datastructure. In MMIF, the value should be a URL that points to a description of the type of document. Above we have a video and a text document and those types are described at [http://mmif.clams.ai/0.2.2/vocabulary/VideoDocument](vocabulary/VideoDocument) and [http://mmif.clams.ai/0.2.2/vocabulary/TextDocument](vocabulary/TextDocument) respectively. Currently, four document types are defined: *VideoDocument*, *TextDocument*, *ImageDocument* and *AudioDocument*.
 
-The description also lists the properties that can be used for a type, and above we have the *id*, *mime* and *location* properties, used for the document identifier, its MIME type and the location of the document, which is a URL or a local path to a file. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the *text* property in LIF, which is a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* key and optionally a *@language* key:
+The description also lists the properties that can be used for a type, and above we have the *id*, *mime* and *location* properties, used for the document identifier, the document's MIME type and the location of the document, which is a URL or a local path to a file. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the *text* property in LIF, using a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* key and optionally a *@language* key:
 
 ``` json
 {
@@ -100,7 +100,7 @@ The description also lists the properties that can be used for a type, and above
 }
 ```
 
-The value associated with *@value* is a string and the value associated with *@language* follows the rules in [BCP47](http://www.w3.org/TR/json-ld/#bib-bcp47), which for our current purposes boils down to using the two-character ISO 639 code. With inline text there is no MIME type needed.
+The value associated with *@value* is a string and the value associated with *@language* follows the rules in [BCP47](http://www.w3.org/TR/json-ld/#bib-bcp47), which for our current purposes boils down to using the two-character ISO 639 code. With inline text no MIME type is needed.
 
 
 
@@ -121,14 +121,14 @@ This is where all the annotations and associated metadata live. Views contain st
 }
 ```
 
-Each view has a unique identifier. Annotation elements in the view have identifiers unique to the view and these elements can be uniquely referred to from outside the view by using the view identifier and the annotation element identifier. For example, if the view above has an annotation with identfier "a8" then it can be referred to from outside the view by using "v1:a8".
+Each view has a unique identifier. Annotation elements in the view have identifiers unique to the view and these elements can be uniquely referred to from outside the view by using the view identifier and the annotation element identifier, separated by a colon. For example, if the view above has an annotation with identfier "a8" then it can be referred to from outside the view by using "v1:a8".
 
 Here are a few general principles relevant to views:
 
 1. There is no limit to the number of views.
 2. Services may create as many new views as they want.
 3. Services may not change or add information to existing views, that is, views are read-only, which has many advantages at the cost of some redundancy. Since views are read-only, services may not overwrite or delete information in existing views. This holds for the view’s metadata as well as the annotations.
-4. Annotations in views have identifiers that are unique to the view. Views have identifiers that uniquely define them relative to other views. A view identifier may not be a document identifier as well.
+4. Annotations in views have identifiers that are unique to the view. Views have identifiers that uniquely define them relative to other views.
 
 We now describe the metadata and the annotations.
 
