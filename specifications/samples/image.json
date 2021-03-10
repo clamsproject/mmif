@@ -5,7 +5,7 @@
     {
       "id": "0",
       "type": "audio-video",
-      "location": "/var/archive/cpb-aacip-507-fj2988397d.png",
+      "location": "file:///var/archive/cpb-aacip-507-fj2988397d.png",
       "metadata": {
         "resolutionX": 640,
         "resolutionY": 480

@@ -2,13 +2,16 @@
 
 All notable changes to this project are documented in this file.
 
-The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). Loosely because we do not keep separate sections within a version for additions and fixes etcetera, instead most logged changes will start with one of Added, Changed, Deprecated, Removed, Fixed, or Security. This project follows [Semantic Versioning](http://semver.org/).
+The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). Loosely because we do not keep separate sections within a version for additions and fixes etcetera, instead most logged changes will start with one of Added, Changed, Deprecated, Removed, Fixed, or Security. This project follows [Semantic Versioning](http://semver.org/), but until we hit version 1.0.0 we will be somewhat cavalier in our versioning.
 
-This file documents changes made to the specification as well as changes to the Python SDK. Changes to the former are listed under section headers named `spec-X.Y.Z` and changes to the latter in headers named `py-X.Y.Z`.
-
-Version names used to start with `spec-` because the SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
+This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
 
+
+## Version 0.3.0 − 2021-03-10
+
+- Updated the MMIF schema. Most significant change is that the location property is now a URI. This is likely a breaking change for all applications that work with version 0.2.2, hence the minor version bump up.
+- Added boxType property to BoundingBox.
 
 
 ## Version 0.2.2 − 2020-12-03

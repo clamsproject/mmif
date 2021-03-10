@@ -1,0 +1,227 @@
+<html>
+  <head>
+    <link href="../css/lappsstyle.css" rel="stylesheet" type="text/css"/>
+    <title>
+      VideoObject
+    </title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="intro">
+        <div id="pageHeader">
+          <h1>
+            CLAMS Vocabulary
+          </h1>
+          <h2>
+            version 0.3.0
+          </h2>
+        </div>
+      </div>
+      <div id="mainContent">
+        <div id="sectionbar">
+          <p>
+            <a href="../index.html">
+              Home
+            </a>
+          </p>
+        </div>
+        <p class="head">
+          <a href="../Thing">
+            Thing
+          </a>
+          <span>
+            &gt;
+          </span>
+          <a href="../Annotation">
+            Annotation
+          </a>
+          <span>
+            &gt;
+          </span>
+          <a href="../Region">
+            Region
+          </a>
+          <span>
+            &gt;
+          </span>
+          <span>
+            VideoObject
+          </span>
+        </p>
+        <br/>
+        <table>
+          <tr>
+            <td class="fixed">
+              <b>
+                Definition
+              </b>
+            </td>
+            <td>
+              A sequence of Polygons, where each Polygon is associated with a TimePoint. So a VideoObject is in effect a sequence of image objects at certain time points.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>
+                URI
+              </b>
+            </td>
+            <td>
+              <a href="http://mmif.clams.ai/0.3.0/vocabulary/VideoObject">
+                http://mmif.clams.ai/0.3.0/vocabulary/VideoObject
+              </a>
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Metadata
+        </h1>
+        <h2>
+          Metadata from Region
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              unit
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              The unit used to determine boundaries. For text regions this is typically *offsets* to indicate character offsets, for images this is could be *pixels*, and for audio or video streams *seconds*, *milliseconds*, *timestamps* or *frames*.
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Metadata from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              document
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the document that the annotation is over. This has to be defined either at the metadata level, in which case it has scope over all annotations of the same type in a view, or at the instance level, in which it has scope over just the single annotation.
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Properties
+        </h1>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              polygons
+            </td>
+            <td>
+              List of IDs
+            </td>
+            <td>
+              The Polygons that make up the object.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              document
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the document that the annotation is over.
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Thing
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              id
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              A unique identifier for the annotation or document. Uniqueness is relative to the view the annotation is in or the list of documents at the top level of a MMIF file.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <br/>
+      </div>
+    </div>
+    <div id="footer">
+      Page generated on 2021-03-10 at 10:16:48
+    </div>
+  </body>
+</html>
