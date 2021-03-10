@@ -19,6 +19,7 @@ List of things to do when creating a new version:
 - [x] Update the `VERSION` file.
 - [ ] Test all examples to see whether they match the schema.
 - [x] Update `specifications/index.md`. Make sure it matches new schema and/or vocabulary if needed and replace version numbers.
+- [ ] Update all the sample files so they all have the right version number.
 - [x] Upate VERSIONS list in `docs/_config.yml`.
 - [x] Update `docs/index.md` (date at the bottom).
 - [ ] Run publish.py script.

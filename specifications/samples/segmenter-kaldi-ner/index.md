@@ -1,7 +1,7 @@
 ---
 layout: page
 title: MMIF Specification
-subtitle: Version 0.2.0
+subtitle: Version 0.3.0
 ---
 
 # Example: Segmenter, Kaldi and NER 
@@ -20,7 +20,7 @@ Metadata:
 {
   "app": "http://mmif.clams.ai/apps/audio-segmenter/0.2.1",
   "contains": {
-    "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame": {
+    "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame": {
       "unit": "milliseconds",
       "document": "m1" } 
 }
@@ -33,7 +33,7 @@ Partial  annotations list:
 ```json
 [
   {
-    "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+    "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
     "properties": {
       "id": "tf1",
       "frameType": "speech",
@@ -41,7 +41,7 @@ Partial  annotations list:
       "end": 132 }
   },
   {
-    "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+    "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
     "properties": {
       "frameType": "non-speech",
       "id": "tf2",
@@ -61,12 +61,12 @@ Metadata:
 {
   "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
   "contains": {
-    "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument": {},
+    "http://mmif.clams.ai/0.3.0/vocabulary/TextDocument": {},
     "http://vocab.lappsgrid.org/Token": {},
-    "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame": {
+    "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame": {
       "unit": "milliseconds",
       "document": "m1" },
-    "http://mmif.clams.ai/0.2.0/vocabulary/Alignment": {} }
+    "http://mmif.clams.ai/0.3.0/vocabulary/Alignment": {} }
 }
 ```
 
@@ -82,7 +82,7 @@ The annotations list has two documents, one shown here:
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+  "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TextDocument",
   "properties": {
     "id": "td1",
     "text": {
@@ -94,7 +94,7 @@ This document does not know it's history, but Kaldi also creates an alignment th
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/0.2.0/vocabulary/Alignment",
+  "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
   "properties": {
     "id": "a1",
     "source": "v1:tf1",
@@ -122,7 +122,7 @@ The token is associated with a time frame in document "m1":
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+  "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
   "properties": {
     "id": "tf1",
     "start": 17,
@@ -134,7 +134,7 @@ And the token and time frame are linked by an alignment:
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/0.2.0/vocabulary/Alignment",
+  "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
   "properties": {
     "id": "a2",
     "source": "tf1",

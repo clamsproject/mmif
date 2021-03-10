@@ -1,10 +1,10 @@
 {
   "metadata": {
-    "mmif": "http://mmif.clams.ai/0.2.0"
+    "mmif": "http://mmif.clams.ai/0.3.0"
   },
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/VideoDocument",
+      "@type": "http://mmif.clams.ai/0.3.0/vocabulary/VideoDocument",
       "properties": {
         "id": "m1",
         "mime": "video/mp4",
@@ -12,7 +12,7 @@
       }
     },
     {
-      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+      "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TextDocument",
       "properties": {
         "id": "m2",
         "mime": "text/plain",
@@ -27,7 +27,7 @@
         "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
         "timestamp": "2020-05-27T12:23:45",
         "contains": {
-          "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame": {
+          "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame": {
             "document": "m1",
             "unit": "seconds"
           }
@@ -35,7 +35,7 @@
       },
       "annotations": [
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
           "properties": {
             "id": "s1",
             "start": 0,
@@ -51,7 +51,7 @@
         "app": "http://apps.clams.ai/slates/1.0.3",
         "timestamp": "2020-05-27T12:23:45",
         "contains": {
-          "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame": {
+          "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame": {
             "document": "m1",
             "unit": "seconds"
           }
@@ -59,7 +59,7 @@
       },
       "annotations": [
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
           "properties": {
             "id": "s1",
             "start": 25,

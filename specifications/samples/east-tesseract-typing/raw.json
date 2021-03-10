@@ -1,10 +1,10 @@
 {
   "metadata": {
-    "mmif": "http://mmif.clams.ai/0.2.0"
+    "mmif": "http://mmif.clams.ai/0.3.0"
   },
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/0.2.0/vocabulary/ImageDocument",
+      "@type": "http://mmif.clams.ai/0.3.0/vocabulary/ImageDocument",
       "properties": {
         "id": "m1",
         "mime": "image/jpeg",
@@ -18,7 +18,7 @@
       "metadata": {
         "app": "http://mmif.clams.ai/apps/east/0.2.1",
         "contains": {
-          "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox": {
+          "http://mmif.clams.ai/0.3.0/vocabulary/BoundingBox": {
             "unit": "pixels",
             "document": "m1"
           }
@@ -26,7 +26,7 @@
       },
       "annotations": [
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/BoundingBox",
           "properties": {
             "id": "bb1",
             "coordinates": [ [10, 20], [40, 20], [10, 30], [40, 30] ],
@@ -34,7 +34,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/BoundingBox",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/BoundingBox",
           "properties": {
             "id": "bb2",
             "coordinates": [ [210, 220], [240, 220], [210, 230], [240, 230] ],
@@ -54,7 +54,7 @@
       },
       "annotations": [
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TextDocument",
           "properties": {
             "id": "td1",
             "text": {
@@ -63,7 +63,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/Alignment",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
           "properties": {
             "id": "a1",
             "source": "v1:bb1",
@@ -71,7 +71,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/TextDocument",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TextDocument",
           "properties": {
             "id": "td2",
             "text": {
@@ -80,7 +80,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/Alignment",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
           "properties": {
             "id": "a2",
             "source": "v1:bb2",
@@ -94,12 +94,12 @@
       "metadata": {
         "app": "http://mmif.clams.ai/apps/semantic-typer/0.2.4",
         "contains": {
-          "http://mmif.clams.ai/0.2.0/vocabulary/SemanticTag": {}
+          "http://mmif.clams.ai/0.3.0/vocabulary/SemanticTag": {}
         }
       },
       "annotations": [
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/SemanticTag",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/SemanticTag",
           "properties": {
             "id": "st1",
             "category": "dog-sound",
@@ -109,7 +109,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.2.0/vocabulary/SemanticTag",
+          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/SemanticTag",
           "properties": {
             "id": "st2",
             "category": "dog-sound",

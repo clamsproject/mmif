@@ -76,7 +76,7 @@ Here is an example document list with a video and its transcript:
 
 The *@type* key has a special meaning in JSON-LD and it is used to define the type of a datastructure. In MMIF, the value should be a URL that points to a description of the type of document. Above we have a video and a text document and those types are described at [http://mmif.clams.ai/0.3.0/vocabulary/VideoDocument](vocabulary/VideoDocument) and [http://mmif.clams.ai/0.3.0/vocabulary/TextDocument](vocabulary/TextDocument) respectively. Currently, four document types are defined: *VideoDocument*, *TextDocument*, *ImageDocument* and *AudioDocument*.
 
-The description also lists the properties that can be used for a type, and above we have the *id*, *mime* and *location* properties, used for the document identifier, the document's MIME type and the location of the document, which is a URL. Should the document be a local file, the `file:` scheme must be used. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the *text* property in LIF, using a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* key and optionally a *@language* key:
+The description also lists the properties that can be used for a type, and above we have the *id*, *mime* and *location* properties, used for the document identifier, the document's MIME type and the location of the document, which is a URL. Should the document be a local file then the `file://` scheme must be used. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the *text* property in LIF, using a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* key and optionally a *@language* key:
 
 ``` json
 {
@@ -145,7 +145,8 @@ This property contains information about the annotations in a view. Here is an e
   "contains": {
     "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame": {
       "unit": "seconds",
-      "document": "m1" } }
+      "document": "m1" } },
+  "parameters": {}
 }
 ```
 
@@ -154,13 +155,15 @@ The *contains* dictionary has keys that refer to annotation objects in the CLAMS
 1. The *document* key gives the identifier of the document that the annotations of that type in this view are over. As we will see later, annotations anchor into documents using keys like *start* and *end* and this property specifies what document that is.
 2. The *unit* key is set to "seconds" and this means that for each annotation the unit for the values in *start* and *end* are seconds. 
 
-Note that when a property is set to some value then all annotations of that type should adhere to that value, in this case the document and unit are set to "m1" and "seconds" respectively. In other words, *contains* dictionary not only functions as an overview of the annotation types in this view, but also as a factor-out for common properties shared among annotations of a type. This is useful especially for *document* property, as in a single view, an app is likely to process only one or two source documents and resulting annotation objects will be anchored on those small number of documents. It is technically possible to add *documenty* and *unit* properties to individual annotations and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later.
+Note that when a property is set to some value then all annotations of that type should adhere to that value, in this case the document and unit are set to "m1" and "seconds" respectively. In other words, the *contains* dictionary not only functions as an overview of the annotation types in this view, but also as a place for common properties shared among annotations of a type. This is useful especially for *document* property, as in a single view, an app is likely to process only one or two source documents and resulting annotation objects will be anchored on those small number of documents. It is technically possible to add *documenty* and *unit* properties to individual annotations and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later.
 
 Section 2 has more details on the interaction between the vocabulary and the metadata for the annotation types in the *contains* dictionary.
 
 The *timestamp* key stores when the view was created by the application. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views, which is significant because by default arrays in JSON-LD are not ordered.
 
 The *app* key contains a URL that specifies what application created the annotation data. That URL should contain all metadata information relevant for the application: description, configuration, input requirements and a more complete description of what output is created. The app URL always includes a version number for the app. The metadata should also contain a link to the Git repository for the app (and that repository will actually maintain all the information in the URL).
+
+Finally, the *parameter* is a dictionary of parameters and their values that were handed to the app when it was called.
 
 
 
