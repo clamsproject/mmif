@@ -14,5 +14,5 @@ Contributions are welcome via [the github issue tracker](https://github.com/clam
 
 ---
 
-*Last updated: December 3rd 2020*
+*Last updated: March 10th 2021*
 

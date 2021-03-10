@@ -170,9 +170,15 @@ name: BoundingBox
 parent: Polygon
 
 description: >-
-  A rectangular object in an image or video. It does not add new features
-  compared to its parent type Polygon, but it ntroduced as a subtype because the
+  A rectangular object in an image or video. At the moment it does not have
+  features that would not make any sense on its parent type Polygon so
+  technically we can do without BoundingBox, but it was introduced because the
   term is in widespread use.
+
+properties:
+  boxType:
+    type: String
+    description: The type of BoundingBox. Mostly used for text boxes where we use the value text.
 
 ---
 

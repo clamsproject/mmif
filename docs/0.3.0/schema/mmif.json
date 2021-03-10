@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Multi-Media Interchange Format",
+  "description": "The JSON-LD objects exchanged by CLAMS services.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "metadata": {
+      "$ref": "#/definitions/mmifMetadata"
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/annotation"
+      }
+    },
+    "views": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/view"
+      }
+    }
+  },
+  "required": [
+    "metadata",
+    "documents",
+    "views"
+  ],
+  "definitions": {
+    "strStrMap": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "string"
+        }
+      }
+    },
+    "mmifMetadata": {
+      "type": "object",
+      "properties": {
+        "mmif": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "mmif"
+      ]
+    },
+    "viewMetadata": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "app": {
+          "type": "string",
+          "format": "uri"
+        },
+        "contains": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^https?:\/\/": {
+              "$ref": "#/definitions/strStrMap"
+            }
+          }
+        },
+        "parameters": {
+          "$ref": "#/definitions/strStrMap"
+        }
+      },
+      "required": [
+        "app",
+        "contains"
+      ]
+    },
+    "text": {
+      "type": "object",
+      "properties": {
+        "@value": {
+          "type": "string"
+        },
+        "@language": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "@value"
+      ]
+    },
+    "view": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/definitions/viewMetadata"
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/annotation"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "metadata",
+        "annotations"
+      ]
+    },
+    "annotation": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/annotationProperties"
+        }
+      },
+      "required": [
+        "@type",
+        "properties"
+      ],
+      "additionalProperties": false
+    },
+    "annotationProperties": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "start": {
+          "type": "integer",
+          "minimum": -1
+        },
+        "end": {
+          "type": "integer",
+          "minimum": -1
+        },
+        "location": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  }
+}
+
