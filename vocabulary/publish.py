@@ -45,10 +45,6 @@ from bs4 import BeautifulSoup
 from string import Template
 
 
-VERSION = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'VERSION')).read().strip()
-
-VOCABULARY_URL = 'http://mmif.clams.ai/%s/vocabulary' % VERSION
-
 INCLUDE_CONTEXT = False
 
 
@@ -293,6 +289,7 @@ class TypePage(Page):
         self.properties = clams_type.get('properties', [])
         self.fpath = os.path.join(outdir, self.name)
         self.fname = os.path.join(outdir, self.name, 'index.html')
+        self.baseurl = f'http://mmif.clams.ai/{version}/vocabulary'
         self._add_title(self.name)
         self._add_main_structure()
         self._add_header()
@@ -329,7 +326,7 @@ class TypePage(Page):
         self._add_space()
 
     def _add_definition(self):
-        url = '%s/%s' % (VOCABULARY_URL, self.name)
+        url = '%s/%s' % (self.baseurl, self.name)
         table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
                                            dtrs=[tag('b', text='Definition')]),
                                        tag('td', text=self.description)]),
@@ -395,24 +392,24 @@ def increase_leading_space(text):
     return '\n'.join(new_lines)
 
 
-def compile_index_md(source_md, target_dir):
+def compile_index_md(source_md, target_dir, version):
     source_md_f = open(source_md, 'r')
     #  print(source_md_f.read())
     tmpl_to_compile = Template(source_md_f.read())
-    compiled = tmpl_to_compile.substitute(VERSION=VERSION)
+    compiled = tmpl_to_compile.substitute(VERSION=version)
     source_md_f.close()
     compiled_md_f = open(os.path.join(target_dir, 'index.md'), 'w') 
     compiled_md_f.write(compiled)
     compiled_md_f.close()
 
 
-def setup(out_dir, vocab_dir, schema_dir, context_dir):
+def setup(out_dir, vocab_dir, schema_dir, context_dir, version):
     """Copy non-vocabulary files to the output directory."""
     css_dir = os.path.join(vocab_dir, 'css')
     if not os.path.exists(css_dir):
         os.makedirs(css_dir)
     shutil.copy('lappsstyle.css', css_dir)
-    compile_index_md('../specifications/index.md', out_dir)
+    compile_index_md('../specifications/index.md', out_dir, version)
     shutil.copy('../specifications/pi78oGjdT.jpg', out_dir)
     shutil.copy('../specifications/pi78oGjdT-annotated.jpg', out_dir)
     samples_in = '../specifications/samples'
@@ -433,11 +430,12 @@ def setup(out_dir, vocab_dir, schema_dir, context_dir):
         shutil.copy('../context/mmif.json', context_dir)
         shutil.copy('../context/vocab-clams.json', context_dir)
         shutil.copy('../context/vocab-lapps.json', context_dir)
-        compile_index_md('../context/index.md', context_dir)
+        compile_index_md('../context/index.md', context_dir, version)
 
 
 if __name__ == '__main__':
-    out_dir =  os.path.join('..', 'docs', VERSION)
+    version = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'VERSION')).read().strip()
+    out_dir = os.path.join('..', 'docs', version)
     if len(sys.argv) > 1 and sys.argv[1] == '--test':
         out_dir = 'www'
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -447,9 +445,9 @@ if __name__ == '__main__':
     context_dir = os.path.join(out_dir, 'context')
     print("\n>>> Creating directory structure in '%s'" % out_dir)
     print(">>> Copying non-vocabulary files to '%s'" % out_dir)
-    setup(out_dir, vocab_dir, schema_dir, context_dir)
+    setup(out_dir, vocab_dir, schema_dir, context_dir, version)
     print(">>> Adding vocabulary pages to '%s'\n" % vocab_dir)
     clams_types = read_yaml("clams.vocabulary.yaml")
     tree = Tree(clams_types)
-    write_hierarchy(tree, vocab_dir, VERSION)
-    write_pages(tree, vocab_dir, VERSION)
+    write_hierarchy(tree, vocab_dir, version)
+    write_pages(tree, vocab_dir, version)
