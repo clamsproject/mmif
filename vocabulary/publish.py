@@ -40,6 +40,7 @@ import shutil
 import time
 import yaml
 
+from os.path import join as pjoin
 from glob import glob
 from bs4 import BeautifulSoup
 from string import Template
@@ -212,7 +213,7 @@ class IndexPage(Page):
         self.stylesheet = 'css/lappsstyle.css'
         super().__init__(outdir, version)
         self.fpath = outdir
-        self.fname = os.path.join(outdir, 'index.html')
+        self.fname = pjoin(outdir, 'index.html')
         self.tree = tree
         self._add_title('CLAMS Vocabulary')
         self._add_main_structure()
@@ -287,8 +288,8 @@ class TypePage(Page):
         self.description = clams_type['description']
         self.metadata = clams_type.get('metadata', [])
         self.properties = clams_type.get('properties', [])
-        self.fpath = os.path.join(outdir, self.name)
-        self.fname = os.path.join(outdir, self.name, 'index.html')
+        self.fpath = pjoin(outdir, self.name)
+        self.fname = pjoin(outdir, self.name, 'index.html')
         self.baseurl = f'http://mmif.clams.ai/{version}/vocabulary'
         self._add_title(self.name)
         self._add_main_structure()
@@ -392,60 +393,53 @@ def increase_leading_space(text):
     return '\n'.join(new_lines)
 
 
-def compile_index_md(source_md, target_dir, version):
-    source_md_f = open(source_md, 'r')
-    #  print(source_md_f.read())
-    tmpl_to_compile = Template(source_md_f.read())
-    compiled = tmpl_to_compile.substitute(VERSION=version)
-    source_md_f.close()
-    compiled_md_f = open(os.path.join(target_dir, 'index.md'), 'w') 
-    compiled_md_f.write(compiled)
-    compiled_md_f.close()
+def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=True):
+    for r, ds, fs in os.walk(src_dir):
+        r = r[len(src_dir)+1:]
+        for f in fs:
+            print(r, f)
+            if f.startswith('.') or r in exclude_fnames or f in exclude_fnames:
+                continue
+            elif len(include_fnames) == 0 or f in include_fnames:
+                os.makedirs(pjoin(dst_dir, r), exist_ok=True)
+                if templating and f.endswith('.json') or f.endswith('.md'):
+                    with open(pjoin(src_dir, r, f), 'r') as in_f, open(pjoin(dst_dir, r, f), 'w') as out_f:
+                        print(f)
+                        tmpl_to_compile = Template(in_f.read())
+                        compiled = tmpl_to_compile.substitute(
+                            VERSION=version,
+                            schema='schema'
+                        )
+                        out_f.write(compiled)
+                else:
+                    shutil.copy(pjoin(src_dir, r, f), pjoin(dst_dir, r))
 
 
-def setup(out_dir, vocab_dir, schema_dir, context_dir, version):
+def setup(out_dir, vocab_dir, context_dir, version):
     """Copy non-vocabulary files to the output directory."""
-    css_dir = os.path.join(vocab_dir, 'css')
+    css_dir = pjoin(vocab_dir, 'css')
     if not os.path.exists(css_dir):
         os.makedirs(css_dir)
     shutil.copy('lappsstyle.css', css_dir)
-    compile_index_md('../specifications/index.md', out_dir, version)
-    shutil.copy('../specifications/pi78oGjdT.jpg', out_dir)
-    shutil.copy('../specifications/pi78oGjdT-annotated.jpg', out_dir)
-    samples_in = '../specifications/samples'
-    samples_out = os.path.join(out_dir, 'samples')
-    shutil.copytree(samples_in, os.path.join(out_dir, 'samples'))
-    # these are probably obsolete, so don't publish them
-    for fname in (glob(samples_out + '/image*')
-                  + glob(samples_out + '/video*')
-                  + glob(samples_out + '/slate*')):
-        os.remove(fname)
-    if not os.path.exists(schema_dir):
-        os.makedirs(schema_dir)
-    shutil.copy('../schema/lif.json', schema_dir)
-    shutil.copy('../schema/mmif.json', schema_dir)
+    copy('../specifications', out_dir, exclude_fnames=['next.md'])
+    copy('../schema', out_dir, include_fnames=['lif.json', 'mmif.json'], templating=False)
     if INCLUDE_CONTEXT:
-        if not os.path.exists(context_dir):
-            os.makedirs(context_dir)
-        shutil.copy('../context/mmif.json', context_dir)
-        shutil.copy('../context/vocab-clams.json', context_dir)
-        shutil.copy('../context/vocab-lapps.json', context_dir)
-        compile_index_md('../context/index.md', context_dir, version)
+        copy('../context', out_dir, exclude_fnames=['example.json'], templating=False)
 
 
 if __name__ == '__main__':
-    version = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'VERSION')).read().strip()
-    out_dir = os.path.join('..', 'docs', version)
+    version = open(pjoin(os.path.dirname(os.path.abspath(__file__)), '..', 'VERSION')).read().strip()
+    out_dir = pjoin('..', 'docs', version)
     if len(sys.argv) > 1 and sys.argv[1] == '--test':
         out_dir = 'www'
     shutil.rmtree(out_dir, ignore_errors=True)
-    os.mkdir(out_dir)
-    vocab_dir = os.path.join(out_dir, 'vocabulary')
-    schema_dir = os.path.join(out_dir, 'schema')
-    context_dir = os.path.join(out_dir, 'context')
+    vocab_dir = pjoin(out_dir, 'vocabulary')
+    schema_dir = pjoin(out_dir, 'schema')
+    context_dir = pjoin(out_dir, 'context')
     print("\n>>> Creating directory structure in '%s'" % out_dir)
+    os.makedirs(out_dir)
     print(">>> Copying non-vocabulary files to '%s'" % out_dir)
-    setup(out_dir, vocab_dir, schema_dir, context_dir, version)
+    setup(out_dir, vocab_dir, context_dir, version)
     print(">>> Adding vocabulary pages to '%s'\n" % vocab_dir)
     clams_types = read_yaml("clams.vocabulary.yaml")
     tree = Tree(clams_types)

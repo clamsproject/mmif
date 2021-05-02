@@ -19,14 +19,15 @@ author: Brandeis LLC
 navbar-links:
   HOME: "/"
   CLAMS: "https://clams.ai"
-  VERSIONS: 
+  VERSIONS:
     ## add a new line *at the top* of this list when new version is released
+    - 0.3.1: '0.3.1'
     - 0.3.0: '0.3.0'
     - 0.2.2: '0.2.2'
     - 0.2.1: '0.2.1'
     - 0.2.0: "0.2.0"
     - 0.1.0: "0.1.0"
-
+      
 # --- Logo --- #
 
 # Image to show in the navigation bar - works best with a square image
