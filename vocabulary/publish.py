@@ -27,9 +27,9 @@ When you use the default output directory and merge changes into the master
 branch then the site at http://mmif.clams.ai/VERSION will be automatically
 created or updated.
 
-This requires BeautifulSoup as well as the lxml parser
+This requires Pyyaml, BeautifulSoup as well as the lxml parser
 
-$ pip install bs4, lxml
+$ pip install bs4, lxml, pyyaml
 
 """
 
@@ -41,7 +41,6 @@ import time
 import yaml
 
 from os.path import join as pjoin
-from glob import glob
 from bs4 import BeautifulSoup
 from string import Template
 
@@ -415,16 +414,28 @@ def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=True
                     shutil.copy(pjoin(src_dir, r, f), pjoin(dst_dir, r))
 
 
-def setup(out_dir, vocab_dir, context_dir, version):
+def update_jekyll_config(version):
+    infname = pjoin('..', 'docs', '_config.yml')
+    outfname = infname + '.new'
+    with open(infname) as config_f, \
+            open(outfname, 'w') as out_f:
+        new_version_line = f"    - {version}: '{version}'\n"
+        lines = config_f.readlines()
+        for i, line in enumerate(lines):
+            out_f.write(line)
+            if line == '  VERSIONS:\n':
+                if lines[i+1] != new_version_line:
+                    out_f.write(new_version_line)
+    shutil.move(outfname, infname)
+    
+
+def setup(out_dir, version):
     """Copy non-vocabulary files to the output directory."""
-    css_dir = pjoin(vocab_dir, 'css')
-    if not os.path.exists(css_dir):
-        os.makedirs(css_dir)
-    shutil.copy('lappsstyle.css', css_dir)
     copy('../specifications', out_dir, exclude_fnames=['next.md'])
     copy('../schema', out_dir, include_fnames=['lif.json', 'mmif.json'], templating=False)
     if INCLUDE_CONTEXT:
         copy('../context', out_dir, exclude_fnames=['example.json'], templating=False)
+    update_jekyll_config(version)
 
 
 if __name__ == '__main__':
@@ -437,10 +448,13 @@ if __name__ == '__main__':
     schema_dir = pjoin(out_dir, 'schema')
     context_dir = pjoin(out_dir, 'context')
     print("\n>>> Creating directory structure in '%s'" % out_dir)
-    os.makedirs(out_dir)
+    os.makedirs(out_dir, exist_ok=True)
     print(">>> Copying non-vocabulary files to '%s'" % out_dir)
-    setup(out_dir, vocab_dir, context_dir, version)
+    setup(out_dir, version)
     print(">>> Adding vocabulary pages to '%s'\n" % vocab_dir)
+    css_dir = pjoin(out_dir, 'vocabulary', 'css')
+    os.makedirs(css_dir, exist_ok=True)
+    shutil.copy('lappsstyle.css', css_dir)
     clams_types = read_yaml("clams.vocabulary.yaml")
     tree = Tree(clams_types)
     write_hierarchy(tree, vocab_dir, version)

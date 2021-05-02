@@ -19,8 +19,8 @@ author: Brandeis LLC
 navbar-links:
   HOME: "/"
   CLAMS: "https://clams.ai"
+  # a new version will be added here by publish.py
   VERSIONS:
-    ## add a new line *at the top* of this list when new version is released
     - 0.3.1: '0.3.1'
     - 0.3.0: '0.3.0'
     - 0.2.2: '0.2.2'
