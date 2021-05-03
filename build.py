@@ -1,41 +1,17 @@
-"""publish.py
-
-Script to create webpages from a YAML file with the vocabulary.
-
-Usage:
-
-$ python publish.py
-$ python publish.py --test
-
-This publishes the specifications to the ../docs/VERSION directory where the
-actual version is taken from the VERSION file in the top-level directory of this
-repository. If the output directory exists then files in it will be overwritten.
-
-This copies the specifications, schema and the vocabulary:
-
-- Some files from ../specifications will be copied to ../docs/VERSION, including
-  the index file which will be copied to ../docs/VERSION/index.md.
-
-- Some of the JSON schema in ../schema are copied to ../docs/VERSION/schema
-
-- The vocabulary specifications in clams.vocabulary.yaml are used to write
-  webpages to ../docs/VERSION/vocabulary.
-
-With the --test option all files will be written to www in this directory.
+"""
+Script to collect MMIF specifications and generate source files for publication 
+as a github-page.
+Generated source files are located under `docs/VERSION` directory where the
+actual version is taken from the `VERSION` file in the project root.
+Output directory can be changed using `test` flag. 
 
 When you use the default output directory and merge changes into the master
 branch then the site at http://mmif.clams.ai/VERSION will be automatically
 created or updated.
-
-This requires Pyyaml, BeautifulSoup as well as the lxml parser
-
-$ pip install bs4, lxml, pyyaml
-
 """
 
 
 import os
-import sys
 import shutil
 import time
 import yaml
@@ -392,7 +368,7 @@ def increase_leading_space(text):
     return '\n'.join(new_lines)
 
 
-def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=True):
+def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=None):
     for r, ds, fs in os.walk(src_dir):
         r = r[len(src_dir)+1:]
         for f in fs:
@@ -400,20 +376,18 @@ def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=True
                 continue
             elif len(include_fnames) == 0 or f in include_fnames:
                 os.makedirs(pjoin(dst_dir, r), exist_ok=True)
-                if templating and f.endswith('.json') or f.endswith('.md'):
+                if templating is not None and f.endswith('.json') or f.endswith('.md'):
                     with open(pjoin(src_dir, r, f), 'r') as in_f, open(pjoin(dst_dir, r, f), 'w') as out_f:
                         tmpl_to_compile = Template(in_f.read())
                         compiled = tmpl_to_compile.substitute(
-                            VERSION=version,
-                            schema='schema'
+                            **templating
                         )
                         out_f.write(compiled)
                 else:
                     shutil.copy(pjoin(src_dir, r, f), pjoin(dst_dir, r))
 
 
-def update_jekyll_config(version):
-    infname = pjoin('..', 'docs', '_config.yml')
+def update_jekyll_config(infname, version):
     outfname = infname + '.new'
     with open(infname) as config_f, \
             open(outfname, 'w') as out_f:
@@ -426,34 +400,92 @@ def update_jekyll_config(version):
                     out_f.write(new_version_line)
     shutil.move(outfname, infname)
     
+    
+def build_spec(src, dst, version):
+    copy(src, dst, exclude_fnames=['next.md'], templating={'VERSION': version})
 
-def setup(out_dir, version):
-    """Copy non-vocabulary files to the output directory."""
-    copy('../specifications', out_dir, exclude_fnames=['next.md'])
-    copy('../schema', out_dir, include_fnames=['lif.json', 'mmif.json'], templating=False)
-    if INCLUDE_CONTEXT:
-        copy('../context', out_dir, exclude_fnames=['example.json'], templating=False)
-    update_jekyll_config(version)
+
+def build_schema(src, dst, version):
+    copy(src, dst, include_fnames=['lif.json', 'mmif.json'])
+
+
+def build_context(src, dst, version):
+    copy(src, dst, exclude_fnames=['example.json'])
+
+
+def build_vocab(src, dst, version):
+    css_dir = pjoin(dst, 'css')
+    os.makedirs(css_dir, exist_ok=True)
+    shutil.copy(pjoin(src, 'lappsstyle.css'), css_dir)
+    clams_types = read_yaml(pjoin(src, "clams.vocabulary.yaml"))
+    tree = Tree(clams_types)
+    write_hierarchy(tree, dst, version)
+    write_pages(tree, dst, version)
 
 
 if __name__ == '__main__':
-    version = open(pjoin(os.path.dirname(os.path.abspath(__file__)), '..', 'VERSION')).read().strip()
-    out_dir = pjoin('..', 'docs', version)
-    if len(sys.argv) > 1 and sys.argv[1] == '--test':
-        out_dir = 'www'
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    import argparse
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=__doc__
+    )
+    mmif_components = ['specification', 'schema', 'context', 'vocabulary']
+    parser.add_argument(
+        'components',
+        metavar='components',
+        action='store',
+        default='all',
+        nargs='*',
+        choices=['all'] + mmif_components,
+        help=f'List names of components to build {mmif_components}, ' 
+             'or pass "all" to build all '
+             'available components (JSON-LD context is not included by default).'
+    )
+    parser.add_argument(
+        '-t', '--test',
+        action='store',
+        nargs='?',
+        default=None,
+        const=pjoin(dirname, 'www'),
+        help='build current version in test output directory. Default is "www" directory in the project root.'
+    )
+    args = parser.parse_args()
+    version = open(pjoin(dirname, 'VERSION')).read().strip()
+    out_dir = args.test if args.test else pjoin(dirname, 'docs', version)
+    jekyll_conf_file = pjoin(dirname, 'docs', '_config.yml')
+    vocab_src_dir = pjoin(dirname, 'vocabulary')
+    spec_src_dir = pjoin(dirname, 'specifications')
+    schema_src_dir = pjoin(dirname, 'schema')
+    context_src_dir = pjoin(dirname, 'context')
+    vocab_out_dir = pjoin(out_dir, 'vocabulary')
+    vocab_css_out_dir = pjoin(vocab_out_dir, 'css')
+    schema_out_dir = pjoin(out_dir, 'schema')
+    context_out_dir = pjoin(out_dir, 'context')
     shutil.rmtree(out_dir, ignore_errors=True)
-    vocab_dir = pjoin(out_dir, 'vocabulary')
-    schema_dir = pjoin(out_dir, 'schema')
-    context_dir = pjoin(out_dir, 'context')
+    
     print("\n>>> Creating directory structure in '%s'" % out_dir)
     os.makedirs(out_dir, exist_ok=True)
-    print(">>> Copying non-vocabulary files to '%s'" % out_dir)
-    setup(out_dir, version)
-    print(">>> Adding vocabulary pages to '%s'\n" % vocab_dir)
-    css_dir = pjoin(out_dir, 'vocabulary', 'css')
-    os.makedirs(css_dir, exist_ok=True)
-    shutil.copy('lappsstyle.css', css_dir)
-    clams_types = read_yaml("clams.vocabulary.yaml")
-    tree = Tree(clams_types)
-    write_hierarchy(tree, vocab_dir, version)
-    write_pages(tree, vocab_dir, version)
+    
+    if args.components == 'all':
+        components = ['specification', 'schema', 'vocabulary']
+        if INCLUDE_CONTEXT:
+            components.append('context')
+    else:
+        components = args.components
+
+    if 'specification' in components:
+        print(">>> Building specification in '%s'" % out_dir)
+        build_spec(spec_src_dir, out_dir, version)
+    if 'schema' in components:
+        print(">>> Building json schema in '%s'" % out_dir)
+        build_schema(schema_src_dir, out_dir, version)
+    if 'context' in components:
+        print(">>> Building json-ld context in '%s'" % out_dir)
+        build_context(context_src_dir, out_dir, version)
+    if 'vocabulary' in components: 
+        print(">>> Building vocabulary in '%s'\n" % vocab_out_dir)
+        build_vocab(vocab_src_dir, vocab_out_dir, version)
+    if args.test is None:
+        print(">>> Updating jekyll configuration in '%s'" % jekyll_conf_file)
+        update_jekyll_config(jekyll_conf_file, version)
