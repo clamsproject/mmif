@@ -145,10 +145,18 @@ This property contains information about the annotations in a view. Here is an e
   "contains": {
     "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame": {
       "unit": "seconds",
-      "document": "m1" } },
+      "document": "m1" 
+    } 
+  },
   "parameters": {}
 }
 ```
+
+The *timestamp* key stores when the view was created by the application. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views, which is significant because by default arrays in JSON-LD are not ordered.
+
+The *app* key contains an identifier that specifies what application created the view. The identifier must be a URL form, and HTTP webpage pointed by the URL should contain all app metadata information relevant for the application: description, configuration, input/output specifications and a more complete description of what output is created. The app identifier always includes a version number for the app. The metadata should also contain a link to the public code repository for the app (and that repository will actually maintain all the information in the URL).
+
+The *parameter* is a dictionary of parameters and their values, if any, that were handed to the app at the runtime when it was called.
 
 The *contains* dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains properties specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations and it gives two metadata properties for that annotation type:
 
@@ -159,13 +167,23 @@ Note that when a property is set to some value then all annotations of that type
 
 Section 2 has more details on the interaction between the vocabulary and the metadata for the annotation types in the *contains* dictionary.
 
-The *timestamp* key stores when the view was created by the application. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views, which is significant because by default arrays in JSON-LD are not ordered.
-
-The *app* key contains a URL that specifies what application created the annotation data. That URL should contain all metadata information relevant for the application: description, configuration, input requirements and a more complete description of what output is created. The app URL always includes a version number for the app. The metadata should also contain a link to the Git repository for the app (and that repository will actually maintain all the information in the URL).
-
-Finally, the *parameter* is a dictionary of parameters and their values that were handed to the app when it was called.
-
-
+Finally, when an app fails to process the input for any reason and produces an error, it can record the error in `error` field, instead of `contains`. When this happens, the annotation list of the view must remain empty. 
+Here is an example of a view with an error. 
+```json
+{ 
+  "id": "v1", 
+  "metadata": {
+    "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
+    "timestamp": "2020-05-27T12:23:45",
+    "error": {
+      "message": "FileNotFoundError: /data/input.mp4 from Document \"vd1\" is not found.",
+      "stackTrace": "Optionally, some-stack-traceback-information"
+    },
+    "parameters": {}
+  },
+  "annotations": []
+}
+```
 
 #### 1.2.2.  The *view's annotations* property
 
