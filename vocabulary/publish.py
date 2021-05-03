@@ -396,14 +396,12 @@ def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=True
     for r, ds, fs in os.walk(src_dir):
         r = r[len(src_dir)+1:]
         for f in fs:
-            print(r, f)
             if f.startswith('.') or r in exclude_fnames or f in exclude_fnames:
                 continue
             elif len(include_fnames) == 0 or f in include_fnames:
                 os.makedirs(pjoin(dst_dir, r), exist_ok=True)
                 if templating and f.endswith('.json') or f.endswith('.md'):
                     with open(pjoin(src_dir, r, f), 'r') as in_f, open(pjoin(dst_dir, r, f), 'w') as out_f:
-                        print(f)
                         tmpl_to_compile = Template(in_f.read())
                         compiled = tmpl_to_compile.substitute(
                             VERSION=version,
