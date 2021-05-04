@@ -402,7 +402,7 @@ def update_jekyll_config(infname, version):
     
     
 def build_spec(src, dst, version):
-    copy(src, dst, exclude_fnames=['next.md'], templating={'VERSION': version})
+    copy(src, dst, exclude_fnames=['next.md', 'notes', 'samples/others'], templating={'VERSION': version})
 
 
 def build_schema(src, dst, version):
@@ -479,7 +479,7 @@ if __name__ == '__main__':
         build_spec(spec_src_dir, out_dir, version)
     if 'schema' in components:
         print(">>> Building json schema in '%s'" % out_dir)
-        build_schema(schema_src_dir, out_dir, version)
+        build_schema(schema_src_dir, schema_out_dir, version)
     if 'context' in components:
         print(">>> Building json-ld context in '%s'" % out_dir)
         build_context(context_src_dir, out_dir, version)
