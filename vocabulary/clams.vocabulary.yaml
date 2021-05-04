@@ -48,16 +48,6 @@ description: >-
   an image, an audio stream or a video streem. Typically one of the sub types
   of this will be used.
 
-metadata:
-
-  unit:
-    type: String
-    description: >-
-      The unit used to determine boundaries. For text regions this is typically
-      *offsets* to indicate character offsets, for images this is could be
-      *pixels*, and for audio or video streams *seconds*, *milliseconds*,
-      *timestamps* or *frames*.
-
 ---
 
 name: TimePoint
@@ -65,6 +55,13 @@ parent: Region
 
 description: >-
   A time point in an audio or video stream.
+
+metadata:
+  timeUnit:
+    type: String
+    description: >-
+      Specifies which unit of time the *point* value is based. 
+      Can be *seconds* or *milliseconds*. 
 
 properties:
   point:
@@ -90,12 +87,12 @@ properties:
     type: Integer
     description: >-
       The starting offset in the primary data. What unit is used is determined
-      by the *unit* metadata property.
+      by the *xxxUnit* metadata property.
   end:
     type: Integer
     description: >-
       The ending offset in the primary data. What unit is used is determined
-      by the *unit* metadata property.
+      by the *xxxUnit* metadata property.
   targets:
     type: List of IDs
     description: >-
@@ -117,6 +114,13 @@ description: >-
   pointing directly into primary data (by using start and end offsets) or
   by linking to one or more other Annotations with the targets property.
 
+metadata:
+  charUnit:
+    type: String
+    description: >-
+      Assuming that a *TextDocument* is a unicode text encoded in UTF-8, 
+      *charUnit* specifies how character offsets in *start* and *end* values
+      are counted. Can be *codepoints*, *codeunits*, or *bytes*.
 ---
 
 name: TimeFrame
@@ -126,6 +130,13 @@ description: >-
   A temporal interval in an audio or video stream. This is similar to the term
   segment used in audio processing, but that term has a different meaning in the
   image and video community.
+
+metadata:
+  timeUnit:
+    type: String
+    description: >-
+      Specifies which unit of time the *start* and *end* values are based. 
+      Can be *seconds* or *milliseconds*. 
 
 properties:
   frameType:
