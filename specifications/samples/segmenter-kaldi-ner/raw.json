@@ -1,10 +1,10 @@
 {
   "metadata": {
-    "mmif": "http://mmif.clams.ai/0.3.0"
+    "mmif": "http://mmif.clams.ai/$VERSION"
   },
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/0.3.0/vocabulary/AudioDocument",
+      "@type": "http://mmif.clams.ai/$VERSION/vocabulary/AudioDocument",
       "properties": {
         "id": "m1",
         "mime": "audio/mpeg",
@@ -18,7 +18,7 @@
       "metadata": {
         "app": "http://mmif.clams.ai/apps/audio-segmenter/0.2.1",
         "contains": {
-          "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame": {
+          "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame": {
             "unit": "milliseconds",
             "document": "m1"
           }
@@ -26,7 +26,7 @@
       },
       "annotations": [
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame",
           "properties": {
             "id": "tf1",
             "frameType": "speech",
@@ -35,7 +35,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame",
           "properties": {
             "frameType": "non-speech",
             "id": "tf2",
@@ -44,7 +44,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame",
           "properties": {
             "id": "tf3",
             "frameType": "speech",
@@ -59,18 +59,18 @@
       "metadata": {
         "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
         "contains": {
-          "http://mmif.clams.ai/0.3.0/vocabulary/TextDocument": {},
+          "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument": {},
           "http://vocab.lappsgrid.org/Token": {},
-          "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame": {
+          "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame": {
             "unit": "milliseconds",
             "document": "m1"
           },
-          "http://mmif.clams.ai/0.3.0/vocabulary/Alignment": {}
+          "http://mmif.clams.ai/$VERSION/vocabulary/Alignment": {}
         }
       },
       "annotations": [
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TextDocument",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument",
           "properties": {
             "id": "td1",
             "text": {
@@ -79,7 +79,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
           "properties": {
             "id": "a1",
             "source": "v1:tf1",
@@ -107,7 +107,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame",
           "properties": {
             "id": "tf1",
             "start": 17,
@@ -115,7 +115,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame",
           "properties": {
             "id": "tf2",
             "start": 65,
@@ -123,7 +123,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
           "properties": {
             "id": "a2",
             "source": "tf1",
@@ -131,7 +131,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
           "properties": {
             "id": "a3",
             "source": "tf2",
@@ -139,7 +139,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TextDocument",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument",
           "properties": {
             "id": "td2",
             "textSource": "v1:tf3",
@@ -149,7 +149,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
           "properties": {
             "id": "a4",
             "source": "v1:tf3",
@@ -177,7 +177,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame",
           "properties": {
             "id": "tf3",
             "start": 194,
@@ -185,7 +185,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/TimeFrame",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame",
           "properties": {
             "id": "tf4",
             "start": 241,
@@ -193,7 +193,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
           "properties": {
             "id": "a5",
             "source": "tf3",
@@ -201,7 +201,7 @@
           }
         },
         {
-          "@type": "http://mmif.clams.ai/0.3.0/vocabulary/Alignment",
+          "@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
           "properties": {
             "id": "a5",
             "source": "tf4",
