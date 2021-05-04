@@ -67,13 +67,35 @@
             }
           }
         },
+        "error": {
+          "type": "object", 
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "stackTrace": {
+              "type": "string"
+            }
+          },
+          "required": ["message"]
+        },
         "parameters": {
           "$ref": "#/definitions/strStrMap"
         }
       },
-      "required": [
-        "app",
-        "contains"
+      "oneOf": [
+        {
+          "required": [
+            "app",
+            "contains"
+          ]
+        },
+        {
+          "required": [
+            "app",
+            "error"
+          ]
+        }
       ]
     },
     "text": {
