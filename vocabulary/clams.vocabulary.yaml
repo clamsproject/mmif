@@ -43,6 +43,21 @@ properties:
 name: Region
 parent: Annotation
 
+metadata:
+  timeUnit:
+    type: String
+    description: >-
+      Specifies which unit of time the measurement is based. 
+      Can be *seconds* or *milliseconds*, or in case of annotations on 
+      a VideoDocument, *frames*. 
+
+  charUnit:
+    type: String
+    description: >-
+      Assuming that a *TextDocument* is a unicode text encoded in UTF-8, 
+      *charUnit* specifies how character offsets in *start* and *end* values
+      are counted. Can be *codepoints*, *codeunits*, or *bytes*.
+
 description: >-
   An annotation over a region in primary data where primary data can be a text,
   an image, an audio stream or a video streem. Typically one of the sub types
@@ -56,15 +71,8 @@ parent: Region
 description: >-
   A time point in an audio or video stream.
 
-metadata:
-  timeUnit:
-    type: String
-    description: >-
-      Specifies which unit of time the *point* value is based. 
-      Can be *seconds* or *milliseconds*. 
-
 properties:
-  point:
+  timePoint:
     type: Integer
     description: The starting offset in the stream.
     required: true
@@ -115,12 +123,6 @@ description: >-
   by linking to one or more other Annotations with the targets property.
 
 metadata:
-  charUnit:
-    type: String
-    description: >-
-      Assuming that a *TextDocument* is a unicode text encoded in UTF-8, 
-      *charUnit* specifies how character offsets in *start* and *end* values
-      are counted. Can be *codepoints*, *codeunits*, or *bytes*.
 ---
 
 name: TimeFrame
@@ -172,7 +174,7 @@ properties:
     description: The coordinates of the polygon.
     required: true
   timePoint:
-    type: ID
+    type: Integer
     description: If on a video stream, the TimePoint that the BoundingBox occurs in.
 
 ---
