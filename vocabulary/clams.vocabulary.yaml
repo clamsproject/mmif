@@ -43,20 +43,18 @@ properties:
 name: Region
 parent: Annotation
 
+metadata:
+  timeUnit:
+    type: String
+    description: >-
+      Specifies which unit of time the measurement is based. 
+      Can be *seconds* or *milliseconds*, or in case of annotations on 
+      a VideoDocument, *frames*. 
+
 description: >-
   An annotation over a region in primary data where primary data can be a text,
   an image, an audio stream or a video streem. Typically one of the sub types
   of this will be used.
-
-metadata:
-
-  unit:
-    type: String
-    description: >-
-      The unit used to determine boundaries. For text regions this is typically
-      *offsets* to indicate character offsets, for images this is could be
-      *pixels*, and for audio or video streams *seconds*, *milliseconds*,
-      *timestamps* or *frames*.
 
 ---
 
@@ -67,7 +65,7 @@ description: >-
   A time point in an audio or video stream.
 
 properties:
-  point:
+  timePoint:
     type: Integer
     description: The starting offset in the stream.
     required: true
@@ -90,12 +88,12 @@ properties:
     type: Integer
     description: >-
       The starting offset in the primary data. What unit is used is determined
-      by the *unit* metadata property.
+      by the *xxxUnit* metadata property.
   end:
     type: Integer
     description: >-
       The ending offset in the primary data. What unit is used is determined
-      by the *unit* metadata property.
+      by the *xxxUnit* metadata property.
   targets:
     type: List of IDs
     description: >-
@@ -126,6 +124,13 @@ description: >-
   A temporal interval in an audio or video stream. This is similar to the term
   segment used in audio processing, but that term has a different meaning in the
   image and video community.
+
+metadata:
+  timeUnit:
+    type: String
+    description: >-
+      Specifies which unit of time the *start* and *end* values are based. 
+      Can be *seconds* or *milliseconds*. 
 
 properties:
   frameType:
@@ -161,7 +166,7 @@ properties:
     description: The coordinates of the polygon.
     required: true
   timePoint:
-    type: ID
+    type: Integer
     description: If on a video stream, the TimePoint that the BoundingBox occurs in.
 
 ---
