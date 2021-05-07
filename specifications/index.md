@@ -144,9 +144,9 @@ This property contains information about the annotations in a view. Here is an e
   "timestamp": "2020-05-27T12:23:45",
   "contains": {
     "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame": {
-      "unit": "seconds",
+      "timeUnit": "seconds",
       "document": "m1" 
-    } 
+    }
   },
   "parameters": {}
 }
@@ -161,9 +161,9 @@ The *parameter* is a dictionary of parameters and their values, if any, that wer
 The *contains* dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains properties specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations and it gives two metadata properties for that annotation type:
 
 1. The *document* key gives the identifier of the document that the annotations of that type in this view are over. As we will see later, annotations anchor into documents using keys like *start* and *end* and this property specifies what document that is.
-2. The *unit* key is set to "seconds" and this means that for each annotation the unit for the values in *start* and *end* are seconds. 
+2. The *timeUnit* key is set to "seconds" and this means that for each annotation the unit for the values in *start* and *end* are seconds. 
 
-Note that when a property is set to some value then all annotations of that type should adhere to that value, in this case the document and unit are set to "m1" and "seconds" respectively. In other words, the *contains* dictionary not only functions as an overview of the annotation types in this view, but also as a place for common properties shared among annotations of a type. This is useful especially for *document* property, as in a single view, an app is likely to process only one or two source documents and resulting annotation objects will be anchored on those small number of documents. It is technically possible to add *documenty* and *unit* properties to individual annotations and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later.
+Note that when a property is set to some value in the *contains* in the view metadata then all annotations of that type should adhere to that value, in this case the *document* and *timeUnit* are set to "m1" and "seconds" respectively. In other words, the *contains* dictionary not only functions as an overview of the annotation types in this view, but also as a place for common properties shared among annotations of a type. This is useful especially for *document* property, as in a single view, an app is likely to process only one or two source documents and resulting annotation objects will be anchored on those small number of documents. It is technically possible to add *documenty* and *timeUnit* properties to individual annotations and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later. 
 
 Section 2 has more details on the interaction between the vocabulary and the metadata for the annotation types in the *contains* dictionary.
 
@@ -217,8 +217,9 @@ Here is an other example of a view containing two bounding boxes created by the 
     "timestamp": "2020-05-27T12:23:45",
     "contains": {
       "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox": {
-        "document": "image3",
-        "unit": "pixels" } }
+        "document": "image3"
+      } 
+    }
   },
   "annotations": [
       { "@type": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox",
@@ -236,7 +237,7 @@ Here is an other example of a view containing two bounding boxes created by the 
 }
 ```
 
-Note how the *coordinates* property is a list of lists where each embedded list is a pair of an x-coordinate and a y-coordinate.
+Note how the *coordinates* property is a list of lists where each embedded list is a pair of an x-coordinate and a y-coordinate. 
 
 
 
@@ -451,17 +452,17 @@ The structure of MMIF files is defined in the [schema](schema/mmif.json)  and de
 
 The value of *@type* refers to the URL [http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox](http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that *id* is a required property inherited from *Annotation* and that *coordinates* is a required property of *BoundingBox*. Both are expressed in the properties dictionary above. The page also says that there is an optional property *timePoint*, but it is not used above.
 
-The vocabulary also defines metadata properties. For example, the optional property *unit* can be used for a *BoundingBox* to specify what unit is used for the coordinates in instances of *BoundingBox*. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the *contains* section:
+The vocabulary also defines metadata properties. For example, the optional property *timeUnit* can be used for a *TimeFrame* to specify what unit is used for the start and end time points in instances of *TimeFrame*. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the *contains* section:
 
 ```json
 {
   "metadata": {
-    "app": "http://apps.clams.ai/some_bounding_box_app/1.0.3",
+    "app": "http://apps.clams.ai/some_time_segmentation_app/1.0.3",
     "timestamp": "2020-05-27T12:23:45",
     "contains": {
-        "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox": {
+        "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame": {
           "document": "m12",
-          "unit": "pixels" } }
+          "timeUnit": "milliseconds" } }
   }
 }
 ```

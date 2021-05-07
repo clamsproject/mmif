@@ -51,13 +51,6 @@ metadata:
       Can be *seconds* or *milliseconds*, or in case of annotations on 
       a VideoDocument, *frames*. 
 
-  charUnit:
-    type: String
-    description: >-
-      Assuming that a *TextDocument* is a unicode text encoded in UTF-8, 
-      *charUnit* specifies how character offsets in *start* and *end* values
-      are counted. Can be *codepoints*, *codeunits*, or *bytes*.
-
 description: >-
   An annotation over a region in primary data where primary data can be a text,
   an image, an audio stream or a video streem. Typically one of the sub types
@@ -122,7 +115,6 @@ description: >-
   pointing directly into primary data (by using start and end offsets) or
   by linking to one or more other Annotations with the targets property.
 
-metadata:
 ---
 
 name: TimeFrame
