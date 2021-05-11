@@ -20,6 +20,8 @@ Along with the formal specifications and documentation we also provide a referen
 We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](versioning) for more information.
 
 
+## 0. The format of MMIF files
+As mentioned, MMIF is JSON in essence. When serialized to a physical file, the file must use **Unicode** charset encoded in **UTF-8**. 
 
 ## 1.  The structure of MMIF files
 
@@ -158,12 +160,18 @@ The `app` key contains an identifier that specifies what application created the
 
 The `parameters` is a dictionary of parameters and their values, if any, that were handed to the app at the runtime when it was called.
 
-The `contains` dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains properties specified for the annotation type. The example above has one key that indicates that the view contains `TimeFrame` annotations, and it gives two metadata properties for that annotation type:
+The `contains` dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations, and it gives two metadata values for that annotation type:
 
 1. The `document` key gives the identifier of the document that the annotations of that type in this view are over. As we will see later, annotations anchor into documents using keys like `start` and `end` and this property specifies what document that is.
 2. The `timeUnit` key is set to "seconds" and this means that for each annotation the unit for the values in `start` and `end` are seconds. 
 
-Note that when a property is set to some value in the `contains` in the view metadata then all annotations of that type should adhere to that value, in this case the `document` and `timeUnit` are set to *"m1"* and *"seconds"* respectively. In other words, the `contains` dictionary not only functions as an overview of the annotation types in this view, but also as a place for common properties shared among annotations of a type. This is useful especially for `document` property, as in a single view, an app is likely to process only one or two source documents and resulting annotation objects will be anchored on those small number of documents. It is technically possible to add `document` and `timeUnit` properties to individual annotations and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later. 
+Every annotation object type defined in the CLAMS vocabulary has two feature structures - `metadata` and `properties`. See [this definition of *TimeFrame*](vocabulary/TimeFrame/) type in the vocabulary for an example. As we see here, `contains` dictionary in a view's metadata is used to assign values to metadata keys. We'll see in the following section that individual annotation objects are used to assign values to `properties` keys. 
+{: .box-note}
+
+Note that when a property is set to some value in the `contains` in the view metadata then all annotations of that type should adhere to that value, in this case the `document` and `timeUnit` are set to *"m1"* and *"seconds"* respectively. In other words, the `contains` dictionary not only functions as an overview of the annotation types in this view, but also as a place for common metadata shared among annotations of a type. This is useful especially for `document` property, as in a single view, an app is likely to process only a limited number of source documents and resulting annotation objects will be anchored on those documents. It is technically possible for *TimeFrame* type to add `document` properties to individual annotation objects and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later. 
+
+For object types that are used to measure time (such as *TimePoint*, *TimeFrame*, or *VideoObject*), the unit of the measurement (`timeUnit`) must be specified in the `contains`. However, for objects that measure image regions (such as [*BoundingBox*](vocabulary/BoundingBox).`coordinates`), the *unit* is always assumed to be *pixels*. Similarly, for objects that measure text spans (such as [*Span*](vocabulary/Span).start/end), the *unit* of counting characters must always be code points. As mentioned above, MMIF must be serialized to a UTF-8 Unicode file. 
+{: .box-note}
 
 Section 2 has more details on the interaction between the vocabulary and the metadata for the annotation types in the `contains` dictionary.
 
