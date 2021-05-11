@@ -1,24 +1,27 @@
 """
-Script to collect MMIF specifications and generate source files for publication 
-as a github-page.
-Generated source files are located under `docs/VERSION` directory where the
-actual version is taken from the `VERSION` file in the project root.
-Output directory can be changed using `test` flag. 
+
+Script to collect MMIF specifications and generate source files for
+publication as a github-page. Generated source files are located under
+`docs/VERSION` directory where the actual version is taken from the `VERSION`
+file in the project root.
 
 When you use the default output directory and merge changes into the master
 branch then the site at http://mmif.clams.ai/VERSION will be automatically
 created or updated.
+
 """
 
 
 import os
 import shutil
 import time
-import yaml
+import argparse
 
 from os.path import join as pjoin
-from bs4 import BeautifulSoup
 from string import Template
+
+import yaml
+from bs4 import BeautifulSoup
 
 
 INCLUDE_CONTEXT = False
@@ -387,19 +390,42 @@ def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=None
                     shutil.copy(pjoin(src_dir, r, f), pjoin(dst_dir, r))
 
 
-def update_jekyll_config(infname, version):
-    outfname = infname + '.new'
-    with open(infname) as config_f, \
-            open(outfname, 'w') as out_f:
-        new_version_line = f"    - {version}: '{version}'\n"
-        lines = config_f.readlines()
-        for i, line in enumerate(lines):
-            out_f.write(line)
-            if line == '  VERSIONS:\n':
-                if lines[i+1] != new_version_line:
-                    out_f.write(new_version_line)
-    shutil.move(outfname, infname)
+def build(dirname, args):
     
+    version = open(pjoin(dirname, 'VERSION')).read().strip()
+    out_dir = args.testdir if args.testdir else pjoin(dirname, 'docs', version)
+    jekyll_conf_file = pjoin(dirname, 'docs', '_config.yml')
+    vocab_src_dir = pjoin(dirname, 'vocabulary')
+    spec_src_dir = pjoin(dirname, 'specifications')
+    schema_src_dir = pjoin(dirname, 'schema')
+    context_src_dir = pjoin(dirname, 'context')
+    vocab_out_dir = pjoin(out_dir, 'vocabulary')
+    vocab_css_out_dir = pjoin(vocab_out_dir, 'css')
+    schema_out_dir = pjoin(out_dir, 'schema')
+    context_out_dir = pjoin(out_dir, 'context')
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    print("\n>>> Creating directory structure in '%s'" % out_dir)
+    os.makedirs(out_dir, exist_ok=True)
+
+    print(">>> Building specification in '%s'" % out_dir)
+    build_spec(spec_src_dir, out_dir, version)
+
+    print(">>> Building json schema in '%s'" % out_dir)
+    build_schema(schema_src_dir, schema_out_dir, version)
+
+    if INCLUDE_CONTEXT:
+        # TODO: this is actually broken
+        print(">>> Building json-ld context in '%s'" % out_dir)
+        build_context(context_src_dir, out_dir, version)
+
+    print(">>> Building vocabulary in '%s'\n" % vocab_out_dir)
+    build_vocab(vocab_src_dir, vocab_out_dir, version)
+
+    if args.testdir is None:
+        print(">>> Updating jekyll configuration in '%s'" % jekyll_conf_file)
+        update_jekyll_config(jekyll_conf_file, version)
+
     
 def build_spec(src, dst, version):
     copy(src, dst, exclude_fnames=['next.md', 'notes', 'samples/others'], templating={'VERSION': version})
@@ -423,69 +449,27 @@ def build_vocab(src, dst, version):
     write_pages(tree, dst, version)
 
 
-if __name__ == '__main__':
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    import argparse
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description=__doc__
-    )
-    mmif_components = ['specification', 'schema', 'context', 'vocabulary']
-    parser.add_argument(
-        'components',
-        metavar='components',
-        action='store',
-        default='all',
-        nargs='*',
-        choices=['all'] + mmif_components,
-        help=f'List names of components to build {mmif_components}, ' 
-             'or pass "all" to build all '
-             'available components (JSON-LD context is not included by default).'
-    )
-    parser.add_argument(
-        '-t', '--test',
-        action='store',
-        nargs='?',
-        default=None,
-        const=pjoin(dirname, 'www'),
-        help='build current version in test output directory. Default is "www" directory in the project root.'
-    )
-    args = parser.parse_args()
-    version = open(pjoin(dirname, 'VERSION')).read().strip()
-    out_dir = args.test if args.test else pjoin(dirname, 'docs', version)
-    jekyll_conf_file = pjoin(dirname, 'docs', '_config.yml')
-    vocab_src_dir = pjoin(dirname, 'vocabulary')
-    spec_src_dir = pjoin(dirname, 'specifications')
-    schema_src_dir = pjoin(dirname, 'schema')
-    context_src_dir = pjoin(dirname, 'context')
-    vocab_out_dir = pjoin(out_dir, 'vocabulary')
-    vocab_css_out_dir = pjoin(vocab_out_dir, 'css')
-    schema_out_dir = pjoin(out_dir, 'schema')
-    context_out_dir = pjoin(out_dir, 'context')
-    shutil.rmtree(out_dir, ignore_errors=True)
-    
-    print("\n>>> Creating directory structure in '%s'" % out_dir)
-    os.makedirs(out_dir, exist_ok=True)
-    
-    if args.components == 'all':
-        components = ['specification', 'schema', 'vocabulary']
-        if INCLUDE_CONTEXT:
-            components.append('context')
-    else:
-        components = args.components
+def update_jekyll_config(infname, version):
+    outfname = infname + '.new'
+    with open(infname) as config_f, \
+            open(outfname, 'w') as out_f:
+        new_version_line = f"    - {version}: '{version}'\n"
+        lines = config_f.readlines()
+        for i, line in enumerate(lines):
+            out_f.write(line)
+            if line == '  VERSIONS:\n':
+                if lines[i+1] != new_version_line:
+                    out_f.write(new_version_line)
+    shutil.move(outfname, infname)
 
-    if 'specification' in components:
-        print(">>> Building specification in '%s'" % out_dir)
-        build_spec(spec_src_dir, out_dir, version)
-    if 'schema' in components:
-        print(">>> Building json schema in '%s'" % out_dir)
-        build_schema(schema_src_dir, schema_out_dir, version)
-    if 'context' in components:
-        print(">>> Building json-ld context in '%s'" % out_dir)
-        build_context(context_src_dir, out_dir, version)
-    if 'vocabulary' in components: 
-        print(">>> Building vocabulary in '%s'\n" % vocab_out_dir)
-        build_vocab(vocab_src_dir, vocab_out_dir, version)
-    if args.test is None:
-        print(">>> Updating jekyll configuration in '%s'" % jekyll_conf_file)
-        update_jekyll_config(jekyll_conf_file, version)
+
+
+if __name__ == '__main__':
+
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--test', dest="testdir",
+                        help='build version in test output directory')
+    args = parser.parse_args()
+    print(args)
+    build(dirname, args)
