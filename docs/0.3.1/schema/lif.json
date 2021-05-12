@@ -1,0 +1,116 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "LAPPS Interchange Format",
+    "description": "The JSON-LD objects exchanged by LAPPS web services.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "@context": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                {
+                    "type": "string",
+                    "format": "uri"
+                }
+            ]
+        },
+        "@vocab": {
+            "type": "string",
+            "format": "uri"
+        },
+        "text": {
+            "type": "object",
+            "properties": {
+                "@value": {
+                    "type": "string"
+                },
+                "@language": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "@value"
+            ],
+            "additionalProperties": false
+        },
+        "metadata": {
+            "$ref": "#/definitions/map"
+        },
+        "views": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/view"
+            }
+        }
+    },
+    "definitions": {
+        "map": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "view": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/map"
+                },
+                "annotations": {
+                    "$ref": "#/definitions/annotations"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "annotations"
+            ]
+        },
+        "annotations": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/annotation"
+            }
+        },
+        "annotation": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "@type": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "integer",
+                    "minimum": -1
+                },
+                "end": {
+                    "type": "integer",
+                    "minimum": -1
+                },
+                "features": {
+                    "$ref": "#/definitions/map"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/map"
+                }
+            },
+            "required": [
+                "id",
+                "@type"
+            ],
+            "additionalProperties": false
+        }
+    }
+}

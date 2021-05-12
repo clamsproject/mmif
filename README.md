@@ -2,11 +2,10 @@
 
 Repository for MMIF specifications, MMIF schema and the CLAMS vocabulary.
 
-To create a new version use the `publish.py` script:
+To create a new version use the `build.py` script:
 
 ```bash
-$> cd vocabulary
-$> python publish.py
+$> python build.py
 ```
 
 This creates a new version in `docs/VERSION` where the version is taken from the `VERSION` file.
@@ -23,6 +22,7 @@ List of things to do when creating a new version:
   - Update VERSIONS list in `docs/_config.yml`.
   - Update `docs/index.md` (date at the bottom).
 - [ ] Check `specifications/index.md`. Make sure it matches new schema and/or vocabulary if needed.
+  - This should be depricated
 - [ ] Test all examples to see whether they match the schema.
 - [ ] Check all pages
 - [ ] Final updates to `CHANGELOG.md`.
