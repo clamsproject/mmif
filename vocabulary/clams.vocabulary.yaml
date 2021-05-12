@@ -127,13 +127,6 @@ description: >-
   segment used in audio processing, but that term has a different meaning in the
   image and video community.
 
-metadata:
-  timeUnit:
-    type: String
-    description: >-
-      Specifies which unit of time the *start* and *end* values are based. 
-      Can be *seconds* or *milliseconds*. 
-
 properties:
   frameType:
     type: String
