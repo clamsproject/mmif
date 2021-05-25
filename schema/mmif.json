@@ -157,18 +157,6 @@
       "properties": {
         "id": {
           "type": "string"
-        },
-        "start": {
-          "type": "integer",
-          "minimum": -1
-        },
-        "end": {
-          "type": "integer",
-          "minimum": -1
-        },
-        "location": {
-          "type": "string",
-          "format": "uri"
         }
       },
       "required": [
