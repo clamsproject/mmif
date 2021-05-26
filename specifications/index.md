@@ -15,11 +15,13 @@ MMIF consists of two formal components in addition to this more informal specifi
 
 The  JSON schema for MMIF defines the syntactic elements of MMIF which will be explained at length in section 1. These specifications often refer to elements from the CLAMS  and LAPPS Vocabularies which define concepts and their ontological relations, see section 2 for notes on those vocabularies.
 
-Along with the formal specifications and documentation we also provide a reference implementation of MMIF. It is developed in the Python programming language and it will be distributed via github (as source code) as well as via the [Python Package Index](https://pypi.org/) (as a Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
+Along with the formal specifications and documentation we also provide a reference implementation of MMIF. It is developed in the Python programming language, and it will be distributed via GitHub (as source code) as well as via the [Python Package Index](https://pypi.org/) (as a Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
 
 We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](versioning) for more information.
 
 
+## 0. The format of MMIF files
+As mentioned, MMIF is JSON in essence. When serialized to a physical file, the file must use **Unicode** charset encoded in **UTF-8**. 
 
 ## 1.  The structure of MMIF files
 
@@ -43,13 +45,13 @@ The top-level structure of a MMIF file is as follows:
 }
 ```
 
-The *metadata* property stores metadata associated with the file. It is not heavily used for now, but we do use it to store the MMIF version used in the document. The *mmif* metadata property is required. You are allowed to add any other metadata properties.
+The `metadata` property stores metadata associated with the file. It is not heavily used for now, but we do use it to store the MMIF version used in the document. The `mmif` metadata property is required. You are allowed to add any other metadata properties.
 
 
 
 ### 1.1. The *documents* property
 
-We assume that when a MMIF document is initialized it is given a list of media and each of these media is either an external file or a text string. These media are all imported into the MMIF file as documents of a certain type and the specifications for each medium/document is stored in the *documents* list. This list is read-only and cannot be extended after initialization. There are no limits on how many documents and how many documents of what types are in the list, but typically there will be just a few documents in there.
+We assume that when a MMIF document is initialized it is given a list of media and each of these media is either an external file or a text string. These media are all imported into the MMIF file as documents of a certain type and the specifications for each medium/document is stored in the `documents` list. This list is read-only and cannot be extended after initialization. There are no limits on how many documents and how many documents of what types are in the list, but typically there will be just a few documents in there.
 
 Here is an example document list with a video and its transcript:
 
@@ -74,9 +76,9 @@ Here is an example document list with a video and its transcript:
 }
 ```
 
-The *@type* key has a special meaning in JSON-LD and it is used to define the type of a datastructure. In MMIF, the value should be a URL that points to a description of the type of document. Above we have a video and a text document and those types are described at [http://mmif.clams.ai/$VERSION/vocabulary/VideoDocument](vocabulary/VideoDocument) and [http://mmif.clams.ai/$VERSION/vocabulary/TextDocument](vocabulary/TextDocument) respectively. Currently, four document types are defined: *VideoDocument*, *TextDocument*, *ImageDocument* and *AudioDocument*.
+The `@type` key has a special meaning in JSON-LD and it is used to define the type of data structure. In MMIF, the value should be a URL that points to a description of the type of document. Above we have a video and a text document and those types are described at [http://mmif.clams.ai/$VERSION/vocabulary/VideoDocument](vocabulary/VideoDocument) and [http://mmif.clams.ai/$VERSION/vocabulary/TextDocument](vocabulary/TextDocument) respectively. Currently, four document types are defined: *VideoDocument*, *TextDocument*, *ImageDocument* and *AudioDocument*.
 
-The description also lists the properties that can be used for a type, and above we have the *id*, *mime* and *location* properties, used for the document identifier, the document's MIME type and the location of the document, which is a URL. Should the document be a local file then the `file://` scheme must be used. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the *text* property in LIF, using a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a *@value* key and optionally a *@language* key:
+The description also lists the properties that can be used for a type, and above we have the `id`, `mime` and `location` properties, used for the document identifier, the document's MIME type and the location of the document, which is a URL. Should the document be a local file then the `file://` scheme must be used. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the `text` property in LIF, using a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a `@value` key and optionally a `@language` key:
 
 ``` json
 {
@@ -100,14 +102,14 @@ The description also lists the properties that can be used for a type, and above
 }
 ```
 
-The value associated with *@value* is a string and the value associated with *@language* follows the rules in [BCP47](http://www.w3.org/TR/json-ld/#bib-bcp47), which for our current purposes boils down to using the two-character ISO 639 code. With inline text no MIME type is needed.
+The value associated with `@value` is a string and the value associated with `@language` follows the rules in [BCP47](http://www.w3.org/TR/json-ld/#bib-bcp47), which for our current purposes boils down to using the two-character ISO 639 code. With inline text no MIME type is needed.
 
 
 
 
 ### 1.2.  The *views* property
 
-This is where all the annotations and associated metadata live. Views contain structured information about documents but are separate from those documents. The value of *views* is a JSON-LD array of view objects where each view specifies what documents the annotation is over, what information it contains and what service created that information. To that end, each view has four properties:  *id*, *metadata* and *annotations*.
+This is where all the annotations and associated metadata live. Views contain structured information about documents but are separate from those documents. The value of `views` is a JSON-LD array of view objects where each view specifies what documents the annotation is over, what information it contains and what service created that information. To that end, each view has four properties:  `id`, `metadata` and `annotations`.
 
 ```json
 {
@@ -121,7 +123,7 @@ This is where all the annotations and associated metadata live. Views contain st
 }
 ```
 
-Each view has a unique identifier. Annotation elements in the view have identifiers unique to the view and these elements can be uniquely referred to from outside the view by using the view identifier and the annotation element identifier, separated by a colon. For example, if the view above has an annotation with identfier "a8" then it can be referred to from outside the view by using "v1:a8".
+Each view has a unique identifier. Annotation elements in the view have identifiers unique to the view and these elements can be uniquely referred to from outside the view by using the view identifier and the annotation element identifier, separated by a colon. For example, if the view above has an annotation with identifier "a8" then it can be referred to from outside the view by using "v1:a8".
 
 Here are a few general principles relevant to views:
 
@@ -144,28 +146,34 @@ This property contains information about the annotations in a view. Here is an e
   "timestamp": "2020-05-27T12:23:45",
   "contains": {
     "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame": {
-      "unit": "seconds",
+      "timeUnit": "seconds",
       "document": "m1" 
-    } 
+    }
   },
   "parameters": {}
 }
 ```
 
-The *timestamp* key stores when the view was created by the application. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views, which is significant because by default arrays in JSON-LD are not ordered.
+The `timestamp` key stores when the view was created by the application. This is using the ISO 8601 format where the T separates the date from the time of the day. The timestamp can also be used to order views, which is significant because by default arrays in JSON-LD are not ordered.
 
-The *app* key contains an identifier that specifies what application created the view. The identifier must be a URL form, and HTTP webpage pointed by the URL should contain all app metadata information relevant for the application: description, configuration, input/output specifications and a more complete description of what output is created. The app identifier always includes a version number for the app. The metadata should also contain a link to the public code repository for the app (and that repository will actually maintain all the information in the URL).
+The `app` key contains an identifier that specifies what application created the view. The identifier must be a URL form, and HTTP webpage pointed by the URL should contain all app metadata information relevant for the application: description, configuration, input/output specifications and a more complete description of what output is created. The app identifier always includes a version number for the app. The metadata should also contain a link to the public code repository for the app (and that repository will actually maintain all the information in the URL).
 
-The *parameter* is a dictionary of parameters and their values, if any, that were handed to the app at the runtime when it was called.
+The `parameters` is a dictionary of parameters and their values, if any, that were handed to the app at the runtime when it was called.
 
-The *contains* dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains properties specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations and it gives two metadata properties for that annotation type:
+The `contains` dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations, and it gives two metadata values for that annotation type:
 
-1. The *document* key gives the identifier of the document that the annotations of that type in this view are over. As we will see later, annotations anchor into documents using keys like *start* and *end* and this property specifies what document that is.
-2. The *unit* key is set to "seconds" and this means that for each annotation the unit for the values in *start* and *end* are seconds. 
+1. The `document` key gives the identifier of the document that the annotations of that type in this view are over. As we will see later, annotations anchor into documents using keys like `start` and `end` and this property specifies what document that is.
+2. The `timeUnit` key is set to "seconds" and this means that for each annotation the unit for the values in `start` and `end` are seconds. 
 
-Note that when a property is set to some value then all annotations of that type should adhere to that value, in this case the document and unit are set to "m1" and "seconds" respectively. In other words, the *contains* dictionary not only functions as an overview of the annotation types in this view, but also as a place for common properties shared among annotations of a type. This is useful especially for *document* property, as in a single view, an app is likely to process only one or two source documents and resulting annotation objects will be anchored on those small number of documents. It is technically possible to add *documenty* and *unit* properties to individual annotations and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later.
+Every annotation object type defined in the CLAMS vocabulary has two feature structures - `metadata` and `properties`. See [this definition of *TimeFrame*](vocabulary/TimeFrame/) type in the vocabulary for an example. As we see here, `contains` dictionary in a view's metadata is used to assign values to metadata keys. We'll see in the following section that individual annotation objects are used to assign values to `properties` keys. 
+{: .box-note}
 
-Section 2 has more details on the interaction between the vocabulary and the metadata for the annotation types in the *contains* dictionary.
+Note that when a property is set to some value in the `contains` in the view metadata then all annotations of that type should adhere to that value, in this case the `document` and `timeUnit` are set to *"m1"* and *"seconds"* respectively. In other words, the `contains` dictionary not only functions as an overview of the annotation types in this view, but also as a place for common metadata shared among annotations of a type. This is useful especially for `document` property, as in a single view, an app is likely to process only a limited number of source documents and resulting annotation objects will be anchored on those documents. It is technically possible for *TimeFrame* type to add `document` properties to individual annotation objects and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later. 
+
+For object types that are used to measure time (such as *TimePoint*, *TimeFrame*, or *VideoObject*), the unit of the measurement (`timeUnit`) must be specified in the `contains`. However, for objects that measure image regions (such as [*BoundingBox*](vocabulary/BoundingBox).`coordinates`), the *unit* is always assumed to be *pixels*. That is, a coordinate is numbers of pixels from a point in an image to the origin along all axes, where the origin (*(0,0)*) is always the top-left point of the image. Similarly, for objects that measure text spans (such as [*Span*](vocabulary/Span).start/end), the *unit* of counting characters must always be code points. As mentioned above, MMIF must be serialized to a UTF-8 Unicode file. 
+{: .box-note}
+
+Section 2 has more details on the interaction between the vocabulary and the metadata for the annotation types in the `contains` dictionary.
 
 Finally, when an app fails to process the input for any reason and produces an error, it can record the error in `error` field, instead of `contains`. When this happens, the annotation list of the view must remain empty. 
 Here is an example of a view with an error. 
@@ -187,7 +195,7 @@ Here is an example of a view with an error.
 
 #### 1.2.2.  The *view's annotations* property
 
-The value of the annotations property on a view is a list of annotation objects. Here is an example of an annotation object:
+The value of the `annotations` property on a view is a list of annotation objects. Here is an example of an annotation object:
 
 ```json
 {
@@ -201,13 +209,13 @@ The value of the annotations property on a view is a list of annotation objects.
 }
 ```
 
-The two required keys are *@type* and *properties*. As mentioned before, the *@type* key in JSON-LD is used to define the type of a datastructure. The *properties* dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [http://mmif.clams.ai/$VERSION/vocabulary](vocabulary) or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature *frameType* as well as the inherited features *id*, *start* and *end*. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers.
+The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [http://mmif.clams.ai/$VERSION/vocabulary](vocabulary) or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature `frameType` as well as the inherited features `id`, `start` and `end`. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers.
 
-The *id* key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s1”) or the identifier with a view identifier prefix (for example “v1:s1”). If there is no prefix the current view is assumed.
+The `id` key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s1”), or the identifier with a view identifier prefix (for example “v1:s1”). If there is no prefix, the current view is assumed.
 
-The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside of other annotations. For example, LAPPS *Constituent* annotations will not contain other *Constituent* annotations. However, in the features dictionary annotations can refer to other annotations using the identifiers of the other annotations.
+The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside other annotations. For example, LAPPS *Constituent* annotations will not contain other *Constituent* annotations. However, in the `properties` dictionary annotations can refer to other annotations using the identifiers of the other annotations.
 
-Here is an other example of a view containing two bounding boxes created by the EAST text recognition app:
+Here is another example of a view containing two bounding boxes created by the EAST text recognition app:
 
 ```json
 {
@@ -217,39 +225,39 @@ Here is an other example of a view containing two bounding boxes created by the 
     "timestamp": "2020-05-27T12:23:45",
     "contains": {
       "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox": {
-        "document": "image3",
-        "unit": "pixels" } }
+        "document": "image3"
+      } 
+    }
   },
   "annotations": [
-      { "@type": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox",
-        "properties": {
-          "id": "bb0",
-          "coordinates": [[10,20], [60,20], [10,50], [60,50]] }
-      },
-      { "@type": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox",
-        "properties": {
-          "id": "bb1",
-          "coordinates": [[90,40], [110,40], [90,80], [110,80]] }
-      }
-    ]
-  }
+    { "@type": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox",
+      "properties": {
+        "id": "bb0",
+        "coordinates": [[10,20], [60,20], [10,50], [60,50]] }
+    },
+    { "@type": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox",
+      "properties": {
+        "id": "bb1",
+        "coordinates": [[90,40], [110,40], [90,80], [110,80]] }
+    }
+  ]
 }
 ```
 
-Note how the *coordinates* property is a list of lists where each embedded list is a pair of an x-coordinate and a y-coordinate.
+Note how the `coordinates` property is a list of lists where each embedded list is a pair of an x-coordinate and a y-coordinate. 
 
 
 
 
 ### 1.3.  Views with documents
 
-We have seen that an initial set of media is added to the MMIF *documents* list and that applications then create views from those documents. But some applications are special in that they create text from audiovisual data and the annotations they create are similar to the documents in the *documents* list in that they could be the starting point for a text processing chain. For example, Tesseract can take a bounding box in an image and generate text from it and a Named Entity Recognition (NER) component can take the text and extract entities, just like it would from a transcript or other text document in the *documents* list.
+We have seen that an initial set of media is added to the MMIF `documents` list and that applications then create views from those documents. But some applications are special in that they create text from audiovisual data and the annotations they create are similar to the documents in the `documents` list in that they could be the starting point for a text processing chain. For example, Tesseract can take a bounding box in an image and generate text from it and a Named Entity Recognition (NER) component can take the text and extract entities, just like it would from a transcript or other text document in the `documents` list.
 
 Let's use an example of an image of a barking dog where a region of the image has been recognized by the EAST application as an image box containing text (image taken from [http://clipart-library.com/dog-barking-clipart.html](http://clipart-library.com/dog-barking-clipart.html)): 
 
-<img src="pi78oGjdT-annotated.jpg" border="1" height="200"/>
+<img alt="yelp" src="pi78oGjdT-annotated.jpg" style="border: 1px;" height="200"/>
 
-The result of this processing is a MMIF document with an image document and a view that contains a *BoundingBox* annotation where the bounding box has the *boxType* property set to "text":
+The result of this processing is a MMIF document with an image document and a view that contains a *BoundingBox* annotation where the bounding box has the `boxType` property set to "text":
 
 ```json
 {
@@ -314,11 +322,12 @@ Tesseract will then add a view to this MMIF document that contains a text docume
 }
 ```
 
-The text document annotation is the same kind of objects as the text document objects in the toplevel *documents* property, it has the same type and uses the same properties. Notice also that the history of the text document, namely that it was derived from a particular bounding box in a particular image, can be traced via the alignment of the text document with the bounding box.
+The text document annotation is the same kind of objects as the text document objects in the toplevel `documents` property, it has the same type and uses the same properties. Notice also that the history of the text document, namely that it was derived from a particular bounding box in a particular image, can be traced via the alignment of the text document with the bounding box.
 
-> An alternative for using an aligment would be to use a *textSource* property on the document or perhaps to reuse the *location* property. That would require less space, but would introduce another ways to align annotations.
+An alternative for using an alignment would be to use a `textSource` property on the document or perhaps to reuse the `location` property. That would require less space, but would introduce another ways to align annotations.
+{: .box-note}
 
-Now this text document can be input to language processing. An NER component will not do anything interesting with this text so let's say we have a semantic typing component that has *dog-sound* as one of its categories. That hypothetical semantic typing component would add a new view to the list. That semantic typing component would add a new view to the list:
+Now this text document can be input to language processing. An NER component will not do anything interesting with this text so let's say we have a semantic typing component that has *"dog-sound"* as one of its categories. That hypothetical semantic typing component would add a new view to the list. That semantic typing component would add a new view to the list:
 
 ```json
 {
@@ -342,11 +351,13 @@ Now this text document can be input to language processing. An NER component wil
 }
 ```
 
-This view encodes that the span from character offset 0 to character offset 4 contains a semantic tag and that the catgeory is "dog-sound". This type can be traced to *TextDocument* "td1" in view "v2" via the *document* metadata property, and from there to the bounding box in the image.
+This view encodes that the span from character offset 0 to character offset 4 contains a semantic tag and that the category is "dog-sound". This type can be traced to *TextDocument* "td1" in view "v2" via the `document` metadata property, and from there to the bounding box in the image.
 
 See section 3 with the MMIF examples for a more realistic and larger example.
 
-> We are here abstracting away from how the actual processing would proceed since we are focusing on the representation. In short, the CLAMS platform knows what kind of input an application requires and it would now that an NLP application requires a *TextDocument* to run on and it knows how to find all instance of *TextDOcument* in a MMIF file.
+We are here abstracting away from how the actual processing would proceed since we are focusing on the representation. In short, the CLAMS platform knows what kind of input an application requires and it would now that an NLP application requires a *TextDocument* to run on and it knows how to find all instance of *TextDocument* in a MMIF file.
+{: .box-note}
+
 
 
 
@@ -396,7 +407,7 @@ The image with the dog in the previous section just had a bounding box for the p
 
 This of course assumes that view "v1" has a bounding box identified by "v1:bb2". 
 
-Now if you run the semantic tagger you would get to tags with the category set to "dog-sound":
+Now if you run the semantic tagger you would get tags with the category set to "dog-sound":
 
 ```json
 {
@@ -429,15 +440,16 @@ Now if you run the semantic tagger you would get to tags with the category set t
 }
 ```
 
-Notice how the document to which the *SemanticTag* annotations point is not expressed by the metadata *document* property but by individual *document* properties on each semantic tag. This is unavoidable when we have multiple text documents that can be input to language processing.
+Notice how the document to which the *SemanticTag* annotations point is not expressed by the metadata `document` property but by individual `document` properties on each semantic tag. This is unavoidable when we have multiple text documents that can be input to language processing.
 
-> The above glances over the problem that we need some way for Tesseract to know what bounding boxes to take. We can do that by either introducing some kind of type or use the *app* property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for an application.
+The above glances over the problem that we need some way for Tesseract to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for an application.
+{: .box-note}
 
 
 
 ## 2. MMIF and the Vocabularies
 
-The structure of MMIF files is defined in the [schema](schema/mmif.json)  and described in this document. But the semantics of what is expressed in the views are determined by the [CLAMS Vocabulary](vocabulary). Each annotation in a view has two fields: *@type* and *properties*. The value of the first one is typically an annotation type from the vocabulary. Here is a *BoundingBox* annotation as an example:
+The structure of MMIF files is defined in the [schema](schema/mmif.json)  and described in this document. But the semantics of what is expressed in the views are determined by the [CLAMS Vocabulary](vocabulary). Each annotation in a view has two fields: `@type` and `properties`. The value of the first one is typically an annotation type from the vocabulary. Here is a *BoundingBox* annotation as an example:
 
 ```json
 {
@@ -449,26 +461,26 @@ The structure of MMIF files is defined in the [schema](schema/mmif.json)  and de
 }
 ```
 
-The value of *@type* refers to the URL [http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox](http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that *id* is a required property inherited from *Annotation* and that *coordinates* is a required property of *BoundingBox*. Both are expressed in the properties dictionary above. The page also says that there is an optional property *timePoint*, but it is not used above.
+The value of `@type` refers to the URL [http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox](http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that `id` is a required property inherited from *Annotation* and that `coordinates` is a required property of *BoundingBox*. Both are expressed in the `properties` dictionary above. The page also says that there is an optional property `timePoint`, but it is not used above.
 
-The vocabulary also defines metadata properties. For example, the optional property *unit* can be used for a *BoundingBox* to specify what unit is used for the coordinates in instances of *BoundingBox*. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the *contains* section:
+The vocabulary also defines metadata properties. For example, the optional property `timeUnit` can be used for a *TimeFrame* to specify what unit is used for the start and end time points in instances of *TimeFrame*. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the `contains` section:
 
 ```json
 {
   "metadata": {
-    "app": "http://apps.clams.ai/some_bounding_box_app/1.0.3",
+    "app": "http://apps.clams.ai/some_time_segmentation_app/1.0.3",
     "timestamp": "2020-05-27T12:23:45",
     "contains": {
-        "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox": {
+        "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame": {
           "document": "m12",
-          "unit": "pixels" } }
+          "timeUnit": "milliseconds" } }
   }
 }
 ```
 
-Annotations in a MMIF file often refer to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). In that case, the annotation type in *@type* will refer to a URL just as with CLAMS annotation types, the only difference is that the URL will be in the LAPPS Vocabulary. Properties and metadata properties of LAPPS annotation types are defined and used the same way as described above for CLAMS types.
+Annotations in a MMIF file often refer to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). In that case, the annotation type in `@type` will refer to a URL just as with CLAMS annotation types, the only difference is that the URL will be in the LAPPS Vocabulary. Properties and metadata properties of LAPPS annotation types are defined and used the same way as described above for CLAMS types.
 
-Using a LAPPS type is actually an instance of the more general notion that the value of *@type* can be any URL (actually, any IRI). You can use any annotation category defined elsewhere, for example, you can use categories defined by the creator of an application or categories from other vocabularies. Here is an example with a type from [https://schema.org](https://schema.org):
+Using a LAPPS type is actually an instance of the more general notion that the value of `@type` can be any URL (actually, any IRI). You can use any annotation category defined elsewhere, for example, you can use categories defined by the creator of an application or categories from other vocabularies. Here is an example with a type from [https://schema.org](https://schema.org):
 
 ```json
 {
@@ -480,7 +492,7 @@ Using a LAPPS type is actually an instance of the more general notion that the v
 }
 ```
 
-This assumes that [https://schema.org/Clip](https://schema.org/Clip) defines all the features used in the *properties* dictionary. One little disconnect here is that in MMIF we insist on each annotation having an identifier in the *id* property and as it happens [https://schema.org](https://schema.org) does not define an *id* attribute, although it does define *identifier*. 
+This assumes that [https://schema.org/Clip](https://schema.org/Clip) defines all the features used in the `properties` dictionary. One little disconnect here is that in MMIF we insist on each annotation having an identifier in the `id` property and as it happens [https://schema.org](https://schema.org) does not define an `id` attribute, although it does define `identifier`. 
 
 The CLAMS Platform does not require that a URL like [https://schema.org/Clip](https://schema.org/Clip) actually exists, but if it doesn't users of an application that creates the *Clip* type will not know exactly what the application creates.
 
