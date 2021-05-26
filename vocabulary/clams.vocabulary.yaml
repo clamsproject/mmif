@@ -43,6 +43,11 @@ properties:
 name: Region
 parent: Annotation
 
+description: >-
+  An annotation over a region in primary data where primary data can be a text,
+  an image, an audio stream or a video streem. Typically one of the sub types
+  of this will be used.
+
 metadata:
   timeUnit:
     type: String
@@ -50,11 +55,6 @@ metadata:
       Specifies which unit of time the measurement is based. 
       Can be *seconds* or *milliseconds*, or in case of annotations on 
       a VideoDocument, *frames*. 
-
-description: >-
-  An annotation over a region in primary data where primary data can be a text,
-  an image, an audio stream or a video streem. Typically one of the sub types
-  of this will be used.
 
 ---
 

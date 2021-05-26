@@ -7,6 +7,12 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
 
+## Version 0.3.2 - 2021-05-2?
+
+- (schema) Removed all optional attributes from `annotationProperties` in the JSON schema. We figured that it is impossible to keep all attributes from all individual vocabulary types in a single JSON schema file (e.g. no way to deal with naming conflicts). 
+- (vocabulary) Renamed `Region.unit` to `Region.timeUnit`. We realized that only time needs a unit to measure. Image regions are always based on pixels and text regions are always on unicode codepoints (not bytes)
+- (vocabulary) Renamed `TimePoint.point` to `TimePoint.timePoint` to make it more consistent with `Polygon.timePoint`. 
+
 ## Version 0.3.1 - 2021-05-11
 
 - Added and `error` property to the view metadata. The view metadata now either have an non-empty error section or a non-empty contains section. This is not a breaking change since the old schema did allow arbitrary extra properties in the view metadata.
