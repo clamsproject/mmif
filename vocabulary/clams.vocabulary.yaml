@@ -278,6 +278,17 @@ description: >-
   enforced directionality we tend to consider the text region or document as the
   target of the alignment.
 
+metadata:
+  sourceType:
+    type: URI
+    description: >-
+      The type of sources of the alignment. When an alignment starts from more that two source types, namely sources can be different types, one should not use this metadata.
+
+  targetType:
+    type: URI
+    description: >-
+      The type of targets of the alignment. When an alignment goes to more that two target types, namely targets can be different types, one should not use this metadata.
+
 properties:
   source:
     type: ID
