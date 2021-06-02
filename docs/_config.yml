@@ -17,7 +17,7 @@ author: Brandeis LLC
 # --- List of links in the navigation bar --- #
 
 navbar-links:
-  HOME: "/"
+  MMIF: "/"
   CLAMS: "https://clams.ai"
   # a new version will be added here by publish.py
   VERSIONS:
