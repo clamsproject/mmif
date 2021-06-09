@@ -12,6 +12,7 @@ This file documents changes made to the MMIF specification. Version names used t
 - (schema) Removed all optional attributes from `annotationProperties` in the JSON schema. We figured that it is impossible to keep all attributes from all individual vocabulary types in a single JSON schema file (e.g. no way to deal with naming conflicts). 
 - (vocabulary) Renamed `Region.unit` to `Region.timeUnit`. We realized that only time needs a unit to measure. Image regions are always based on pixels and text regions are always on unicode codepoints (not bytes)
 - (vocabulary) Renamed `TimePoint.point` to `TimePoint.timePoint` to make it more consistent with `Polygon.timePoint`. 
+- (vocabulary) Added `sourceType` and `targetType` as metadata props to `Alignment` type, to simplify navigation over simple bi-modal aliangments. 
 
 ## Version 0.3.1 - 2021-05-11
 
