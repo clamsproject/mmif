@@ -468,7 +468,7 @@ if __name__ == '__main__':
 
     dirname = os.path.dirname(os.path.abspath(__file__))
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--test', dest="testdir",
+    parser.add_argument('--test', dest="testdir", nargs="?", default=None, const='testbuild',
                         help='build version in test output directory')
     args = parser.parse_args()
     print(args)

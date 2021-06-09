@@ -1,0 +1,167 @@
+<html>
+  <head>
+    <link href="../css/lappsstyle.css" rel="stylesheet" type="text/css"/>
+    <title>
+      Relation
+    </title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="intro">
+        <div id="pageHeader">
+          <h1>
+            CLAMS Vocabulary
+          </h1>
+          <h2>
+            version 0.4.0
+          </h2>
+        </div>
+      </div>
+      <div id="mainContent">
+        <div id="sectionbar">
+          <p>
+            <a href="../index.html">
+              Home
+            </a>
+          </p>
+        </div>
+        <p class="head">
+          <a href="../Thing">
+            Thing
+          </a>
+          <span>
+            &gt;
+          </span>
+          <a href="../Annotation">
+            Annotation
+          </a>
+          <span>
+            &gt;
+          </span>
+          <span>
+            Relation
+          </span>
+        </p>
+        <br/>
+        <table>
+          <tr>
+            <td class="fixed">
+              <b>
+                Definition
+              </b>
+            </td>
+            <td>
+              Any relationship between two or more annotation types. For texts could be a grammatical relation such as subject-object, a semantic relation between meanings or roles, or a temporal relation indicating the simultaneity or ordering in time of events or states. For image regions and video objects this could involve spatial relations or part-whole relations.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>
+                URI
+              </b>
+            </td>
+            <td>
+              <a href="http://mmif.clams.ai/0.4.0/vocabulary/Relation">
+                http://mmif.clams.ai/0.4.0/vocabulary/Relation
+              </a>
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Metadata
+        </h1>
+        <h2>
+          Metadata from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              document
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the document that the annotation is over. This has to be defined either at the metadata level, in which case it has scope over all annotations of the same type in a view, or at the instance level, in which it has scope over just the single annotation.
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Properties
+        </h1>
+        <h2>
+          Properties from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              document
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the document that the annotation is over.
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Thing
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              id
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              A unique identifier for the annotation or document. Uniqueness is relative to the view the annotation is in or the list of documents at the top level of a MMIF file.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <br/>
+      </div>
+    </div>
+    <div id="footer">
+      Page generated on 2021-06-09 at 15:04:52
+    </div>
+  </body>
+</html>

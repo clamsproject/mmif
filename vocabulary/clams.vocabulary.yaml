@@ -49,14 +49,12 @@ description: >-
   of this will be used.
 
 metadata:
-
-  unit:
+  timeUnit:
     type: String
     description: >-
-      The unit used to determine boundaries. For text regions this is typically
-      *offsets* to indicate character offsets, for images this is could be
-      *pixels*, and for audio or video streams *seconds*, *milliseconds*,
-      *timestamps* or *frames*.
+      Specifies which unit of time the measurement is based. 
+      Can be *seconds* or *milliseconds*, or in case of annotations on 
+      a VideoDocument, *frames*. 
 
 ---
 
@@ -67,7 +65,7 @@ description: >-
   A time point in an audio or video stream.
 
 properties:
-  point:
+  timePoint:
     type: Integer
     description: The starting offset in the stream.
     required: true
@@ -78,9 +76,9 @@ name: Interval
 parent: Region
 
 description: >-
-  An annotation over an interval of two-dimensional primary data, either a text
-  or a video or audio stream. An Interval may be defined by pointing directly
-  into primary data (by using start and end offsets) or by linking to one or
+  An annotation over an interval of linear primary data, either a text, a video 
+  or audio stream. An Interval may be defined by pointing directly into 
+  primary data (by using start and end offsets) or by linking to one or
   more other Annotations with the targets property. This annotation type is
   intended to be an abstract type and typically one of the sub types will be
   used.
@@ -89,13 +87,15 @@ properties:
   start:
     type: Integer
     description: >-
-      The starting offset in the primary data. What unit is used is determined
-      by the *unit* metadata property.
+      The starting offset in the primary data. This point is inclusive. 
+      For time intervals, the unit is determined by the *timeUnit* metadata key.
+      For text intervals, the unit is Unicode code point. 
   end:
     type: Integer
     description: >-
-      The ending offset in the primary data. What unit is used is determined
-      by the *unit* metadata property.
+      The ending offset in the primary data. This point is exclusive. 
+      For time intervals, the unit is determined by the *timeUnit* metadata key.
+      For text intervals, the unit is Unicode code point. 
   targets:
     type: List of IDs
     description: >-
@@ -158,10 +158,11 @@ description: >-
 properties:
   coordinates:
     type: List of pairs
-    description: The coordinates of the polygon.
+    description: The coordinates of the polygon, taking the top-left of the image
+      as the origin (0,0). Unit used to measure the distance is the number of pixels.
     required: true
   timePoint:
-    type: ID
+    type: Integer
     description: If on a video stream, the TimePoint that the BoundingBox occurs in.
 
 ---
@@ -276,6 +277,17 @@ description: >-
   document and the other an image or audio segment or document. While there is no
   enforced directionality we tend to consider the text region or document as the
   target of the alignment.
+
+metadata:
+  sourceType:
+    type: URI
+    description: >-
+      The type of sources of the alignment. When an alignment starts from more that two source types, namely sources can be different types, one should not use this metadata.
+
+  targetType:
+    type: URI
+    description: >-
+      The type of targets of the alignment. When an alignment goes to more that two target types, namely targets can be different types, one should not use this metadata.
 
 properties:
   source:
