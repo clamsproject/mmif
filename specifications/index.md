@@ -19,11 +19,16 @@ Along with the formal specifications and documentation we also provide a referen
 
 We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](versioning) for more information.
 
+## Table of Contents
+{:.no_toc}
 
-## 0. The format of MMIF files
+1. toc placeholder
+{:toc}
+
+## The format of MMIF files
 As mentioned, MMIF is JSON in essence. When serialized to a physical file, the file must use **Unicode** charset encoded in **UTF-8**. 
 
-## 1.  The structure of MMIF files
+## The structure of MMIF files
 
 The [JSON schema](schema/mmif.json) formally define the syntactic structure of a MMIF file. This section is an informal companion to the schema and gives further information.
 
@@ -49,7 +54,7 @@ The `metadata` property stores metadata associated with the file. It is not heav
 
 
 
-### 1.1. The *documents* property
+### The *documents* property
 
 We assume that when a MMIF document is initialized it is given a list of media and each of these media is either an external file or a text string. These media are all imported into the MMIF file as documents of a certain type and the specifications for each medium/document is stored in the `documents` list. This list is read-only and cannot be extended after initialization. There are no limits on how many documents and how many documents of what types are in the list, but typically there will be just a few documents in there.
 
@@ -107,7 +112,7 @@ The value associated with `@value` is a string and the value associated with `@l
 
 
 
-### 1.2.  The *views* property
+### The *views* property
 
 This is where all the annotations and associated metadata live. Views contain structured information about documents but are separate from those documents. The value of `views` is a JSON-LD array of view objects where each view specifies what documents the annotation is over, what information it contains and what service created that information. To that end, each view has four properties:  `id`, `metadata` and `annotations`.
 
@@ -136,7 +141,7 @@ We now describe the metadata and the annotations.
 
 
 
-#### 1.2.1.  The *view's metadata* property
+#### The *view's metadata* property
 
 This property contains information about the annotations in a view. Here is an example for a view over a video with medium identifier "m1" with segments added by the CLAMS bars-and-tones application:
 
@@ -193,7 +198,7 @@ Here is an example of a view with an error.
 }
 ```
 
-#### 1.2.2.  The *view's annotations* property
+#### The *view's annotations* property
 
 The value of the `annotations` property on a view is a list of annotation objects. Here is an example of an annotation object:
 
@@ -249,7 +254,7 @@ Note how the `coordinates` property is a list of lists where each embedded list 
 
 
 
-### 1.3.  Views with documents
+### Views with documents
 
 We have seen that an initial set of media is added to the MMIF `documents` list and that applications then create views from those documents. But some applications are special in that they create text from audiovisual data and the annotations they create are similar to the documents in the `documents` list in that they could be the starting point for a text processing chain. For example, Tesseract can take a bounding box in an image and generate text from it and a Named Entity Recognition (NER) component can take the text and extract entities, just like it would from a transcript or other text document in the `documents` list.
 
@@ -361,7 +366,7 @@ We are here abstracting away from how the actual processing would proceed since 
 
 
 
-### 1.4.  Multiple text documents in a view
+### Multiple text documents in a view
 
 The image with the dog in the previous section just had a bounding box for the part of the image with the word *yelp*, but there were three other image regions that could have been input to OCR as well. With more boxes we just add more text documents and more alignments, here shown for one additional box:
 
@@ -447,7 +452,7 @@ The above glances over the problem that we need some way for Tesseract to know w
 
 
 
-## 2. MMIF and the Vocabularies
+## MMIF and the Vocabularies
 
 The structure of MMIF files is defined in the [schema](schema/mmif.json)  and described in this document. But the semantics of what is expressed in the views are determined by the [CLAMS Vocabulary](vocabulary). Each annotation in a view has two fields: `@type` and `properties`. The value of the first one is typically an annotation type from the vocabulary. Here is a *BoundingBox* annotation as an example:
 
@@ -498,7 +503,7 @@ The CLAMS Platform does not require that a URL like [https://schema.org/Clip](ht
 
 
 
-## 3. MMIF Examples
+## MMIF Examples
 
 To finish off this document we provide some examples of complete MMIF documents:
 
@@ -508,8 +513,10 @@ To finish off this document we provide some examples of complete MMIF documents:
 | [bars-tones-slates](samples/bars-tones-slates)         | A couple of time frames and some minimal text processing on a transcript. |
 | [east-tesseract-typing](samples/east-tesseract-typing) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
 | [segmenter-kaldi-ner](samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER. |
+| [segmenter-kaldi-ner](samples/everything)     | A big MMIF example with various multimodal AI apps for video/audio as well as text.  |
 
 Each example has some comments and a link to a raw JSON file.
 
 As we move along integrating new applications, other examples will be added with other kinds of annotation types.
+
 
