@@ -24,7 +24,7 @@
         "contains": {
           "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
             "document": "m1",
-            "unit": "milliseconds" }
+            "timeUnit": "milliseconds" }
         }
       },
       "annotations": [
@@ -47,7 +47,7 @@
         "contains": {
           "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
             "document": "m1",
-            "unit": "milliseconds" }
+            "timeUnit": "milliseconds" }
         }
       },
       "annotations": [
@@ -68,7 +68,7 @@
         "app": "http://mmif.clams.ai/apps/audio-segmenter/0.2.1",
         "contains": {
           "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
-            "unit": "milliseconds",
+            "timeUnit": "milliseconds",
             "document": "m1" }
         }
       },
@@ -101,7 +101,7 @@
           "http://vocab.lappsgrid.org/Token": {
             "document": "td1" },
           "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
-            "unit": "milliseconds",
+            "timeUnit": "milliseconds",
             "document": "m1" },
           "http://mmif.clams.ai/0.4.0/vocabulary/Alignment": {}
         }
@@ -746,7 +746,6 @@
         "app": "http://mmif.clams.ai/apps/east/0.2.1",
         "contains": {
           "http://mmif.clams.ai/0.4.0/vocabulary/BoundingBox": {
-            "unit": "pixels",
             "document": "m1" }
         }
       },
@@ -960,7 +959,10 @@
         "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
         "contains": {
           "http://mmif.clams.ai/0.4.0/vocabulary/TextDocument": {},
-          "http://mmif.clams.ai/0.4.0/vocabulary/Alignment": {}
+          "http://mmif.clams.ai/0.4.0/vocabulary/Alignment": {
+            "sourceType": "http://mmif.clams.ai/0.4.0/vocabulary/TextDocument", 
+            "targetType": "http://mmif.clams.ai/0.4.0/vocabulary/BoundingBox"
+          }
         }
       },
       "annotations": [

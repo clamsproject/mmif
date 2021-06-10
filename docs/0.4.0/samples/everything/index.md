@@ -64,7 +64,7 @@ In the metadata it spells out that the offsets of all tokens are taken to be off
     "http://vocab.lappsgrid.org/Token": {
       "document": "td1" },
     "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
-      "unit": "milliseconds",
+      "timeUnit": "milliseconds",
       "document": "m1" },
     "http://mmif.clams.ai/0.4.0/vocabulary/Alignment": {}
   }
@@ -103,15 +103,13 @@ See the full example below for all the tokens, time frames for each token and th
 
 ### EAST and Tesseract
 
-EAST adds bounding boxes anchored to the text document with id=m1 using pixles as the unit:
+EAST adds bounding boxes anchored to the video document with id=m1:
 
 ```json
 {
   "app": "http://mmif.clams.ai/apps/east/0.2.1",
   "contains": {
-    "http://mmif.clams.ai/0.4.0/BoundingBox": {
-      "unit": "pixels",
-      "document": "m1" }
+    "http://mmif.clams.ai/0.4.0/BoundingBox": { "document": "m1" }
 }
 ```
 
@@ -130,7 +128,30 @@ Let's assume that EAST runs on frames sampled from the video at 1 second interva
 
 Due to the nature of the input many of the bounding boxes will have identical or near-identical coordinates. For example, there are two more bounding boxes with the coordinates above, one for the box with time offset 3000 and one for the box with time offset 5000.
 
-Tesseract now runs on all those boxes and creates a text document for each of them, here's one:
+Tesseract now runs on all those boxes and creates a text document for each of them. In doing so, it will add these to a new view: 
+* text documents from each text box
+* alignment of that documents to their originating boxes
+
+Thus, the metadata of the new view would be:
+
+
+```json
+{
+  "app": "http://mmif.clams.ai/apps/tesseract/0.4.4",
+  "contains": {
+    "http://mmif.clams.ai/0.4.0/vocabulary/TextDocument": {},
+    "http://mmif.clams.ai/0.4.0/vocabulary/Alignment": {
+      "sourceType": "http://mmif.clams.ai/0.4.0/vocabulary/TextDocument", 
+      "targetType": "http://mmif.clams.ai/0.4.0/vocabulary/BoundingBox"
+    }
+  }
+}
+```
+
+Unlike the alignment annotations in the Kaldi view, Tesseract specifies types of both ends of the alignments in the `contains` metadata. This is only allowed because all alignment annotations in the view have the same source type and target types. This information can help, for example, machines search for certain alignments more quickly.
+{: .box-note}
+
+Now the recognition results are recorded as text documents, here's one:
 
 ```json
 {

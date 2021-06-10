@@ -17,7 +17,7 @@ The  JSON schema for MMIF defines the syntactic elements of MMIF which will be e
 
 Along with the formal specifications and documentation we also provide a reference implementation of MMIF. It is developed in the Python programming language, and it will be distributed via GitHub (as source code) as well as via the [Python Package Index](https://pypi.org/) (as a Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
 
-We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](versioning) for more information.
+We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](versioning) for more information on how APIs *target* versions and compatibility between different versions. 
 
 ## Table of Contents
 {:.no_toc}
@@ -513,7 +513,7 @@ To finish off this document we provide some examples of complete MMIF documents:
 | [bars-tones-slates](samples/bars-tones-slates)         | A couple of time frames and some minimal text processing on a transcript. |
 | [east-tesseract-typing](samples/east-tesseract-typing) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
 | [segmenter-kaldi-ner](samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER. |
-| [segmenter-kaldi-ner](samples/everything)     | A big MMIF example with various multimodal AI apps for video/audio as well as text.  |
+| [everything](samples/everything)     | A big MMIF example with various multimodal AI apps for video/audio as well as text.  |
 
 Each example has some comments and a link to a raw JSON file.
 

@@ -21,7 +21,7 @@ Metadata:
   "app": "http://mmif.clams.ai/apps/audio-segmenter/0.2.1",
   "contains": {
     "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
-      "unit": "milliseconds",
+      "timeUnit": "milliseconds",
       "document": "m1" } 
 }
 ```
@@ -64,7 +64,7 @@ Metadata:
     "http://mmif.clams.ai/0.4.0/vocabulary/TextDocument": {},
     "http://vocab.lappsgrid.org/Token": {},
     "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
-      "unit": "milliseconds",
+      "timeUnit": "milliseconds",
       "document": "m1" },
     "http://mmif.clams.ai/0.4.0/vocabulary/Alignment": {} }
 }

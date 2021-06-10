@@ -64,7 +64,7 @@ In the metadata it spells out that the offsets of all tokens are taken to be off
     "http://vocab.lappsgrid.org/Token": {
       "document": "td1" },
     "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame": {
-      "unit": "milliseconds",
+      "timeUnit": "milliseconds",
       "document": "m1" },
     "http://mmif.clams.ai/$VERSION/vocabulary/Alignment": {}
   }
