@@ -960,7 +960,10 @@
         "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
         "contains": {
           "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument": {},
-          "http://mmif.clams.ai/$VERSION/vocabulary/Alignment": {}
+          "http://mmif.clams.ai/$VERSION/vocabulary/Alignment": {
+            "sourceType": "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument", 
+            "targetType": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox"
+          }
         }
       },
       "annotations": [
