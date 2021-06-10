@@ -513,7 +513,7 @@ To finish off this document we provide some examples of complete MMIF documents:
 | [bars-tones-slates](samples/bars-tones-slates)         | A couple of time frames and some minimal text processing on a transcript. |
 | [east-tesseract-typing](samples/east-tesseract-typing) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
 | [segmenter-kaldi-ner](samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER. |
-| [segmenter-kaldi-ner](samples/everything)     | A big MMIF example with various multimodal AI apps for video/audio as well as text.  |
+| [everything](samples/everything)     | A big MMIF example with various multimodal AI apps for video/audio as well as text.  |
 
 Each example has some comments and a link to a raw JSON file.
 
