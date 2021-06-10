@@ -29,7 +29,7 @@
         "contains": {
           "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
             "document": "m1",
-            "unit": "seconds"
+            "timeUnit": "seconds"
           }
         }
       },
@@ -53,7 +53,7 @@
         "contains": {
           "http://mmif.clams.ai/0.4.0/vocabulary/TimeFrame": {
             "document": "m1",
-            "unit": "seconds"
+            "timeUnit": "seconds"
           }
         }
       },
