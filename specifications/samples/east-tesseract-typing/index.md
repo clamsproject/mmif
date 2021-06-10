@@ -42,7 +42,7 @@ Here are the metadata in this view:
   "app": "http://mmif.clams.ai/apps/east/0.2.1",
   "contains": {
     "http://mmif.clams.ai/$VERSION/BoundingBox": {
-      "unit": "pixels",
+      "timeUnit": "pixels",
       "document": "m1" } }
 }
 ```
