@@ -17,7 +17,7 @@ The  JSON schema for MMIF defines the syntactic elements of MMIF which will be e
 
 Along with the formal specifications and documentation we also provide a reference implementation of MMIF. It is developed in the Python programming language, and it will be distributed via GitHub (as source code) as well as via the [Python Package Index](https://pypi.org/) (as a Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
 
-We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](versioning) for more information.
+We use [semantic versioning](https://semver.org/) with the `major.minor.patch` version scheme. All formal components (this document, the JSON schema and CLAMS vocabulary) share the same version number, while the `mmif-python` Python SDK shares `major` and `minor` numbers with the specification version. See the [versioning notes](../versioning) for more information on compatibility between different versions and how it plays out when chaining CLAMS apps in a pipeline. 
 
 ## Table of Contents
 {:.no_toc}
