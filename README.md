@@ -5,7 +5,7 @@ Repository for MMIF specifications, MMIF schema and the CLAMS vocabulary.
 To create a new version use the `build.py` script:
 
 ```bash
-$> python build.py
+$ python build.py
 ```
 
 This creates a new version in `docs/VERSION` where the version is taken from the `VERSION` file.
@@ -15,7 +15,7 @@ This creates a new version in `docs/VERSION` where the version is taken from the
 List of things to do when creating a new version:
 
 - [ ] Update the `VERSION` file.
-- [ ] Run publish.py script. This will automatically do 
+- [ ] Run the build.py script. This will automatically do the following:
   - Collect all changes (schema, vocabulary and specifications)
   - Update `specifications/index.md` to replace version numbers.
   - Update all the sample files so they all have the right version number.
@@ -26,5 +26,5 @@ List of things to do when creating a new version:
 - [ ] Test all examples to see whether they match the schema.
 - [ ] Check all pages
 - [ ] Final updates to `CHANGELOG.md`.
-- [ ] Submit and merge to master branch.
+- [ ] Submit all changes (including ones that were made automatically, like the changes to the config file in the documentation directory) and merge to the main branch.
 
