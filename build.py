@@ -13,6 +13,7 @@ created or updated.
 import json
 import os
 import shutil
+import subprocess
 import sys
 import time
 import argparse
@@ -399,12 +400,15 @@ def check_version_exists(version):
         body = json.loads(res.read())
         tags = [os.path.basename(tag['ref']) for tag in body]
         if version in tags:
-            raise RuntimeError(f"{version} already exists, can't overwrite an exising verison.")
+            raise RuntimeError(f"{version} already exists, can't overwrite an exising version.")
     except urllib.error.URLError:
-        warnings.warn(f"Can't check if {version} already exists on the official repository."
-                      f"\nPossibly an internet connection issue?"
-                      f"\nContinuing without the check, this might overwrite an exising version.",
+        warnings.warn(f"Cannot connect to the remote repository.\n"
+                      f"Now using local git tags to check version conflict.",
                       category=RuntimeWarning)
+        proc = subprocess.run('git tag'.split(), cwd=os.path.abspath(os.path.dirname(__file__)), capture_output=True)
+        if version in proc.stdout.decode('ascii').split('\n'):
+            raise RuntimeError(f"{version} already exists, can't overwrite an exising version.")
+
 
 
 def build(dirname, args):
