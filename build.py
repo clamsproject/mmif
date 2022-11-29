@@ -10,13 +10,17 @@ branch then the site at http://mmif.clams.ai/VERSION will be automatically
 created or updated.
 
 """
-
-
+import json
 import os
 import shutil
+import subprocess
+import sys
 import time
 import argparse
+import urllib.error
+import warnings
 
+from urllib import request
 from os.path import join as pjoin
 from string import Template
 
@@ -390,9 +394,27 @@ def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=None
                     shutil.copy(pjoin(src_dir, r, f), pjoin(dst_dir, r))
 
 
+def check_version_exists(version):
+    try:
+        res = request.urlopen('https://api.github.com/repos/clamsproject/mmif/git/refs/tags')
+        body = json.loads(res.read())
+        tags = [os.path.basename(tag['ref']) for tag in body]
+        if version in tags:
+            raise RuntimeError(f"{version} already exists, can't overwrite an exising version.")
+    except urllib.error.URLError:
+        warnings.warn(f"Cannot connect to the remote repository.\n"
+                      f"Now using local git tags to check version conflict.",
+                      category=RuntimeWarning)
+        proc = subprocess.run('git tag'.split(), cwd=os.path.abspath(os.path.dirname(__file__)), capture_output=True)
+        if version in proc.stdout.decode('ascii').split('\n'):
+            raise RuntimeError(f"{version} already exists, can't overwrite an exising version.")
+
+
+
 def build(dirname, args):
     
     version = open(pjoin(dirname, 'VERSION')).read().strip()
+    check_version_exists(version)
     out_dir = args.testdir if args.testdir else pjoin(dirname, 'docs', version)
     jekyll_conf_file = pjoin(dirname, 'docs', '_config.yml')
     vocab_src_dir = pjoin(dirname, 'vocabulary')
@@ -461,7 +483,6 @@ def update_jekyll_config(infname, version):
                 if lines[i+1] != new_version_line:
                     out_f.write(new_version_line)
     shutil.move(outfname, infname)
-
 
 
 if __name__ == '__main__':
