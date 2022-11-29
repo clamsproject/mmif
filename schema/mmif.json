@@ -79,6 +79,12 @@
           },
           "required": ["message"]
         },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "parameters": {
           "$ref": "#/definitions/strStrMap"
         }
