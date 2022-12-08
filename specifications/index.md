@@ -180,8 +180,8 @@ For object types that are used to measure time (such as *TimePoint*, *TimeFrame*
 
 Section 2 has more details on the interaction between the vocabulary and the metadata for the annotation types in the `contains` dictionary.
 
-Finally, when an app fails to process the input for any reason and produces an error, it can record the error in `error` field, instead of `contains`. When this happens, the annotation list of the view must remain empty. 
-Here is an example of a view with an error. 
+When an app fails to process the input for any reason and produces an error, it can record the error in the `error` field, instead of in `contains`. When this happens, the annotation list of the view must remain empty. Here is an example of a view with an error.
+
 ```json
 { 
   "id": "v1", 
@@ -189,7 +189,7 @@ Here is an example of a view with an error.
     "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
     "timestamp": "2020-05-27T12:23:45",
     "error": {
-      "message": "FileNotFoundError: /data/input.mp4 from Document \"vd1\" is not found.",
+      "message": "FileNotFoundError: /data/input.mp4 from Document d1 is not found.",
       "stackTrace": "Optionally, some-stack-traceback-information"
     },
     "parameters": {}
@@ -197,6 +197,23 @@ Here is an example of a view with an error.
   "annotations": []
 }
 ```
+
+Finally, an app may produce one or more warnings and still succesfully create annotations. In that case one extra view is added that has no annotations and that instead of the `contains` field has a `warnings` field which is a list of strings.
+
+```json
+{
+  "id": "v2",
+  "metadata": {
+    "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
+    "timestamp": "2020-05-27T12:23:45",
+    "warnings": ["Missing parameter frameRate, using default value."],
+    "parameters": {}
+  },
+  "annotations": []
+}
+```
+
+
 
 #### The *view's annotations* property
 
@@ -518,5 +535,4 @@ To finish off this document we provide some examples of complete MMIF documents:
 Each example has some comments and a link to a raw JSON file.
 
 As we move along integrating new applications, other examples will be added with other kinds of annotation types.
-
 
