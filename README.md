@@ -12,7 +12,7 @@ This creates a new version in `docs/VERSION` where the version is taken from the
 
 ### Local build and preview
 
-HTML files generated from `build.py` will be deployed to a github.io page. The base webpage on where all the versioned specifications will be reside is deployed via the `jekyll` engine. That is, to test and preview a local build, one needs to install `jekyll` for local serving, which in turn, requires ruby. Install ruby following [this documentation](https://www.ruby-lang.org/en/documentation/installation/). `jekyll` wants ruby>=2.5, but ruby is shipped with `bundle/bundler` (*THE* dependency management utility for ruby) only since 2.6, hence installing 2.6 or newer is preferred. For 2.5, one needs to manually install bundler after installing ruby.
+HTML files generated from `build.py` will be deployed to a github.io page. The base webpage on where all the versioned specifications will reside is deployed via the `jekyll` engine. That is, to test and preview a local build, one needs to install `jekyll` for local serving, which in turn, requires ruby. Install ruby following [this documentation](https://www.ruby-lang.org/en/documentation/installation/). `jekyll` wants ruby>=2.5, but ruby is shipped with `bundle/bundler` (*THE* dependency management utility for ruby) only since 2.6, hence installing 2.6 or newer is preferred. For 2.5, one needs to manually install bundler after installing ruby.
 
 Once ruby and bundler are ready,
 

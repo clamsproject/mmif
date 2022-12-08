@@ -19,8 +19,10 @@ name: Annotation
 parent: Thing
 
 description: >-
-  Any kind of information added to a document. Could be a region over the
-  primary data or a relation over regions.
+  Any kind of information added to a document. 
+  If an annotation is specific to a region over the primary data or a relation over such regions, 
+  specific sub-types should be used instead of this high-level type. 
+
 
 metadata:
   document:
