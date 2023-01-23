@@ -13,7 +13,7 @@ MMIF consists of two formal components in addition to this more informal specifi
   - [https://mmif.clams.ai/$VERSION/vocabulary](vocabulary)
   - [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org)
 
-The  JSON schema for MMIF defines the syntactic elements of MMIF which will be explained at length in section 1. These specifications often refer to elements from the CLAMS  and LAPPS Vocabularies which define concepts and their ontological relations, see section 2 for notes on those vocabularies.
+The JSON schema for MMIF defines the syntactic elements of MMIF which will be explained at length in ["structure" section](#the-structure-of-mmif-files). These specifications often refer to elements from the CLAMS and LAPPS Vocabularies which define concepts and their ontological relations, see ["vocabulary" section](#mmif-and-the-vocabularies) for notes on those vocabularies.
 
 Along with the formal specifications and documentation we also provide a reference implementation of MMIF. It is developed in the Python programming language, and it will be distributed via GitHub (as source code) as well as via the [Python Package Index](https://pypi.org/) (as a Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
 
@@ -178,7 +178,7 @@ Note that when a property is set to some value in the `contains` in the view met
 For object types that are used to measure time (such as *TimePoint*, *TimeFrame*, or *VideoObject*), the unit of the measurement (`timeUnit`) must be specified in the `contains`. However, for objects that measure image regions (such as [*BoundingBox*](vocabulary/BoundingBox).`coordinates`), the *unit* is always assumed to be *pixels*. That is, a coordinate is numbers of pixels from a point in an image to the origin along all axes, where the origin (*(0,0)*) is always the top-left point of the image. Similarly, for objects that measure text spans (such as [*Span*](vocabulary/Span).start/end), the *unit* of counting characters must always be code points. As mentioned above, MMIF must be serialized to a UTF-8 Unicode file. 
 {: .box-note}
 
-Section 2 has more details on the interaction between the vocabulary and the metadata for the annotation types in the `contains` dictionary.
+Next section has more details on the interaction between the vocabulary and the metadata for the annotation types in the `contains` dictionary.
 
 When an app fails to process the input for any reason and produces an error, it can record the error in the `error` field, instead of in `contains`. When this happens, the annotation list of the view must remain empty. Here is an example of a view with an error.
 
@@ -231,9 +231,12 @@ The value of the `annotations` property on a view is a list of annotation object
 }
 ```
 
-The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [http://mmif.clams.ai/$VERSION/vocabulary](vocabulary) or [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature `frameType` as well as the inherited features `id`, `start` and `end`. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers.
+The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [CLAMS vocabulary ](vocabulary) or [LAPPS vocabulary](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature `frameType` as well as the inherited features `id`, `start` and `end`. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers. 
 
 The `id` key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s1”), or the identifier with a view identifier prefix (for example “v1:s1”). If there is no prefix, the current view is assumed.
+
+We will discuss more details on annotation type vocabularies in the ["vocabulary" section](#mmif-and-the-vocabularies). 
+{: .box-note}
 
 The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside other annotations. For example, LAPPS *Constituent* annotations will not contain other *Constituent* annotations. However, in the `properties` dictionary annotations can refer to other annotations using the identifiers of the other annotations.
 
@@ -375,7 +378,7 @@ Now this text document can be input to language processing. An NER component wil
 
 This view encodes that the span from character offset 0 to character offset 4 contains a semantic tag and that the category is "dog-sound". This type can be traced to *TextDocument* "td1" in view "v2" via the `document` metadata property, and from there to the bounding box in the image.
 
-See section 3 with the MMIF examples for a more realistic and larger example.
+See ["examples" section](#mmif-examples) with the MMIF examples for a more realistic and larger example.
 
 We are here abstracting away from how the actual processing would proceed since we are focusing on the representation. In short, the CLAMS platform knows what kind of input an application requires and it would now that an NLP application requires a *TextDocument* to run on and it knows how to find all instance of *TextDocument* in a MMIF file.
 {: .box-note}
@@ -483,9 +486,18 @@ The structure of MMIF files is defined in the [schema](schema/mmif.json)  and de
 }
 ```
 
-The value of `@type` refers to the URL [http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox](http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that `id` is a required property inherited from *Annotation* and that `coordinates` is a required property of *BoundingBox*. Both are expressed in the `properties` dictionary above. The page also says that there is an optional property `timePoint`, but it is not used above.
+The value of `@type` refers to the URL [http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox](vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that `id` is a required property inherited from *Annotation* and that `coordinates` is a required property of *BoundingBox*. Both are expressed in the `properties` dictionary above. The page also says that there is an optional property `timePoint`, but it is not used above.
 
-The vocabulary also defines metadata properties. For example, the optional property `timeUnit` can be used for a *TimeFrame* to specify what unit is used for the start and end time points in instances of *TimeFrame*. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the `contains` section:
+As displayed in the vocabulary, annotation types are hierarchically structured with `is-a` inheritance relations. That is, all properties from a parent type are *inherited* to their children. The top-level type in the CLAMS vocabulary is [http://mmif.clams.ai/$VERSION/vocabulary/Annotation](vocabulary/Annotation) and it can be generally used for attaching a piece of information (annotation) to a source document, using `document` property to indicate the source. If an annotation is specifically about (or derived from) a part of the document (for example, a certain sentence in the text or a certain area of the image, etc), one should consider one of the *Annotation*'s children that can anchor to the part that suits semantics and purpose of the annotation. Again, the annotation object can (and probably should) use the `document` property with a source identifier, as long as the type is a sub-type of the *Annotation*. We will see concrete examples in the below. 
+
+The [http://mmif.clams.ai/$VERSION/vocabulary/Thing](vocabulary/Thing) type is designed only as a placeholder and is not intended to be used to represent actual annotations. 
+{: .box-note}
+
+
+The vocabulary also defines `metadata` properties. For example, the optional property `timeUnit` can be used for a *TimeFrame* to specify what unit is used for the start and end time points in instances of *TimeFrame*. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the `contains` dictionary:
+
+As aforementioned, the *Annotation* type and its children can put the source identifier in the `contains` dictionary, using `document` metadata property. Namely, there are two ways to express the source document of annotations: at individual object level or at the view level. Unless there is a good reason to specify document information for each and every annotation objects, using the view-level representation is recommended to save space when the MMIF is serialized to a JSON file. 
+{: .box-warning}
 
 ```json
 {
