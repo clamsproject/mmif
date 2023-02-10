@@ -6,6 +6,12 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 
 This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
+
+## Version 0.4.2 - 2023-02-09 
+
+- Added `warnings` field in view metadata. This can be used to throw runtime warnings (in other words, non-critical errors). Currently, we decided for an app to create a new empty view AFTER all of its processed views and collect all warnings there. (see #188). 
+- Re-purposed top-level `Annotation` `@type` for document-level metadata annotations. It was previously just an abstract placeholder in the type hierarchy. 
+
 ## Version 0.4.1 − 2022-11-17
 
 - Cosmetic changes and documentation updates.
