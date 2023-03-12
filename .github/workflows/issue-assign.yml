@@ -1,0 +1,10 @@
+name: "assign an issue when issue branch is created"
+
+on:
+  create:
+
+jobs:
+  call-assign:
+    if: github.ref_type == 'branch'
+    uses: clamsproject/.github/.github/workflows/repo-issue-assign.yml@main
+    secrets: inherit

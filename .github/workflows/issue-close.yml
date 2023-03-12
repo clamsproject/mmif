@@ -1,0 +1,11 @@
+name: "unassign all when an issue is closed"
+
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  call-unassign:
+    uses: clamsproject/.github/.github/workflows/repo-issue-close.yml@main
+    secrets: inherit
