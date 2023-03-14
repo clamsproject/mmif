@@ -128,8 +128,17 @@ class Tree(object):
             self.print_tree(child, level + 1)
 
 
-def write_hierarchy(tree, outdir, version):
-    IndexPage(tree, outdir, version).write()
+def write_hierarchy(tree, index_dir, version):
+    IndexPage(tree, index_dir, version).write()
+    for clams_type in tree.types:
+        type_ver = clams_type.get('version', version)
+        redirect_dir = pjoin(index_dir, clams_type["name"])
+        os.makedirs(redirect_dir, exist_ok=True)
+        with open(pjoin(redirect_dir, 'index.html'), 'w') as redirect_page:
+            # TODO (krim @ 3/14/23): this realies on assumption of the URL format, should be a better, future-proof way. 
+            redirect_page.write(
+                f'<head> <meta http-equiv="Refresh" content="0; URL=../../../vocabulary/{clams_type["name"]}/{type_ver}" /> </head>'
+            )
 
 
 def write_pages(tree, outdir, version):
