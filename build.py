@@ -10,19 +10,17 @@ branch then the site at http://mmif.clams.ai/VERSION will be automatically
 created or updated.
 
 """
+import argparse
 import json
 import os
 import shutil
 import subprocess
-import sys
 import time
-import argparse
 import urllib.error
 import warnings
-
-from urllib import request
 from os.path import join as pjoin
 from string import Template
+from urllib import request
 
 import yaml
 from bs4 import BeautifulSoup
@@ -31,11 +29,12 @@ from bs4 import BeautifulSoup
 INCLUDE_CONTEXT = False
 
 
-def read_yaml(fname):
+def read_yaml(fp):
     """Read a YAML file and return a list of Python dictionaries, one for each
     document in the YAML file."""
-    stream = open(fname, 'r')
-    docs = [doc for doc in yaml.safe_load_all(stream)]
+    if isinstance(fp, str):
+        fp = open(fp, 'r')
+    docs = [doc for doc in yaml.safe_load_all(fp)]
     return docs
 
 
