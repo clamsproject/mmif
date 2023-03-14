@@ -183,7 +183,7 @@ class Page(object):
 
     def write(self):
         if not os.path.exists(self.fpath):
-            os.mkdir(self.fpath)
+            os.makedirs(self.fpath, exist_ok=True)
         with open(self.fname, 'w') as fh:
             fh.write(increase_leading_space(self.soup.prettify()))
 
@@ -261,23 +261,23 @@ class IndexPage(Page):
 
 class TypePage(Page):
 
-    def __init__(self, clams_type, outdir, version):
-        self.stylesheet = '../css/lappsstyle.css'
-        super().__init__(outdir, version)
+    def __init__(self, clams_type, outdir, mmif_version):
+        subdirs = (clams_type['name'], mmif_version)
+        self.stylesheet = f"{'/'.join(['..'] * len(subdirs))}/css/lappsstyle.css"
+        super().__init__(outdir, mmif_version)
         self.clams_type = clams_type
-        self.name = clams_type['name']
         self.description = clams_type['description']
         self.metadata = clams_type.get('metadata', [])
         self.properties = clams_type.get('properties', [])
-        self.fpath = pjoin(outdir, self.name)
-        self.fname = pjoin(outdir, self.name, 'index.html')
-        self.baseurl = f'http://mmif.clams.ai/{version}/vocabulary'
-        self._add_title(self.name)
+        self.fpath = pjoin(outdir, *subdirs)
+        self.fname = pjoin(self.fpath, 'index.html')
+        self.baseurl = f'http://mmif.clams.ai/vocabulary'
+        self._add_title(clams_type['name'])
         self._add_main_structure()
         self._add_header()
-        self._add_home_button()
-        self._add_head()
-        self._add_definition()
+        self._add_home_button(mmif_version)
+        self._add_head(mmif_version)
+        self._add_definition(mmif_version)
         self._add_metadata()
         self._add_properties()
         self._add_space()
@@ -291,24 +291,25 @@ class TypePage(Page):
             parent = parent['parentNode']
         return chain
 
-    def _add_home_button(self):
+    def _add_home_button(self, mmif_version):
         self.main_content.append(
             DIV({'id': 'sectionbar'},
-                dtrs=[tag('p', dtrs=[HREF('../index.html', 'Home')])]))
+                dtrs=[tag('p', dtrs=[HREF(f'../../../{mmif_version}/vocabulary/index.html', 'Home')])]))
 
-    def _add_head(self):
+    def _add_head(self, mmif_version):
         chain = reversed(self._chain_to_top())
         dtrs = []
         for n in chain:
-            dtrs.append(HREF("../%s" % n['name'], n['name']))
+            uri_suffix = [n['name'], n.get('version', mmif_version)]
+            dtrs.append(HREF('/'.join(['..'] * len(uri_suffix) + uri_suffix), n['name']))
             dtrs.append(SPAN('>'))
-        dtrs.append(SPAN(self.name))
+        dtrs.append(SPAN(self.clams_type['name']))
         p = tag('p', {'class': 'head'}, dtrs=dtrs)
         self.main_content.append(p)
         self._add_space()
 
-    def _add_definition(self):
-        url = '%s/%s' % (self.baseurl, self.name)
+    def _add_definition(self, mmif_version):
+        url = '/'.join((self.baseurl, self.clams_type['name'], mmif_version))
         table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
                                            dtrs=[tag('b', text='Definition')]),
                                        tag('td', text=self.description)]),
@@ -414,7 +415,7 @@ def build(dirname, args):
     
     version = open(pjoin(dirname, 'VERSION')).read().strip()
     check_version_exists(version)
-    out_dir = args.testdir if args.testdir else pjoin(dirname, 'docs', version)
+    out_dir = pjoin(dirname, args.testdir, version) if args.testdir else pjoin(dirname, 'docs', version)
     jekyll_conf_file = pjoin(dirname, 'docs', '_config.yml')
     vocab_src_dir = pjoin(dirname, 'vocabulary')
     spec_src_dir = pjoin(dirname, 'specifications')
@@ -473,7 +474,6 @@ def build_vocab(src, index_dir, version, item_dir):
     tree = Tree(clams_types)
     # TODO (krim @ 3/13/23): this will generate index page, and create re-directions of member types for inside links
     write_hierarchy(tree, index_dir, version)
-    # TODO (krim @ 3/13/23): and this will write individual pages under "https://mmif.clams.ai/vocabulary/SomeType/x.y.z" (or something like that)
     write_pages(tree, item_dir, version)
 
 
