@@ -421,8 +421,11 @@ def build(dirname, args):
     spec_src_dir = pjoin(dirname, 'specifications')
     schema_src_dir = pjoin(dirname, 'schema')
     context_src_dir = pjoin(dirname, 'context')
-    vocab_out_dir = pjoin(out_dir, 'vocabulary')
-    vocab_css_out_dir = pjoin(vocab_out_dir, 'css')
+    vocab_index_out_dir = pjoin(out_dir, 'vocabulary')
+    # vocab items will have individual versions, thus they won't be placed in the MMIF version directory
+    # TODO (krim @ 3/13/23): decide versioning scheme for individual vocab at_types
+    vocab_items_out_dir = pjoin(os.path.dirname(out_dir), 'vocabulary')
+    vocab_css_out_dir = pjoin(vocab_index_out_dir, 'css')
     schema_out_dir = pjoin(out_dir, 'schema')
     context_out_dir = pjoin(out_dir, 'context')
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -441,8 +444,8 @@ def build(dirname, args):
         print(">>> Building json-ld context in '%s'" % out_dir)
         build_context(context_src_dir, out_dir, version)
 
-    print(">>> Building vocabulary in '%s'\n" % vocab_out_dir)
-    build_vocab(vocab_src_dir, vocab_out_dir, version)
+    print(f">>> Building vocabulary: index in {vocab_index_out_dir}, items in {vocab_items_out_dir}")
+    build_vocab(vocab_src_dir, vocab_index_out_dir, version, vocab_items_out_dir)
 
     if args.testdir is None:
         print(">>> Updating jekyll configuration in '%s'" % jekyll_conf_file)
@@ -461,14 +464,18 @@ def build_context(src, dst, version):
     copy(src, dst, exclude_fnames=['example.json'])
 
 
-def build_vocab(src, dst, version):
-    css_dir = pjoin(dst, 'css')
-    os.makedirs(css_dir, exist_ok=True)
-    shutil.copy(pjoin(src, 'lappsstyle.css'), css_dir)
-    clams_types = read_yaml(pjoin(src, "clams.vocabulary.yaml"))
+def build_vocab(src, index_dir, version, item_dir):
+    vocab_yaml_path = os.path.relpath(pjoin(src, "clams.vocabulary.yaml"), os.path.dirname(__file__))
+    for d in (index_dir, item_dir):
+        css_dir = pjoin(d, 'css')
+        os.makedirs(css_dir, exist_ok=True)
+        shutil.copy(pjoin(src, 'lappsstyle.css'), css_dir)
+    clams_types = read_yaml(vocab_yaml_path)
     tree = Tree(clams_types)
-    write_hierarchy(tree, dst, version)
-    write_pages(tree, dst, version)
+    # TODO (krim @ 3/13/23): this will generate index page, and create re-directions of member types for inside links
+    write_hierarchy(tree, index_dir, version)
+    # TODO (krim @ 3/13/23): and this will write individual pages under "https://mmif.clams.ai/vocabulary/SomeType/x.y.z" (or something like that)
+    write_pages(tree, item_dir, version)
 
 
 def update_jekyll_config(infname, version):
