@@ -10,19 +10,17 @@ branch then the site at http://mmif.clams.ai/VERSION will be automatically
 created or updated.
 
 """
+import argparse
 import json
 import os
 import shutil
 import subprocess
-import sys
 import time
-import argparse
 import urllib.error
 import warnings
-
-from urllib import request
 from os.path import join as pjoin
 from string import Template
+from urllib import request
 
 import yaml
 from bs4 import BeautifulSoup
@@ -31,11 +29,12 @@ from bs4 import BeautifulSoup
 INCLUDE_CONTEXT = False
 
 
-def read_yaml(fname):
+def read_yaml(fp):
     """Read a YAML file and return a list of Python dictionaries, one for each
     document in the YAML file."""
-    stream = open(fname, 'r')
-    docs = [doc for doc in yaml.safe_load_all(stream)]
+    if isinstance(fp, str):
+        fp = open(fp, 'r')
+    docs = [doc for doc in yaml.safe_load_all(fp)]
     return docs
 
 
@@ -129,8 +128,17 @@ class Tree(object):
             self.print_tree(child, level + 1)
 
 
-def write_hierarchy(tree, outdir, version):
-    IndexPage(tree, outdir, version).write()
+def write_hierarchy(tree, index_dir, version):
+    IndexPage(tree, index_dir, version).write()
+    for clams_type in tree.types:
+        type_ver = clams_type.get('version', version)
+        redirect_dir = pjoin(index_dir, clams_type["name"])
+        os.makedirs(redirect_dir, exist_ok=True)
+        with open(pjoin(redirect_dir, 'index.html'), 'w') as redirect_page:
+            # TODO (krim @ 3/14/23): this realies on assumption of the URL format, should be a better, future-proof way. 
+            redirect_page.write(
+                f'<head> <meta http-equiv="Refresh" content="0; URL=../../../vocabulary/{clams_type["name"]}/{type_ver}" /> </head>'
+            )
 
 
 def write_pages(tree, outdir, version):
@@ -184,7 +192,7 @@ class Page(object):
 
     def write(self):
         if not os.path.exists(self.fpath):
-            os.mkdir(self.fpath)
+            os.makedirs(self.fpath, exist_ok=True)
         with open(self.fname, 'w') as fh:
             fh.write(increase_leading_space(self.soup.prettify()))
 
@@ -262,23 +270,23 @@ class IndexPage(Page):
 
 class TypePage(Page):
 
-    def __init__(self, clams_type, outdir, version):
-        self.stylesheet = '../css/lappsstyle.css'
-        super().__init__(outdir, version)
+    def __init__(self, clams_type, outdir, mmif_version):
+        subdirs = (clams_type['name'], mmif_version)
+        self.stylesheet = f"{'/'.join(['..'] * len(subdirs))}/css/lappsstyle.css"
+        super().__init__(outdir, mmif_version)
         self.clams_type = clams_type
-        self.name = clams_type['name']
         self.description = clams_type['description']
         self.metadata = clams_type.get('metadata', [])
         self.properties = clams_type.get('properties', [])
-        self.fpath = pjoin(outdir, self.name)
-        self.fname = pjoin(outdir, self.name, 'index.html')
-        self.baseurl = f'http://mmif.clams.ai/{version}/vocabulary'
-        self._add_title(self.name)
+        self.fpath = pjoin(outdir, *subdirs)
+        self.fname = pjoin(self.fpath, 'index.html')
+        self.baseurl = f'http://mmif.clams.ai/vocabulary'
+        self._add_title(clams_type['name'])
         self._add_main_structure()
         self._add_header()
-        self._add_home_button()
-        self._add_head()
-        self._add_definition()
+        self._add_home_button(mmif_version)
+        self._add_head(mmif_version)
+        self._add_definition(mmif_version)
         self._add_metadata()
         self._add_properties()
         self._add_space()
@@ -292,24 +300,25 @@ class TypePage(Page):
             parent = parent['parentNode']
         return chain
 
-    def _add_home_button(self):
+    def _add_home_button(self, mmif_version):
         self.main_content.append(
             DIV({'id': 'sectionbar'},
-                dtrs=[tag('p', dtrs=[HREF('../index.html', 'Home')])]))
+                dtrs=[tag('p', dtrs=[HREF(f'../../../{mmif_version}/vocabulary/index.html', 'Home')])]))
 
-    def _add_head(self):
+    def _add_head(self, mmif_version):
         chain = reversed(self._chain_to_top())
         dtrs = []
         for n in chain:
-            dtrs.append(HREF("../%s" % n['name'], n['name']))
+            uri_suffix = [n['name'], n.get('version', mmif_version)]
+            dtrs.append(HREF('/'.join(['..'] * len(uri_suffix) + uri_suffix), n['name']))
             dtrs.append(SPAN('>'))
-        dtrs.append(SPAN(self.name))
+        dtrs.append(SPAN(self.clams_type['name']))
         p = tag('p', {'class': 'head'}, dtrs=dtrs)
         self.main_content.append(p)
         self._add_space()
 
-    def _add_definition(self):
-        url = '%s/%s' % (self.baseurl, self.name)
+    def _add_definition(self, mmif_version):
+        url = '/'.join((self.baseurl, self.clams_type['name'], mmif_version))
         table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
                                            dtrs=[tag('b', text='Definition')]),
                                        tag('td', text=self.description)]),
@@ -415,14 +424,17 @@ def build(dirname, args):
     
     version = open(pjoin(dirname, 'VERSION')).read().strip()
     check_version_exists(version)
-    out_dir = args.testdir if args.testdir else pjoin(dirname, 'docs', version)
+    out_dir = pjoin(dirname, args.testdir, version) if args.testdir else pjoin(dirname, 'docs', version)
     jekyll_conf_file = pjoin(dirname, 'docs', '_config.yml')
     vocab_src_dir = pjoin(dirname, 'vocabulary')
     spec_src_dir = pjoin(dirname, 'specifications')
     schema_src_dir = pjoin(dirname, 'schema')
     context_src_dir = pjoin(dirname, 'context')
-    vocab_out_dir = pjoin(out_dir, 'vocabulary')
-    vocab_css_out_dir = pjoin(vocab_out_dir, 'css')
+    vocab_index_out_dir = pjoin(out_dir, 'vocabulary')
+    # vocab items will have individual versions, thus they won't be placed in the MMIF version directory
+    # TODO (krim @ 3/13/23): decide versioning scheme for individual vocab at_types
+    vocab_items_out_dir = pjoin(os.path.dirname(out_dir), 'vocabulary')
+    vocab_css_out_dir = pjoin(vocab_index_out_dir, 'css')
     schema_out_dir = pjoin(out_dir, 'schema')
     context_out_dir = pjoin(out_dir, 'context')
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -441,8 +453,8 @@ def build(dirname, args):
         print(">>> Building json-ld context in '%s'" % out_dir)
         build_context(context_src_dir, out_dir, version)
 
-    print(">>> Building vocabulary in '%s'\n" % vocab_out_dir)
-    build_vocab(vocab_src_dir, vocab_out_dir, version)
+    print(f">>> Building vocabulary: index in {vocab_index_out_dir}, items in {vocab_items_out_dir}")
+    build_vocab(vocab_src_dir, vocab_index_out_dir, version, vocab_items_out_dir)
 
     if args.testdir is None:
         print(">>> Updating jekyll configuration in '%s'" % jekyll_conf_file)
@@ -461,14 +473,17 @@ def build_context(src, dst, version):
     copy(src, dst, exclude_fnames=['example.json'])
 
 
-def build_vocab(src, dst, version):
-    css_dir = pjoin(dst, 'css')
-    os.makedirs(css_dir, exist_ok=True)
-    shutil.copy(pjoin(src, 'lappsstyle.css'), css_dir)
-    clams_types = read_yaml(pjoin(src, "clams.vocabulary.yaml"))
+def build_vocab(src, index_dir, version, item_dir):
+    vocab_yaml_path = os.path.relpath(pjoin(src, "clams.vocabulary.yaml"), os.path.dirname(__file__))
+    for d in (index_dir, item_dir):
+        css_dir = pjoin(d, 'css')
+        os.makedirs(css_dir, exist_ok=True)
+        shutil.copy(pjoin(src, 'lappsstyle.css'), css_dir)
+    clams_types = read_yaml(vocab_yaml_path)
     tree = Tree(clams_types)
-    write_hierarchy(tree, dst, version)
-    write_pages(tree, dst, version)
+    # TODO (krim @ 3/13/23): this will generate index page, and create re-directions of member types for inside links
+    write_hierarchy(tree, index_dir, version)
+    write_pages(tree, item_dir, version)
 
 
 def update_jekyll_config(infname, version):
