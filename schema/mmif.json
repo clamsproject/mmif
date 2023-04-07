@@ -118,8 +118,7 @@
       "type": "object",
       "properties": {
         "@value": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "@language": {
           "type": "string"
