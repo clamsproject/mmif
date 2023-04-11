@@ -12,7 +12,8 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/annotation"
-      }
+      },
+      "minLength": 1
     },
     "views": {
       "type": "array",
