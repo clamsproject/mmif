@@ -32,6 +32,7 @@ from typing.io import TextIO
 
 INCLUDE_CONTEXT = False
 BASEURL = 'http://mmif.clams.ai'
+# this file will store a dict of at_type: version, where version is formatted as `v1`
 ATTYPE_VERSIONS_JSONFILENAME = 'attypeversions.json'
 
 
@@ -137,34 +138,7 @@ class Tree(object):
 
 
 def format_attype_version(version: Union[str, int]) -> str:
-    return str(version)
-
-
-def write_hierarchy(tree: Tree, index_dir: str, version: str) -> None:
-    """
-    This will create three things; 
-    1. the index.html page with the vocab tree
-    2. redirection HTML files for each vocab types to its own versioned html page
-    3. a json to keep the versions of individual vocab types that will be used in the next release cycle
-    """
-    IndexPage(tree, index_dir, version).write()
-    for clams_type in tree.types:
-        type_ver = format_attype_version(clams_type.get('version', version))
-        redirect_dir = pjoin(index_dir, clams_type["name"])
-        os.makedirs(redirect_dir, exist_ok=True)
-        with open(pjoin(redirect_dir, 'index.html'), 'w') as redirect_page:
-            # TODO (krim @ 3/14/23): this relies on assumption of the URL format, should be a better, future-proof way. 
-            redirect_page.write(
-                f'<head> <meta http-equiv="Refresh" content="0; URL=../../../vocabulary/{clams_type["name"]}/{type_ver}" /> </head>'
-            )
-    with open(pjoin(index_dir, ATTYPE_VERSIONS_JSONFILENAME), 'w') as attype_versions_jsonfile:
-        json.dump({t['name']: t['version'] for t in tree.types}, attype_versions_jsonfile)
-        
-
-
-def write_pages(tree, outdir, version) -> None:
-    for clams_type in tree.types:
-        TypePage(clams_type, outdir, version).write()
+    return f'v{version}'
 
 
 class Page(object):
@@ -284,7 +258,7 @@ class IndexPage(Page):
         name_cell = tag('td', {'class': 'tc', 'colspan': 4})
         name_cell.append(link)
         if 'version' in clams_type:
-            name_cell.append(SPAN(text=f"({format_attype_version(clams_type['version'])})"))
+            name_cell.append(SPAN(text=f"({clams_type['version']})"))
         if 'metadata' in clams_type:
             properties = ', '.join(clams_type['metadata'].keys())
             name_cell.append(SPAN(text=": [" + properties + ']'))
@@ -317,7 +291,7 @@ class IndexPage(Page):
 class TypePage(Page):
 
     def __init__(self, clams_type, outdir, mmif_version) -> None:
-        subdirs = (clams_type['name'], format_attype_version(clams_type.get('version', mmif_version)))
+        subdirs = (clams_type['name'], clams_type['version'])
         self.stylesheet = f"{'/'.join(['..'] * len(subdirs))}/css/lappsstyle.css"
         super().__init__(outdir, mmif_version)
         self.clams_type = clams_type
@@ -330,8 +304,8 @@ class TypePage(Page):
         self._add_main_structure()
         self._add_header()
         self._add_home_button(mmif_version)
-        self._add_head(mmif_version)
-        self._add_definition(mmif_version)
+        self._add_head()
+        self._add_definition()
         self._add_metadata()
         self._add_properties()
         self._add_space()
@@ -350,11 +324,11 @@ class TypePage(Page):
             DIV({'id': 'sectionbar'},
                 dtrs=[tag('p', dtrs=[HREF(f'../../../{mmif_version}/vocabulary/index.html', 'Home')])]))
 
-    def _add_head(self, mmif_version) -> None:
+    def _add_head(self) -> None:
         chain = reversed(self._chain_to_top())
         dtrs = []
         for n in chain:
-            uri_suffix = [n['name'], format_attype_version(n.get('version', mmif_version))]
+            uri_suffix = [n['name'], n['version']]
             dtrs.append(HREF('/'.join(['..'] * len(uri_suffix) + uri_suffix), n['name']))
             dtrs.append(SPAN('>'))
         dtrs.append(SPAN(self.clams_type['name']))
@@ -362,8 +336,8 @@ class TypePage(Page):
         self.main_content.append(p)
         self._add_space()
 
-    def _add_definition(self, mmif_version) -> None:
-        url = '/'.join((self.baseurl, self.clams_type['name'], format_attype_version(self.clams_type.get('version', mmif_version))))
+    def _add_definition(self) -> None:
+        url = '/'.join((self.baseurl, self.clams_type['name'], self.clams_type['version']))
         table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
                                            dtrs=[tag('b', text='Definition')]),
                                        tag('td', text=self.clams_type['description'])]),
@@ -521,8 +495,10 @@ def build_vocab(src, index_dir, version, item_dir):
     old_vocab_json_fname = os.path.join(cwd, 'docs', str(last_ver), 'vocabulary', ATTYPE_VERSIONS_JSONFILENAME)
     if not os.path.exists(old_vocab_json_fname):
         latest_attype_vers = collections.defaultdict(lambda: 1)
+        # see https://github.com/clamsproject/mmif/issues/14#issuecomment-1504439497 to see why only this one gets v2 to start
+        latest_attype_vers['Annotation'] = 2
     else:
-        latest_attype_vers = json.load(open(old_vocab_json_fname))
+        latest_attype_vers = {k: int(re.sub(r'[^0-9.]+', '', v)) for k, v in json.load(open(old_vocab_json_fname)).items()}
         
     old_types = {t['name']: t for t in old_clams_types}
     for t in new_clams_types:
@@ -535,11 +511,28 @@ def build_vocab(src, index_dir, version, item_dir):
             # but changed
             if t != old_types[t['name']]:
                 v += 1
-        t['version'] = v
+        t['version'] = format_attype_version(v)
 
     tree = Tree(new_clams_types)
-    write_hierarchy(tree, index_dir, version)
-    write_pages(tree, item_dir, version)
+
+    # the main `x.y.z/vocabulary/index.html` page with the vocab tree
+    IndexPage(tree, index_dir, version).write()
+    # then, redirection HTML files for each vocab types to its own versioned html page
+    for clams_type in tree.types:
+        redirect_dir = pjoin(index_dir, clams_type["name"])
+        os.makedirs(redirect_dir, exist_ok=True)
+        with open(pjoin(redirect_dir, 'index.html'), 'w') as redirect_page:
+            # TODO (krim @ 3/14/23): this relies on assumption of the URL format, should be a better, future-proof way. 
+            redirect_page.write(
+                f'<head> <meta http-equiv="Refresh" content="0; URL=../../../vocabulary/{clams_type["name"]}/{clams_type["version"]}" /> </head>'
+            )
+    # JSON to keep the versions of individual vocab types that will be used in the next release cycle
+    with open(pjoin(index_dir, ATTYPE_VERSIONS_JSONFILENAME), 'w') as attype_versions_jsonfile:
+        json.dump({t['name']: t['version'] for t in tree.types}, attype_versions_jsonfile)
+
+    # finally, individually versioned annotation types pages
+    for clams_type in tree.types:
+        TypePage(clams_type, item_dir, version).write()
 
 
 def update_jekyll_config(infname, version):
