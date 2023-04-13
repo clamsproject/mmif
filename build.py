@@ -22,16 +22,20 @@ import urllib.error
 import warnings
 from os.path import join as pjoin
 from string import Template
+from typing import Union, List, Dict, Optional, Set
 from urllib import request
 
+from bs4.formatter import HTMLFormatter
 import yaml
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
+from typing.io import TextIO
 
 INCLUDE_CONTEXT = False
 BASEURL = 'http://mmif.clams.ai'
 ATTYPE_VERSIONS_JSONFILENAME = 'attypeversions.json'
 
-def read_yaml(fp):
+
+def read_yaml(fp: Union[str, bytes, TextIO]) -> List[Dict]:
     """Read a YAML file and return a list of Python dictionaries, one for each
     document in the YAML file."""
     if isinstance(fp, str):
@@ -40,7 +44,7 @@ def read_yaml(fp):
     return docs
 
 
-def get_soup():
+def get_soup() -> BeautifulSoup:
     """Return a basic top-level soup."""
     return BeautifulSoup("<html>" +
                          "<head></head>" +
@@ -49,7 +53,7 @@ def get_soup():
                          features='lxml')
 
 
-def tag(tagname, attrs=None, text=None, dtrs=None):
+def tag(tagname: str, attrs: Optional[Dict] = None, text: Optional[str] = None, dtrs: Optional[List[Tag]] = None) -> Tag:
     """Return a soup Tag element."""
     attrs = {} if attrs is None else attrs
     dtrs = [] if dtrs is None else dtrs
@@ -61,55 +65,58 @@ def tag(tagname, attrs=None, text=None, dtrs=None):
     return newtag
 
 
-def add_stylesheet(soup, stylesheet):
+def add_stylesheet(soup: BeautifulSoup, stylesheet: str) -> None:
     soup.head.append(tag('link', {'rel': 'stylesheet',
                                   'type': 'text/css',
                                   'href': stylesheet}))
 
 
-def DIV(attrs=None, text=None, dtrs=None):
+def DIV(attrs: Optional[Dict] = None, text: Optional[str] = None, dtrs: Optional[List[Tag]] = None) -> Tag:
     return tag('div', attrs=attrs, text=text, dtrs=dtrs)
 
 
-def TABLE(attrs=None, dtrs=None):
+def TABLE(attrs: Optional[Dict] = None, dtrs: Optional[List[Tag]] = None) -> Tag:
     return tag('table', attrs=attrs, dtrs=dtrs)
 
 
-def TABLE_ROW(table_cells):
+def TABLE_ROW(table_cells: List[Tag]) -> Tag:
     return tag('tr', dtrs=table_cells)
 
 
-def H1(text):
+def H1(text: str) -> Tag:
     return tag('h1', text=text)
 
 
-def H2(text):
+def H2(text: str) -> Tag:
     return tag('h2', text=text)
 
 
-def HREF(link, text):
+def HREF(link: str, text: str) -> Tag:
     return tag('a', attrs={'href': link}, text=text)
 
 
-def SPAN(text):
+def SPAN(text: str) -> Tag:
     return tag('span', text=text)
 
 
 class Tree(object):
+    types: List[Dict]
+    types_idx: Dict[str, Dict]
+    root: Dict
 
-    def __init__(self, clams_types):
+    def __init__(self, clams_types) -> None:
         """Take the generator object and put a dictionary"""
         self.types = clams_types
         self.types_idx = { t['name']: t for t in self.types }
         self.root = self.find_root()
         self.build_tree()
 
-    def find_root(self):
+    def find_root(self) -> Optional[Dict]:
         for t in self.types:
             if t['parent'] is None:
                 return t
 
-    def build_tree(self):
+    def build_tree(self) -> None:
         """Add links between all the type definitions by filling in parentNode
         and childNodes attributes."""
         # First initialize the dominance links and then populate them
@@ -118,22 +125,22 @@ class Tree(object):
             t['childNodes'] = []
         for t in self.types:
             parentName = t['parent']
-            if parentName is not None:
+            if parentName is not None and parentName in self.types_idx:
                 parentNode = self.types_idx.get(parentName)
                 t['parentNode'] = parentNode
                 parentNode.setdefault('childNodes', []).append(t)
 
-    def print_tree(self, node, level=0):
+    def print_tree(self, node, level=0) -> None:
         print("%s%s" % ('  ' * level, node['name']))
         for child in node['childNodes']:
             self.print_tree(child, level + 1)
 
 
-def format_attype_version(version):
+def format_attype_version(version: Union[str, int]) -> str:
     return str(version)
 
 
-def write_hierarchy(tree: Tree, index_dir: str, version: str):
+def write_hierarchy(tree: Tree, index_dir: str, version: str) -> None:
     """
     This will create three things; 
     1. the index.html page with the vocab tree
@@ -155,30 +162,35 @@ def write_hierarchy(tree: Tree, index_dir: str, version: str):
         
 
 
-def write_pages(tree, outdir, version):
+def write_pages(tree, outdir, version) -> None:
     for clams_type in tree.types:
         TypePage(clams_type, outdir, version).write()
 
 
 class Page(object):
-
-    def __init__(self, outdir, version):
+    outdir: str
+    version: str
+    soup: BeautifulSoup
+    stylesheet: str
+    container: Tag
+    main_content: Tag
+    intro: Tag
+    fpath: str
+    fname: str
+    
+    def __init__(self, outdir, version) -> None:
         self.outdir = outdir
         self.version = version
         self.soup = get_soup()
-        # the following three will be set by _add_main_structure()
-        self.container = None
-        self.intro = None
-        self.main_content = None
         self._add_stylesheet()
 
-    def _add_stylesheet(self):
+    def _add_stylesheet(self) -> None:
         add_stylesheet(self.soup, self.stylesheet)
 
-    def _add_title(self, title):
+    def _add_title(self, title) -> None:
         self.soup.head.append(tag('title', text=title))
 
-    def _add_header(self):
+    def _add_header(self) -> None:
         """
         We use a MMIF version as a "CLAMS Vocabulary" version in the headers of
         1. the hierarchy page
@@ -203,7 +215,7 @@ class Page(object):
                            H2(version)])
         self.intro.append(header)
 
-    def _add_main_structure(self):
+    def _add_main_structure(self) -> None:
         """Build the basic structure of the body, which is a container div with
         in it an intro div and a mainContent div."""
         container = DIV({'id': 'container'},
@@ -214,23 +226,24 @@ class Page(object):
         self.intro = self.soup.find(id='intro')
         self.main_content = self.soup.find(id='mainContent')
 
-    def _add_footer(self):
+    def _add_footer(self) -> None:
         footer = 'Page generated on %s' % time.strftime("%Y-%m-%d at %H:%M:%S")
         self.soup.body.append(DIV({'id': 'footer'}, text=footer))
 
-    def _add_space(self):
+    def _add_space(self) -> None:
         self.main_content.append(tag('br'))
 
-    def write(self):
+    def write(self) -> None:
         if not os.path.exists(self.fpath):
             os.makedirs(self.fpath, exist_ok=True)
         with open(self.fname, 'w') as fh:
-            fh.write(increase_leading_space(self.soup.prettify()))
+            # https://www.crummy.com/software/BeautifulSoup/bs4/doc/#bs4.HTMLFormatter
+            fh.write(self.soup.prettify(formatter=HTMLFormatter(indent=2)))
 
 
 class IndexPage(Page):
 
-    def __init__(self, tree, outdir, version):
+    def __init__(self, tree, outdir, version) -> None:
         self.stylesheet = 'css/lappsstyle.css'
         super().__init__(outdir, version)
         self.fpath = outdir
@@ -246,7 +259,7 @@ class IndexPage(Page):
         #self._add_space()
         self._add_footer()
 
-    def _add_description(self):
+    def _add_description(self) -> None:
         span1_text = "The CLAMS Vocabulary defines an ontology" \
                      + " of terms for a core of objects and features exchanged" \
                      + " amongst tools that process multi-media data. It is based" \
@@ -264,7 +277,7 @@ class IndexPage(Page):
         self.main_content.append(p1)
         self._add_space()
 
-    def _add_tree(self, clams_type, soup_node):
+    def _add_tree(self, clams_type, soup_node) -> None:
         type_name = clams_type['name']
         fname = '%s' % type_name
         link = HREF(fname, type_name)
@@ -290,7 +303,7 @@ class IndexPage(Page):
         for subtype in clams_type['childNodes']:
             self._add_tree(subtype, sub_cell)
 
-    def _add_ontologies(self):
+    def _add_ontologies(self) -> None:
         onto_soup = BeautifulSoup("""
       <p>The vocabulary is available in the following formats:
           <a href='ontologies/clams.vocabulary.rdf'>RDF</a>,
@@ -303,7 +316,7 @@ class IndexPage(Page):
 
 class TypePage(Page):
 
-    def __init__(self, clams_type, outdir, mmif_version):
+    def __init__(self, clams_type, outdir, mmif_version) -> None:
         subdirs = (clams_type['name'], format_attype_version(clams_type.get('version', mmif_version)))
         self.stylesheet = f"{'/'.join(['..'] * len(subdirs))}/css/lappsstyle.css"
         super().__init__(outdir, mmif_version)
@@ -324,7 +337,7 @@ class TypePage(Page):
         self._add_space()
         self._add_footer()
 
-    def _chain_to_top(self):
+    def _chain_to_top(self) -> List[Dict]:
         chain = []
         parent = self.clams_type['parentNode']
         while parent is not None:
@@ -332,12 +345,12 @@ class TypePage(Page):
             parent = parent['parentNode']
         return chain
 
-    def _add_home_button(self, mmif_version):
+    def _add_home_button(self, mmif_version) -> None:
         self.main_content.append(
             DIV({'id': 'sectionbar'},
                 dtrs=[tag('p', dtrs=[HREF(f'../../../{mmif_version}/vocabulary/index.html', 'Home')])]))
 
-    def _add_head(self, mmif_version):
+    def _add_head(self, mmif_version) -> None:
         chain = reversed(self._chain_to_top())
         dtrs = []
         for n in chain:
@@ -349,7 +362,7 @@ class TypePage(Page):
         self.main_content.append(p)
         self._add_space()
 
-    def _add_definition(self, mmif_version):
+    def _add_definition(self, mmif_version) -> None:
         url = '/'.join((self.baseurl, self.clams_type['name'], format_attype_version(self.clams_type.get('version', mmif_version))))
         table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
                                            dtrs=[tag('b', text='Definition')]),
@@ -358,19 +371,19 @@ class TypePage(Page):
                                        tag('td', dtrs=[HREF(url, url)])])])
         self.main_content.append(table)
 
-    def _add_metadata(self):
+    def _add_metadata(self) -> None:
         self.main_content.append(H1('Metadata'))
         if self.metadata:
             self._add_properties_aux(self.metadata)
         self._add_properties_from_chain('metadata')
 
-    def _add_properties(self):
+    def _add_properties(self) -> None:
         self.main_content.append(H1('Properties'))
         if self.properties:
             self._add_properties_aux(self.properties)
         self._add_properties_from_chain('properties')
 
-    def _add_properties_from_chain(self, proptype):
+    def _add_properties_from_chain(self, proptype) -> None:
         for n in self._chain_to_top():
             properties = n.get(proptype, None)
             if properties is not None:
@@ -378,7 +391,7 @@ class TypePage(Page):
                 self.main_content.append(h2)
                 self._add_properties_aux(properties)
 
-    def _add_properties_aux(self, properties):
+    def _add_properties_aux(self, properties) -> None:
         if properties:
             th1 = tag('th', {'class': 'fixed'}, text='Property')
             th2 = tag('th', {'class': 'fixed'}, text='Type')
@@ -401,30 +414,15 @@ class TypePage(Page):
             self.main_content.append(table)
 
 
-def increase_leading_space(text):
-    """Hack to double the indentation since I didn't like the single character
-    indent in bs4 and there is apparently no way to change that."""
-    # TODO: there are other minor problems with the bs4 pretty print
-    # TODO: find another way to take that string and pretty print it
-    lines = text.split('\n')
-    new_lines = []
-    for line in lines:
-        for i, char in enumerate(line):
-            if char != ' ':
-                new_lines.append("%s%s" % (' ' * i, line))
-                break
-    return '\n'.join(new_lines)
-
-
-def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=None):
+def copy(src_dir: str, dst_dir: str, include_fnames: Set = {}, exclude_fnames: Set = {}, templating: Dict = {}) -> None:
     for r, ds, fs in os.walk(src_dir):
         r = r[len(src_dir)+1:]
         for f in fs:
             if f.startswith('.') or r in exclude_fnames or f in exclude_fnames:
                 continue
-            elif len(include_fnames) == 0 or f in include_fnames:
+            elif not include_fnames or f in include_fnames:
                 os.makedirs(pjoin(dst_dir, r), exist_ok=True)
-                if templating is not None and f.endswith('.json') or f.endswith('.md'):
+                if templating and f.endswith('.json') or f.endswith('.md'):
                     with open(pjoin(src_dir, r, f), 'r') as in_f, open(pjoin(dst_dir, r, f), 'w') as out_f:
                         tmpl_to_compile = Template(in_f.read())
                         compiled = tmpl_to_compile.substitute(
@@ -435,7 +433,7 @@ def copy(src_dir, dst_dir, include_fnames=[], exclude_fnames=[], templating=None
                     shutil.copy(pjoin(src_dir, r, f), pjoin(dst_dir, r))
 
 
-def check_version_exists(version):
+def check_version_exists(version: str):
     try:
         res = request.urlopen('https://api.github.com/repos/clamsproject/mmif/git/refs/tags')
         body = json.loads(res.read())
