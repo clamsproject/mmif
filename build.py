@@ -25,15 +25,16 @@ from string import Template
 from typing import Union, List, Dict, Optional, Set
 from urllib import request
 
-from bs4.formatter import HTMLFormatter
 import yaml
 from bs4 import BeautifulSoup, Tag
+from bs4.formatter import HTMLFormatter
 from typing.io import TextIO
 
 INCLUDE_CONTEXT = False
 BASEURL = 'http://mmif.clams.ai'
 # this file will store a dict of at_type: version, where version is formatted as `v1`
 ATTYPE_VERSIONS_JSONFILENAME = 'attypeversions.json'
+VOCAB_TITLE = 'CLAMS Vocabulary'
 
 
 def read_yaml(fp: Union[str, bytes, TextIO]) -> List[Dict]:
@@ -56,6 +57,7 @@ def get_soup() -> BeautifulSoup:
 
 def tag(tagname: str, attrs: Optional[Dict] = None, text: Optional[str] = None, dtrs: Optional[List[Tag]] = None) -> Tag:
     """Return a soup Tag element."""
+    # TODO (krim @ 4/14/23): what does `dtrs` stand for? 
     attrs = {} if attrs is None else attrs
     dtrs = [] if dtrs is None else dtrs
     newtag = BeautifulSoup('', features='lxml').new_tag(tagname, attrs=attrs)
@@ -142,8 +144,6 @@ def format_attype_version(version: Union[str, int]) -> str:
 
 
 class Page(object):
-    outdir: str
-    version: str
     soup: BeautifulSoup
     stylesheet: str
     container: Tag
@@ -152,9 +152,7 @@ class Page(object):
     fpath: str
     fname: str
     
-    def __init__(self, outdir, version) -> None:
-        self.outdir = outdir
-        self.version = version
+    def __init__(self) -> None:
         self.soup = get_soup()
         self._add_stylesheet()
 
@@ -163,31 +161,6 @@ class Page(object):
 
     def _add_title(self, title) -> None:
         self.soup.head.append(tag('title', text=title))
-
-    def _add_header(self) -> None:
-        """
-        We use a MMIF version as a "CLAMS Vocabulary" version in the headers of
-        1. the hierarchy page
-        2. individual annotation type pages
-        
-        The number used in the headers will always point to the latest MMIF 
-        version at the time of building even on the pages of individual types, 
-        which have their own versions. Namely, a version of an annotation type 
-        can be included in multiple (but all consecutive) MMIF versions, yet it 
-        has only one MMIF version "printed" on its HTML version, which is the 
-        largest number.
-         
-        For example, 
-          - situation: TimeFrame/v2 is first introduced into the vocab hierarchy at MMIF/x.y.0 and stayed unchanged until it's changed in MMIF/x.y.10
-          - expect 1) MMIF/x.y.[0-9]/vocabulary website all have link to the TimeFrame/v2 website
-          - expect 2) the header of the TimeFrmae/v2 website always has the latest MMIF/x.y.? only
-        """
-        title = 'CLAMS Vocabulary'
-        version = 'version %s' % self.version
-        header = DIV({'id': 'pageHeader'},
-                     dtrs=[H1(title),
-                           H2(version)])
-        self.intro.append(header)
 
     def _add_main_structure(self) -> None:
         """Build the basic structure of the body, which is a container div with
@@ -219,11 +192,12 @@ class IndexPage(Page):
 
     def __init__(self, tree, outdir, version) -> None:
         self.stylesheet = 'css/lappsstyle.css'
-        super().__init__(outdir, version)
+        super().__init__()
+        self.version = version
         self.fpath = outdir
         self.fname = pjoin(outdir, 'index.html')
         self.tree = tree
-        self._add_title('CLAMS Vocabulary')
+        self._add_title(VOCAB_TITLE)
         self._add_main_structure()
         self._add_header()
         self._add_description()
@@ -234,7 +208,7 @@ class IndexPage(Page):
         self._add_footer()
 
     def _add_description(self) -> None:
-        span1_text = "The CLAMS Vocabulary defines an ontology" \
+        span1_text = f"The {VOCAB_TITLE} defines an ontology" \
                      + " of terms for a core of objects and features exchanged" \
                      + " amongst tools that process multi-media data. It is based" \
                      + " on the LAPPS Web Service Exchange Vocabulary at "
@@ -287,13 +261,19 @@ class IndexPage(Page):
         for element in onto_soup.body:
             self.main_content.append(element)
 
+    def _add_header(self) -> None:
+        header = DIV({'id': 'pageHeader'},
+                     dtrs=[H1(VOCAB_TITLE),
+                           H2(f'version {self.version}')])
+        self.intro.append(header)
+
 
 class TypePage(Page):
 
-    def __init__(self, clams_type, outdir, mmif_version) -> None:
+    def __init__(self, clams_type, outdir, included_in) -> None:
         subdirs = (clams_type['name'], clams_type['version'])
         self.stylesheet = f"{'/'.join(['..'] * len(subdirs))}/css/lappsstyle.css"
-        super().__init__(outdir, mmif_version)
+        super().__init__()
         self.clams_type = clams_type
         self.metadata = clams_type.get('metadata', [])
         self.properties = clams_type.get('properties', [])
@@ -303,8 +283,10 @@ class TypePage(Page):
         self._add_title(clams_type['name'])
         self._add_main_structure()
         self._add_header()
-        self._add_home_button(mmif_version)
-        self._add_head()
+        sorted(included_in, reverse=True)
+        self._add_home_button(included_in)
+        # make sure old versions that include this type/version is descending-sorted
+        self._add_head(included_in[0])
         self._add_definition()
         self._add_metadata()
         self._add_properties()
@@ -319,12 +301,15 @@ class TypePage(Page):
             parent = parent['parentNode']
         return chain
 
-    def _add_home_button(self, mmif_version) -> None:
+    def _add_home_button(self, included_in: List[str]) -> None:
         self.main_content.append(
-            DIV({'id': 'sectionbar'},
-                dtrs=[tag('p', dtrs=[HREF(f'../../../{mmif_version}/vocabulary/index.html', 'Home')])]))
+            DIV({'id': 'sectionbar'}, dtrs=[tag(
+                'p',
+                text="included in: ",
+                dtrs=[HREF('/'.join([BASEURL, mmif_ver, 'vocabulary']), mmif_ver) for mmif_ver in included_in]
+            )]))
 
-    def _add_head(self) -> None:
+    def _add_head(self, cur_vocab_ver) -> None:
         chain = reversed(self._chain_to_top())
         dtrs = []
         for n in chain:
@@ -332,6 +317,8 @@ class TypePage(Page):
             dtrs.append(HREF('/'.join(['..'] * len(uri_suffix) + uri_suffix), n['name']))
             dtrs.append(SPAN('>'))
         dtrs.append(SPAN(self.clams_type['name']))
+        latest = tag('p', text=f'from {cur_vocab_ver} (last updated)')
+        dtrs.append(latest)
         p = tag('p', {'class': 'head'}, dtrs=dtrs)
         self.main_content.append(p)
         self._add_space()
@@ -386,6 +373,14 @@ class TypePage(Page):
                                  description_cell])
                 table.append(row)
             self.main_content.append(table)
+
+    def _add_header(self) -> None:
+        header = DIV({'id': 'pageHeader'},
+                     dtrs=[
+                         H1(f'{VOCAB_TITLE}'), 
+                         H2(f'{self.clams_type["name"]} ({self.clams_type["version"]})'),
+                         ])
+        self.intro.append(header)
 
 
 def copy(src_dir: str, dst_dir: str, include_fnames: Set = {}, exclude_fnames: Set = {}, templating: Dict = {}) -> None:
@@ -476,7 +471,7 @@ def build_context(src, dst, version):
     copy(src, dst, exclude_fnames=['example.json'])
 
 
-def build_vocab(src, index_dir, version, item_dir):
+def build_vocab(src, index_dir, mmif_version, item_dir):
     vocab_yaml_path = os.path.relpath(pjoin(src, "clams.vocabulary.yaml"), os.path.dirname(__file__))
     for d in (index_dir, item_dir):
         css_dir = pjoin(d, 'css')
@@ -485,38 +480,40 @@ def build_vocab(src, index_dir, version, item_dir):
 
     cwd = os.path.abspath(os.path.dirname(__file__))
     git_tags = subprocess.run('git tag'.split(), cwd=cwd, capture_output=True).stdout.decode('ascii').split('\n')
-    last_ver = sorted([tag for tag in git_tags if tag and re.match(r'\d+\.\d+\.\d+$', tag)])[-1]
+    old_vers = sorted([tag for tag in git_tags if tag and re.match(r'\d+\.\d+\.\d+$', tag)])
+    last_ver = old_vers[-1]
     proc = subprocess.run(f'git show {last_ver}:{vocab_yaml_path}'.split(), cwd=cwd, capture_output=True)
     if proc.returncode != 0:
         raise SystemError('cannot checkout latest vocab yaml to compute changes in vocab')
-    old_clams_types = read_yaml(subprocess.run(f'git show {last_ver}:{vocab_yaml_path}'.split(), cwd=cwd, capture_output=True).stdout)
+    last_clams_types = read_yaml(subprocess.run(f'git show {last_ver}:{vocab_yaml_path}'.split(), cwd=cwd, capture_output=True).stdout)
     new_clams_types = read_yaml(vocab_yaml_path)
 
-    old_vocab_json_fname = os.path.join(cwd, 'docs', str(last_ver), 'vocabulary', ATTYPE_VERSIONS_JSONFILENAME)
-    if not os.path.exists(old_vocab_json_fname):
-        latest_attype_vers = collections.defaultdict(lambda: 1)
-        # see https://github.com/clamsproject/mmif/issues/14#issuecomment-1504439497 to see why only this one gets v2 to start
-        latest_attype_vers['Annotation'] = 2
-    else:
-        latest_attype_vers = {k: int(re.sub(r'[^0-9.]+', '', v)) for k, v in json.load(open(old_vocab_json_fname)).items()}
-        
-    old_types = {t['name']: t for t in old_clams_types}
-    for t in new_clams_types:
-        # a new type added in this version
-        if t['name'] not in old_types:
-            v = 1
+    attype_versions_included = collections.defaultdict(lambda: collections.defaultdict(list))
+    latest_attype_vers = collections.defaultdict(lambda: 1)
+    for old_ver in old_vers:
+        old_attype_versions_fname = os.path.join(cwd, 'docs', str(old_ver), 'vocabulary', ATTYPE_VERSIONS_JSONFILENAME)
+        if not os.path.exists(old_attype_versions_fname):
+            # see https://github.com/clamsproject/mmif/issues/14#issuecomment-1504439497 
+            # to see why only this one gets v2 to start
+            latest_attype_vers['Annotation'] = 2
         else:
-            # existing type
-            v = latest_attype_vers[t['name']]
-            # but changed
-            if t != old_types[t['name']]:
-                v += 1
+            old_attype_versions = json.load(open(old_attype_versions_fname))
+            for attypename, attypever in old_attype_versions.items():
+                if old_ver == last_ver:
+                    latest_attype_vers[attypename] = int(re.sub(r'[^0-9.]+', '', attypever))
+                attype_versions_included[attypename][attypever].append(old_ver)
+            
+    old_types = {t['name']: t for t in last_clams_types}
+    for t in new_clams_types:
+        v = latest_attype_vers[t['name']]
+        if t != old_types[t['name']]:
+            v += 1
         t['version'] = format_attype_version(v)
 
     tree = Tree(new_clams_types)
 
     # the main `x.y.z/vocabulary/index.html` page with the vocab tree
-    IndexPage(tree, index_dir, version).write()
+    IndexPage(tree, index_dir, mmif_version).write()
     # then, redirection HTML files for each vocab types to its own versioned html page
     for clams_type in tree.types:
         redirect_dir = pjoin(index_dir, clams_type["name"])
@@ -532,7 +529,11 @@ def build_vocab(src, index_dir, version, item_dir):
 
     # finally, individually versioned annotation types pages
     for clams_type in tree.types:
-        TypePage(clams_type, item_dir, version).write()
+        TypePage(clams_type, item_dir, 
+                 # theoretically, `mmif_version` is a new string and shouldn't be in the `attype_vers_incl` dict. 
+                 # so we add the "current" (new) version to include this current at_type
+                 included_in=attype_versions_included[clams_type['name']][clams_type['version']] + [mmif_version]
+                 ).write()
 
 
 def update_jekyll_config(infname, version):
