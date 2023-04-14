@@ -394,9 +394,7 @@ def copy(src_dir: str, dst_dir: str, include_fnames: Set = {}, exclude_fnames: S
                 if templating and f.endswith('.json') or f.endswith('.md'):
                     with open(pjoin(src_dir, r, f), 'r') as in_f, open(pjoin(dst_dir, r, f), 'w') as out_f:
                         tmpl_to_compile = Template(in_f.read())
-                        compiled = tmpl_to_compile.substitute(
-                            **templating
-                        )
+                        compiled = tmpl_to_compile.substitute(templating)
                         out_f.write(compiled)
                 else:
                     shutil.copy(pjoin(src_dir, r, f), pjoin(dst_dir, r))
@@ -437,30 +435,34 @@ def build(dirname, args):
     context_out_dir = pjoin(out_dir, 'context')
     shutil.rmtree(out_dir, ignore_errors=True)
 
+    print(f"\n>>> Building vocabulary: index in {vocab_index_out_dir}, items in {vocab_items_out_dir}")
+    vocab_tree = build_vocab(vocab_src_dir, vocab_index_out_dir, version, vocab_items_out_dir)
+
     print("\n>>> Creating directory structure in '%s'" % out_dir)
     os.makedirs(out_dir, exist_ok=True)
 
-    print(">>> Building specification in '%s'" % out_dir)
-    build_spec(spec_src_dir, out_dir, version)
+    print("\n>>> Building specification in '%s'" % out_dir)
+    build_spec(spec_src_dir, out_dir, version, {t['name']: t['version'] for t in vocab_tree.types})
 
-    print(">>> Building json schema in '%s'" % out_dir)
+    print("\n>>> Building json schema in '%s'" % out_dir)
     build_schema(schema_src_dir, schema_out_dir, version)
 
     if INCLUDE_CONTEXT:
         # TODO: this is actually broken
-        print(">>> Building json-ld context in '%s'" % out_dir)
+        print("\n>>> Building json-ld context in '%s'" % out_dir)
         build_context(context_src_dir, out_dir, version)
 
-    print(f">>> Building vocabulary: index in {vocab_index_out_dir}, items in {vocab_items_out_dir}")
-    build_vocab(vocab_src_dir, vocab_index_out_dir, version, vocab_items_out_dir)
-
     if args.testdir is None:
-        print(">>> Updating jekyll configuration in '%s'" % jekyll_conf_file)
+        print("\n>>> Updating jekyll configuration in '%s'" % jekyll_conf_file)
         update_jekyll_config(jekyll_conf_file, version)
 
     
-def build_spec(src, dst, version):
-    copy(src, dst, exclude_fnames=['next.md', 'notes', 'samples/others'], templating={'VERSION': version})
+def build_spec(src, dst, mmif_version, attypes_versions):
+    version_dict = collections.defaultdict(lambda: 'v1')
+    for name, version in attypes_versions.items():
+        version_dict[f"{name}_VER"] = version 
+    version_dict['VERSION'] = mmif_version
+    copy(src, dst, exclude_fnames={'next.md', 'notes', 'samples/others'}, templating=version_dict)
 
 
 def build_schema(src, dst, version):
@@ -471,7 +473,7 @@ def build_context(src, dst, version):
     copy(src, dst, exclude_fnames=['example.json'])
 
 
-def build_vocab(src, index_dir, mmif_version, item_dir):
+def build_vocab(src, index_dir, mmif_version, item_dir) -> Tree:
     vocab_yaml_path = os.path.relpath(pjoin(src, "clams.vocabulary.yaml"), os.path.dirname(__file__))
     for d in (index_dir, item_dir):
         css_dir = pjoin(d, 'css')
@@ -534,6 +536,7 @@ def build_vocab(src, index_dir, mmif_version, item_dir):
                  # so we add the "current" (new) version to include this current at_type
                  included_in=attype_versions_included[clams_type['name']][clams_type['version']] + [mmif_version]
                  ).write()
+    return tree
 
 
 def update_jekyll_config(infname, version):
