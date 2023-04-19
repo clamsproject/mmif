@@ -335,7 +335,7 @@ class TypePage(Page):
         # The reason I used v2 for 0.4.2/Annotation and v1 for 0.4.[0,1]/Annotation is to make this transition
         # compatible in the mmif-python SDK implementation as well. 
         def get_identity_row(identity_url):
-            return TABLE_ROW([tag('td', text='identical to'), tag('td', dtrs=[HREF(identity_url, identity_url)])])
+            return TABLE_ROW([tag('td', text='Also known as'), tag('td', dtrs=[HREF(identity_url, identity_url)])])
         if self.clams_type['version'] == 'v1':
             patches = [0, 1]
             if self.clams_type['name'] != 'Annotation':
