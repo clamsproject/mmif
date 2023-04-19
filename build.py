@@ -325,11 +325,27 @@ class TypePage(Page):
 
     def _add_definition(self) -> None:
         url = '/'.join((self.baseurl, self.clams_type['name'], self.clams_type['version']))
-        table = TABLE(dtrs=[TABLE_ROW([tag('td', {'class': 'fixed'},
-                                           dtrs=[tag('b', text='Definition')]),
-                                       tag('td', text=self.clams_type['description'])]),
-                            TABLE_ROW([tag('td', dtrs=[tag('b', text='URI')]),
-                                       tag('td', dtrs=[HREF(url, url)])])])
+        children = [TABLE_ROW([tag('td', {'class': 'fixed'}, dtrs=[tag('b', text='Definition')]), tag('td', text=self.clams_type['description'])]),
+                    TABLE_ROW([tag('td', dtrs=[tag('b', text='URI')]), tag('td', dtrs=[HREF(url, url)])])]
+        
+        # Some hard-coding to make transition from old vocab URL (mmif/mmif_version/vocab/type) to the new one
+        # (mmif/vocab/type/type_version)
+        # See how transition is mapped: https://github.com/clamsproject/mmif/issues/14#issuecomment-1504439497
+        # NOTE that there isn't ``Annotation/v1`` page and won't be (the new type_ver didn't exist in 0.4.[0,1] times).
+        # The reason I used v2 for 0.4.2/Annotation and v1 for 0.4.[0,1]/Annotation is to make this transition
+        # compatible in the mmif-python SDK implementation as well. 
+        def get_identity_row(identity_url):
+            return TABLE_ROW([tag('td', text='identical to'), tag('td', dtrs=[HREF(identity_url, identity_url)])])
+        if self.clams_type['version'] == 'v1':
+            patches = [0, 1]
+            if self.clams_type['name'] != 'Annotation':
+                patches.append(2)
+            for patch in patches:
+                children.append(get_identity_row(f'https://mmif.clams.ai/0.4.{patch}/vocabulary/{self.clams_type["name"]}/'))
+        elif self.clams_type['version'] == 'v2' and self.clams_type['name'] == 'Annotation':
+            children.append(
+                get_identity_row(f'https://mmif.clams.ai/0.4.2/vocabulary/{self.clams_type["name"]}/'))
+        table = TABLE(dtrs=children)
         self.main_content.append(table)
 
     def _add_metadata(self) -> None:
