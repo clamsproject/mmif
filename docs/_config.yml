@@ -22,6 +22,7 @@ navbar-links:
   # a new version will be added here by build.py
   VERSIONS:
     - 0.5.0: '0.5.0'
+    - 0.4.2: '0.4.2'
     - 0.4.1: '0.4.1'
     - 0.4.0: '0.4.0'
     - 0.3.1: '0.3.1'
