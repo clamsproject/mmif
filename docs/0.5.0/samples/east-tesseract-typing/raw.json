@@ -1,0 +1,124 @@
+{
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/0.5.0"
+  },
+  "documents": [
+    {
+      "@type": "http://mmif.clams.ai/vocabulary/ImageDocument/v1",
+      "properties": {
+        "id": "m1",
+        "mime": "image/jpeg",
+        "location": "file:///var/archive/image-fido-barks.jpg"
+      }
+    }
+  ],
+  "views": [
+    {
+      "id": "v1",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/east/0.2.1",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/BoundingBox/v1": {
+            "timeUnit": "pixels",
+            "document": "m1"
+          }
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/v1",
+          "properties": {
+            "id": "bb1",
+            "coordinates": [ [10, 20], [40, 20], [10, 30], [40, 30] ],
+            "boxType": "text"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/v1",
+          "properties": {
+            "id": "bb2",
+            "coordinates": [ [210, 220], [240, 220], [210, 230], [240, 230] ],
+            "boxType": "text"
+          }
+        }
+      ]
+    },
+    {
+      "id": "v2",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/tesseract/0.2.1",
+        "contains": {
+          "http://mmif.clams.ai/0.1.0/TextDocument": {},
+          "http://mmif.clams.ai/0.1.0/Alignment": {}
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
+          "properties": {
+            "id": "td1",
+            "text": {
+              "@value": "Arf"
+            }
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "a1",
+            "source": "v1:bb1",
+            "target": "td1"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
+          "properties": {
+            "id": "td2",
+            "text": {
+              "@value": "yelp"
+            }
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "a2",
+            "source": "v1:bb2",
+            "target": "td2"
+          }
+        }
+      ]
+    },
+    {
+      "id": "v3",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/semantic-typer/0.2.4",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/SemanticTag/v1": {}
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/v1",
+          "properties": {
+            "id": "st1",
+            "category": "dog-sound",
+            "document": "V2:td1",
+            "start": 0,
+            "end": 4
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/v1",
+          "properties": {
+            "id": "st2",
+            "category": "dog-sound",
+            "document": "V2:td2",
+            "start": 0,
+            "end": 4
+          }
+        }
+      ]
+    }
+  ]
+}

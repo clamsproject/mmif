@@ -1,0 +1,261 @@
+<html>
+  <head>
+    <link href="../../css/lappsstyle.css" rel="stylesheet" type="text/css"/>
+    <title>
+      TimePoint
+    </title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="intro">
+        <div id="pageHeader">
+          <h1>
+            CLAMS Vocabulary
+          </h1>
+          <h2>
+            TimePoint (v1)
+          </h2>
+        </div>
+      </div>
+      <div id="mainContent">
+        <div id="sectionbar">
+          <p>
+            included in:
+            <a href="http://mmif.clams.ai/0.5.0/vocabulary">
+              0.5.0
+            </a>
+          </p>
+        </div>
+        <p class="head">
+          <a href="../../Thing/v1">
+            Thing
+          </a>
+          <span>
+            >
+          </span>
+          <a href="../../Annotation/v2">
+            Annotation
+          </a>
+          <span>
+            >
+          </span>
+          <a href="../../Region/v1">
+            Region
+          </a>
+          <span>
+            >
+          </span>
+          <span>
+            TimePoint
+          </span>
+          <p>
+            from 0.5.0 (last updated)
+          </p>
+        </p>
+        <br/>
+        <table>
+          <tr>
+            <td class="fixed">
+              <b>
+                Definition
+              </b>
+            </td>
+            <td>
+              A time point in an audio or video stream.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>
+                URI
+              </b>
+            </td>
+            <td>
+              <a href="http://mmif.clams.ai/vocabulary/TimePoint/v1">
+                http://mmif.clams.ai/vocabulary/TimePoint/v1
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Also known as
+            </td>
+            <td>
+              <a href="https://mmif.clams.ai/0.4.0/vocabulary/TimePoint/">
+                https://mmif.clams.ai/0.4.0/vocabulary/TimePoint/
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Also known as
+            </td>
+            <td>
+              <a href="https://mmif.clams.ai/0.4.1/vocabulary/TimePoint/">
+                https://mmif.clams.ai/0.4.1/vocabulary/TimePoint/
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Also known as
+            </td>
+            <td>
+              <a href="https://mmif.clams.ai/0.4.2/vocabulary/TimePoint/">
+                https://mmif.clams.ai/0.4.2/vocabulary/TimePoint/
+              </a>
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Metadata
+        </h1>
+        <h2>
+          Metadata from Region
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              timeUnit
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              Specifies which unit of time the measurement is based.  Can be *seconds* or *milliseconds*, or in case of annotations on  a VideoDocument, *frames*.
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Metadata from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              document
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the document that the annotation is over. This has to be defined either at the metadata level, in which case it has scope over all annotations of the same type in a view, or at the instance level, in which it has scope over just the single annotation.
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Properties
+        </h1>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              timePoint
+            </td>
+            <td>
+              Integer
+            </td>
+            <td>
+              The starting offset in the stream.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              document
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the document that the annotation is over.
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Thing
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              id
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              A unique identifier for the annotation or document. Uniqueness is relative to the view the annotation is in or the list of documents at the top level of a MMIF file.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <br/>
+      </div>
+    </div>
+    <div id="footer">
+      Page generated on 2023-04-21 at 15:03:21
+    </div>
+  </body>
+</html>
