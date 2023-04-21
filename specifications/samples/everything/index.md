@@ -33,7 +33,7 @@ The first three steps are straightforward and all result in views with time fram
 
 ```json
 {
-	"@type": "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame",
+	"@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
 	"properties": {
 		"id": "tf2",
 		"frameType": "speech",
@@ -60,13 +60,13 @@ In the metadata it spells out that the offsets of all tokens are taken to be off
 {
   "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
   "contains": {
-    "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument": {},
+    "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
     "http://vocab.lappsgrid.org/Token": {
       "document": "td1" },
-    "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame": {
+    "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER": {
       "timeUnit": "milliseconds",
       "document": "m1" },
-    "http://mmif.clams.ai/$VERSION/vocabulary/Alignment": {}
+    "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER": {}
   }
 }
 ```
@@ -75,7 +75,7 @@ Note that a text document can refer to its text by either using the *text* prope
 
 ```json
 {
-	"@type": "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument",
+	"@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
 	"properties": {
 		"id": "td1",
 		"mime": "text/plain",
@@ -91,7 +91,7 @@ This text is aligned with the second time frame from the segmenter.
 
 ```json
 {
-	"@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
+	"@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
 	"properties": {
 		"id": "a1",
 		"source": "v3:tf2",
@@ -117,7 +117,7 @@ Let's assume that EAST runs on frames sampled from the video at 1 second interva
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox",
+  "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
   "properties": {
     "id": "bb9",
     "timePoint": 4000,
@@ -139,10 +139,10 @@ Thus, the metadata of the new view would be:
 {
   "app": "http://mmif.clams.ai/apps/tesseract/0.4.4",
   "contains": {
-    "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument": {},
-    "http://mmif.clams.ai/$VERSION/vocabulary/Alignment": {
-      "sourceType": "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument", 
-      "targetType": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox"
+    "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
+    "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER": {
+      "sourceType": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER", 
+      "targetType": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER"
     }
   }
 }
@@ -155,7 +155,7 @@ Now the recognition results are recorded as text documents, here's one:
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument",
+  "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
   "properties": {
     "id": "td1",
     "text": { "@value": "DATE" } }
@@ -166,7 +166,7 @@ And here is the corresponding alignment from the bounding box to the text docume
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
+  "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
   "properties": {
     "id": "a1",
     "source": "v5:bb1",

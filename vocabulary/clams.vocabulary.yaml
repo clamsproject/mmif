@@ -1,3 +1,8 @@
+# Changes in this file will automatically increase versions of changed object.
+# The versions of types included in a particular MMIF (more specifically CLAMS vocab)
+# is recorded under `docs/x.y.z/vocabulary/ATTYPE_VERSIONS_JSONFILENAME`
+# Note that individuated type versioning is introduced after 0.4.2, 
+# so `docs/x.y.z` sub-directories of <= 0.4.2 won't have that JSON files.
 
 name: Thing
 parent: null
