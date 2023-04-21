@@ -12,7 +12,8 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/annotation"
-      }
+      },
+      "minLength": 1
     },
     "views": {
       "type": "array",
@@ -40,7 +41,8 @@
       "properties": {
         "mmif": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "minLength": 7
         }
       },
       "required": [
@@ -56,7 +58,8 @@
         },
         "app": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "minLength": 7
         },
         "contains": {
           "type": "object",
@@ -71,7 +74,8 @@
           "type": "object", 
           "properties": {
             "message": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "stackTrace": {
               "type": "string"
@@ -83,7 +87,8 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "minLength": 1
         },
         "parameters": {
           "$ref": "#/definitions/strStrMap"
@@ -129,7 +134,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "metadata": {
           "$ref": "#/definitions/viewMetadata"
@@ -152,7 +158,8 @@
       "type": "object",
       "properties": {
         "@type": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "properties": {
           "$ref": "#/definitions/annotationProperties"
@@ -168,7 +175,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
