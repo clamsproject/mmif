@@ -1,0 +1,17 @@
+name: "add to `apps` GH project when a new issue is submitted"
+
+on:
+  issues:
+    types:
+      - opened
+      - transferred
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  call-assign:
+    uses: clamsproject/.github/.github/workflows/repo-issue-project.yml@main
+    secrets: inherit
+    with:
+      projectnum: 10
