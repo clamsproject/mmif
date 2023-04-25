@@ -17,7 +17,7 @@ Some notes:
 - Each view has some metadata spelling out several kinds of things:
   - The application that created the view.
   - A timestamp of when the view was created.
-  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the *contains* field has a property "http://mmif.clams.ai/$VERSION/vocabulary/TimeFrame" with a dictionary as the value and that dictionary contains the metadata. Here the metadata specify what document the annotations are over what unit is used for annotation offsets.
+  - What kind of annotations are in the view and what metadata are there on those annotations (for example, in the view with id=v2, the *contains* field has a property "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER" with a dictionary as the value and that dictionary contains the metadata. Here the metadata specify what document the annotations are over what unit is used for annotation offsets.
 
 Only one annotation is shown for each view, this is to keep the file as small as possible. Of course, often the bars-and-tones and slate views often have only one annotation so it is likely only the tokens view where annotations were left out.
 

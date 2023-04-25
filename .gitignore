@@ -20,6 +20,7 @@ Icon # Icon must end with two \r
 Network Trash Folder
 Temporary Items
 .apdisk
+*.graffle*
 
 # windows
 Thumbs.db
@@ -83,6 +84,7 @@ mmif-python/VERSION*
 /vocabulary/rdf/clams.vocabulary
 # re-includes
 !vocabulary/rdf/bin/*.jar
+test*/*
 
 # sphinx/autodoc files
 /mmif-python/documentation/_build/

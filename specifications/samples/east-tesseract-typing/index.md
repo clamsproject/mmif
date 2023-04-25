@@ -22,7 +22,7 @@ To see the full example scroll down to the end or open the [raw json file](raw.j
 {
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/$VERSION/vocabulary/ImageDocument",
+      "@type": "http://mmif.clams.ai/vocabulary/ImageDocument/$ImageDocument_VER",
       "properties": {
         "id": "m1",
         "mime": "image/jpg",
@@ -55,14 +55,14 @@ And here is the annotations list:
 ```json
 [
   {
-    "@type": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox",
+    "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
     "properties": {
       "id": "bb1",
       "coordinates": [[10,20], [40,20], [10,30], [40,30]],
       "boxType": "text" }
   },
   {
-    "@type": "http://mmif.clams.ai/$VERSION/vocabulary/BoundingBox",
+    "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
     "properties": {
       "id": "bb2",
       "coordinates": [[210,220], [240,220], [210,230], [240,230]],
@@ -107,14 +107,14 @@ Annotations list:
       "target": "td1" }
   },
   { 
-    "@type": "http://mmif.clams.ai/$VERSION/vocabulary/TextDocument",
+    "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
     "properties": {
       "id": "td2",
       "text": {
         "@value": "yelp" } }
   },
   {
-    "@type": "http://mmif.clams.ai/$VERSION/vocabulary/Alignment",
+    "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
     "properties": {
       "id": "a2",
       "source": "v1:bb2",
@@ -133,7 +133,7 @@ Metadata:
 {
 	"app": "http://mmif.clams.ai/apps/semantic-typer/0.2.4",
 	"contains": {
-		"http://mmif.clams.ai/$VERSION/vocabulary/vocabulary/SemanticTag": {} },
+		"http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER": {} },
 }
 
 ```
@@ -145,7 +145,7 @@ Annotations list:
 ```json
 [
 	{ 
-		"@type": "http://mmif.clams.ai/$VERSION/vocabulary/SemanticTag",
+		"@type": "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER",
 		"properties": {
 			"id": "st1",
 			"category": "dog-sound",
@@ -154,7 +154,7 @@ Annotations list:
 			"end": 4 }
 	},
 	{ 
-		"@type": "http://mmif.clams.ai/$VERSION/vocabulary/SemanticTag",
+		"@type": "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER",
 		"properties": {
 			"id": "st2",
 			"category": "dog-sound",

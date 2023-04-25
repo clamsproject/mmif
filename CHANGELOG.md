@@ -6,6 +6,15 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 
 This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
+## Version 0.5.0 - 2023-04-21
+
+- Changed IRI format of CLAMS vocabulary items
+    * old format: `https://mmif.clams.ai/<VERSION>/vocabulary/<TYPE_NAME>`
+    * new format: `https://mmif.clams.ai/vocabulary/<TYPE_NAME>/<VERSION>`
+- CLAMS vocabulary items are now versioned independantly from the MMIF version. See comments time-stamped between Feb 2023 - Apr 2023 in these threads for discussion behind this big change: 
+    - https://github.com/clamsproject/mmif-python/issues/163#issuecomment-1424549083
+    - https://github.com/clamsproject/mmif/issues/14#issuecomment-1439055907
+- Some of *required* fields in MMIF must now have non-empty values (see #196). 
 
 ## Version 0.4.2 - 2023-02-09 
 
