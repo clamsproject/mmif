@@ -1,4 +1,4 @@
-name: "add to `apps` GH project when a new issue is submitted"
+name: "add to `infra` GH project when a new issue is submitted"
 
 on:
   issues:
