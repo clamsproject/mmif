@@ -57,7 +57,6 @@ def get_soup() -> BeautifulSoup:
 
 def tag(tagname: str, attrs: Optional[Dict] = None, text: Optional[str] = None, dtrs: Optional[List[Tag]] = None) -> Tag:
     """Return a soup Tag element."""
-    # TODO (krim @ 4/14/23): what does `dtrs` stand for? 
     attrs = {} if attrs is None else attrs
     dtrs = [] if dtrs is None else dtrs
     newtag = BeautifulSoup('', features='lxml').new_tag(tagname, attrs=attrs)
@@ -228,11 +227,12 @@ class IndexPage(Page):
     def _add_tree(self, clams_type, soup_node) -> None:
         type_name = clams_type['name']
         fname = '%s' % type_name
-        link = HREF(fname, type_name)
+        if 'version' in clams_type:
+            fname += f' ({clams_type["version"]})'
+        # TODO (krim @ 3/14/23): this relies on assumption of the URL format, should be a better, future-proof way. 
+        link = HREF(f'../../../vocabulary/{clams_type["name"]}/{clams_type["version"]}', fname)
         name_cell = tag('td', {'class': 'tc', 'colspan': 4})
         name_cell.append(link)
-        if 'version' in clams_type:
-            name_cell.append(SPAN(text=f"({clams_type['version']})"))
         if 'metadata' in clams_type:
             properties = ', '.join(clams_type['metadata'].keys())
             name_cell.append(SPAN(text=": [" + properties + ']'))
@@ -533,11 +533,14 @@ def build_vocab(src, index_dir, mmif_version, item_dir) -> Tree:
     # the main `x.y.z/vocabulary/index.html` page with the vocab tree
     IndexPage(tree, index_dir, mmif_version).write()
     # then, redirection HTML files for each vocab types to its own versioned html page
-    for clams_type in tree.types:
+    # (then, we decided not to do the redirection because it also adds confusions by 
+    # reifying URLs for non-existing IRIs e.g. https://mmif.clams.ai/0.5.0/vocabulary/TimeFrame)
+    
+    # for clams_type in tree.types:
+    for clams_type in []:
         redirect_dir = pjoin(index_dir, clams_type["name"])
         os.makedirs(redirect_dir, exist_ok=True)
         with open(pjoin(redirect_dir, 'index.html'), 'w') as redirect_page:
-            # TODO (krim @ 3/14/23): this relies on assumption of the URL format, should be a better, future-proof way. 
             redirect_page.write(
                 f'<head> <meta http-equiv="Refresh" content="0; URL=../../../vocabulary/{clams_type["name"]}/{clams_type["version"]}" /> </head>'
             )
