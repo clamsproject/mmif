@@ -302,11 +302,16 @@ class TypePage(Page):
         return chain
 
     def _add_home_button(self, included_in: List[str]) -> None:
+        included_vers = []
+        for mmif_ver in included_in:
+            if included_vers:
+                included_vers.append(', ')
+            included_vers.append(HREF('/'.join(['..', '..', '..', mmif_ver, 'vocabulary']), mmif_ver))
         self.main_content.append(
             DIV({'id': 'sectionbar'}, dtrs=[tag(
                 'p',
                 text="included in: ",
-                dtrs=[HREF('/'.join([BASEURL, mmif_ver, 'vocabulary']), mmif_ver) for mmif_ver in included_in]
+                dtrs=included_vers
             )]))
 
     def _add_head(self, cur_vocab_ver) -> None:
