@@ -88,4 +88,4 @@ test*/*
 
 # sphinx/autodoc files
 /mmif-python/documentation/_build/
-
+docs/.sass-cache

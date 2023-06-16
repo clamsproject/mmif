@@ -1,0 +1,57 @@
+# main links
+#main:
+#  - title: "CLAMS App user manual"
+#    url: /whisper-wrapper/clamsapp/
+#  - title: "Our Github Page"
+#    url: https://github.com/clamsproject
+#  - title: "documentation"
+#    url: /documentation/
+  # - title: "Sample Posts"
+  #   url: /year-archive/
+  # - title: "Sample Collections"
+  #   url: /collection-archive/
+  # - title: "Sitemap"
+  #   url: /sitemap/
+
+
+#home-sidebar:
+#  - title: "home sidebar"
+#    children:
+#      - title: "wow"
+#        url: /sidebar/
+#      - title: "another one"
+#  - title: "home sidebar 2"
+#    children:
+#      - title: "wow 2"
+#        url: /sidebar/
+#      - title: "another one 2"
+#
+#page-sidebar:
+#  - title: "page sidebar"
+#    children:
+#      - title: "wow"
+#        url: /sidebar/
+#      - title: "another one"
+#  - title: "page sidebar 2"
+#    children:
+#      - title: "wow 2"
+#        url: /sidebar/
+#      - title: "another one 2"
+#
+
+specification:
+  - title: "MMIF Specification"
+    url: /specification/
+
+pre_version:
+  - title: "Home page"
+    url: //
+  - title: "Versions"
+    children:
+      - title: "0.5.0"
+        url: /version-0.5.0/
+      - title: "0.4.2"
+        url: /version-0.4.2/
+      - title: "0.4.1"
+        url: /version-0.4.1/
+

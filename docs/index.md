@@ -1,7 +1,8 @@
 ---
-layout: page
+layout: home
 title: MMIF
-subtitle: Multi-Media Interchange Format
+sidebar:
+  nav: "specification"
 ---
 
 MMIF is a data format, developed as a part of CLAMS project, to convey computational analysis results between CLAMS apps. 
