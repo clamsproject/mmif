@@ -3,6 +3,7 @@ layout: home
 title: MMIF
 sidebar:
   nav: "specification"
+permalink: /
 ---
 
 MMIF is a data format, developed as a part of CLAMS project, to convey computational analysis results between CLAMS apps. 
