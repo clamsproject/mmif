@@ -1,5 +1,5 @@
 # theme                  : "minimal-mistakes-jekyll"
-remote_theme           : "clamsproject/website-theme-alt"
+remote_theme           : "clamsproject/website-theme-alt@test-navigation"
 minimal_mistakes_skin    : "air" # "", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 # avatar: "/assets/img/clams-logo.png"
 
@@ -224,6 +224,8 @@ plugins:
   - jekyll-feed
   - jekyll-include-cache
   - jekyll-toc
+  - jekyll-data
+  - jekyll-remote-theme
 
 # mimic GitHub Pages with --safe
 whitelist:
