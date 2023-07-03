@@ -1,5 +1,6 @@
 ---
-layout: page
+layout: single
+classes: wide
 title: MMIF Specification
 subtitle: Version 1.0.0
 ---

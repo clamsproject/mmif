@@ -285,7 +285,7 @@ We have seen that an initial set of media is added to the MMIF `documents` list 
 
 Let's use an example of an image of a barking dog where a region of the image has been recognized by the EAST application as an image box containing text (image taken from [http://clipart-library.com/dog-barking-clipart.html](http://clipart-library.com/dog-barking-clipart.html)): 
 
-<img alt="yelp" src="pi78oGjdT-annotated.jpg" style="border: 1px;" height="200"/>
+<img alt="yelp" src="/1.0.0/pi78oGjdT-annotated.jpg" style="border: 1px;" height="200"/>
 
 The result of this processing is a MMIF document with an image document and a view that contains a *BoundingBox* annotation where the bounding box has the `boxType` property set to "text":
 
@@ -545,10 +545,10 @@ To finish off this document we provide some examples of complete MMIF documents:
 
 | example                                                   | description                                                  |
 | --------------------------------------------------------- | ------------------------------------------------------------ |
-| [bars-tones-slates](samples/bars-tones-slates)         | A couple of time frames and some minimal text processing on a transcript. |
-| [east-tesseract-typing](samples/east-tesseract-typing) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
-| [segmenter-kaldi-ner](samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER. |
-| [everything](samples/everything)     | A big MMIF example with various multimodal AI apps for video/audio as well as text.  |
+| [bars-tones-slates](/1.0.0/samples/bars-tones-slates)         | A couple of time frames and some minimal text processing on a transcript. |
+| [east-tesseract-typing](/1.0.0/samples/east-tesseract-typing) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
+| [segmenter-kaldi-ner](/1.0.0/samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER. |
+| [everything](/1.0.0/samples/everything)     | A big MMIF example with various multimodal AI apps for video/audio as well as text.  |
 
 Each example has some comments and a link to a raw JSON file.
 

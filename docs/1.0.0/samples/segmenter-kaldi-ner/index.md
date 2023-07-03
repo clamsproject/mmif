@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: single
 title: MMIF Specification
 subtitle: Version 1.0.0
 ---
