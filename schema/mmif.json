@@ -32,7 +32,10 @@
       "type": "object",
       "patternProperties": {
         ".+": {
-          "type": "string"
+          "anyOf": [
+            {"type": "string"},
+            {"type": "array", "items": { "type": "string" }}
+          ]
         }
       }
     },
@@ -91,6 +94,9 @@
           "minLength": 1
         },
         "parameters": {
+          "$ref": "#/definitions/strStrMap"
+        },
+        "refinedParameters": {
           "$ref": "#/definitions/strStrMap"
         }
       },
