@@ -95,6 +95,9 @@
         },
         "parameters": {
           "$ref": "#/definitions/strStrMap"
+        },
+        "appConfiguredAs": {
+          "type": "object"
         }
       },
       "oneOf": [
