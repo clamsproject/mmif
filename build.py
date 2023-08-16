@@ -351,7 +351,8 @@ class TypePage(Page):
             children.append(
                 get_identity_row(f'https://mmif.clams.ai/0.4.2/vocabulary/{self.clams_type["name"]}/'))
         if 'similarTo' in self.clams_type:
-            children.append(TABLE_ROW([tag('td', text='Similar to'), tag('td', dtrs=[HREF(self.clams_type['similarTo'], self.clams_type['similarTo'])])]))
+            for s in self.clams_type['similarTo']:
+                children.append(TABLE_ROW([tag('td', text='Similar to'), tag('td', dtrs=[HREF(s, s)])]))
         table = TABLE(dtrs=children)
         self.main_content.append(table)
 
