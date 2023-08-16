@@ -322,8 +322,6 @@ class TypePage(Page):
             dtrs.append(HREF('/'.join(['..'] * len(uri_suffix) + uri_suffix), n['name']))
             dtrs.append(SPAN('>'))
         dtrs.append(SPAN(self.clams_type['name']))
-        latest = tag('p', text=f'from {cur_vocab_ver} (last updated)')
-        dtrs.append(latest)
         p = tag('p', {'class': 'head'}, dtrs=dtrs)
         self.main_content.append(p)
         self._add_space()
@@ -398,8 +396,8 @@ class TypePage(Page):
     def _add_header(self) -> None:
         header = DIV({'id': 'pageHeader'},
                      dtrs=[
-                         H1(f'{VOCAB_TITLE}'), 
-                         H2(f'{self.clams_type["name"]} ({self.clams_type["version"]})'),
+                         H1(f'{self.clams_type["name"]} ({self.clams_type["version"]})'),
+                         H2(f'{VOCAB_TITLE}'), 
                          ])
         self.intro.append(header)
 
