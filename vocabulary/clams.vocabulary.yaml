@@ -117,7 +117,8 @@ properties:
 name: Span
 parent: Interval
 
-similarTo: http://vocab.lappsgrid.org/Region
+similarTo: 
+  - http://vocab.lappsgrid.org/Region
 
 description: >-
   An annotation over a region in primary text data. A Span may be defined by
