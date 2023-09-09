@@ -1,7 +1,10 @@
 ---
-layout: page
-title: MMIF Specification
-subtitle: Version 0.5.0
+layout: single
+title: MMIF Specification (Version-0.5.0)
+permalink: /version-0.5.0/
+sidebar:
+  nav: "pre_version"
+toc: true
 ---
 
 MMIF is an annotation format for audiovisual media and associated text like transcripts and closed captions. It is a JSON-LD format used to transport data between CLAMS apps and is inspired by and partially based on LIF, the [LAPPS Interchange Format](https://wiki.lappsgrid.org/interchange/). MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
