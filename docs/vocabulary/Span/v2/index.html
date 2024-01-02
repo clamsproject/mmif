@@ -2,7 +2,7 @@
   <head>
     <link href="../../css/lappsstyle.css" rel="stylesheet" type="text/css"/>
     <title>
-      Region
+      Span
     </title>
   </head>
   <body>
@@ -10,7 +10,7 @@
       <div id="intro">
         <div id="pageHeader">
           <h1>
-            Region (v1)
+            Span (v2)
           </h1>
           <h2>
             CLAMS Vocabulary
@@ -21,14 +21,6 @@
         <div id="sectionbar">
           <p>
             included in:
-            <a href="../../../0.5.0/vocabulary">
-              0.5.0
-            </a>
-            ,
-            <a href="../../../1.0.0/vocabulary">
-              1.0.0
-            </a>
-            ,
             <a href="../../../1.1.0/vocabulary">
               1.1.0
             </a>
@@ -47,8 +39,20 @@
           <span>
             >
           </span>
-          <span>
+          <a href="../../Region/v1">
             Region
+          </a>
+          <span>
+            >
+          </span>
+          <a href="../../Interval/v1">
+            Interval
+          </a>
+          <span>
+            >
+          </span>
+          <span>
+            Span
           </span>
         </p>
         <br/>
@@ -60,7 +64,7 @@
               </b>
             </td>
             <td>
-              An annotation over a region in primary data where primary data can be a text, an image, an audio stream or a video streem. Typically one of the sub types of this will be used.
+              An annotation over a region in primary text data. A Span may be defined by pointing directly into primary data (by using start and end offsets) or by linking to one or more other Annotations with the targets property.
             </td>
           </tr>
           <tr>
@@ -70,38 +74,18 @@
               </b>
             </td>
             <td>
-              <a href="http://mmif.clams.ai/vocabulary/Region/v1">
-                http://mmif.clams.ai/vocabulary/Region/v1
+              <a href="http://mmif.clams.ai/vocabulary/Span/v2">
+                http://mmif.clams.ai/vocabulary/Span/v2
               </a>
             </td>
           </tr>
           <tr>
             <td>
-              Also known as
+              Similar to
             </td>
             <td>
-              <a href="https://mmif.clams.ai/0.4.0/vocabulary/Region/">
-                https://mmif.clams.ai/0.4.0/vocabulary/Region/
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Also known as
-            </td>
-            <td>
-              <a href="https://mmif.clams.ai/0.4.1/vocabulary/Region/">
-                https://mmif.clams.ai/0.4.1/vocabulary/Region/
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Also known as
-            </td>
-            <td>
-              <a href="https://mmif.clams.ai/0.4.2/vocabulary/Region/">
-                https://mmif.clams.ai/0.4.2/vocabulary/Region/
+              <a href="http://vocab.lappsgrid.org/Region">
+                http://vocab.lappsgrid.org/Region
               </a>
             </td>
           </tr>
@@ -109,6 +93,9 @@
         <h1>
           Metadata
         </h1>
+        <h2>
+          Metadata from Region
+        </h2>
         <table class="definition-table">
           <tr>
             <th class="fixed">
@@ -163,6 +150,55 @@
         <h1>
           Properties
         </h1>
+        <h2>
+          Properties from Interval
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              start
+            </td>
+            <td>
+              Integer
+            </td>
+            <td>
+              The starting offset in the primary data. This point is inclusive.  For time intervals, the unit is determined by the *timeUnit* metadata key. For text intervals, the unit is Unicode code point.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              end
+            </td>
+            <td>
+              Integer
+            </td>
+            <td>
+              The ending offset in the primary data. This point is exclusive.  For time intervals, the unit is determined by the *timeUnit* metadata key. For text intervals, the unit is Unicode code point.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              targets
+            </td>
+            <td>
+              List of IDs
+            </td>
+            <td>
+              IDs of a sequence of annotations covering the region of primary data referred to by this annotation. Used as an alternative to *start* and *end* to point to component annotations (for example a token sequence) rather than directly into primary data, or to link two or more annotations (for example in a coreference annotation).
+            </td>
+          </tr>
+        </table>
         <h2>
           Properties from Annotation
         </h2>
