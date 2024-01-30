@@ -117,7 +117,8 @@ properties:
 name: Span
 parent: Interval
 
-similarTo: http://vocab.lappsgrid.org/Region
+similarTo: 
+  - http://vocab.lappsgrid.org/Region
 
 description: >-
   An annotation over a region in primary text data. A Span may be defined by
@@ -134,10 +135,13 @@ description: >-
   segment used in audio processing, but that term has a different meaning in the
   image and video community.
 
+
 properties:
   frameType:
     type: String
-    description: The type of TimeFrame. Could be bars-and-tones, speech, noise, music, other.
+    description: The type of TimeFrame. Possible values include, but are not 
+      limited to, bars, tonses, bars-and-tones, speech, noise, music, slate, 
+      chyron, lower-third, credits, and other. 
 
 ---
 

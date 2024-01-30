@@ -1,16 +1,16 @@
 ---
 layout: page
 title: MMIF Specification
-subtitle: Version $VERSION
+subtitle: Version 1.1.0
 ---
 
 MMIF is an annotation format for audiovisual media and associated text like transcripts and closed captions. It is a JSON-LD format used to transport data between CLAMS apps and is inspired by and partially based on LIF, the [LAPPS Interchange Format](https://wiki.lappsgrid.org/interchange/). MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
 
 MMIF consists of two formal components in addition to this more informal specification:
 1. The JSON schema:
-  - [https://mmif.clams.ai/$VERSION/schema/mmif.json](schema/mmif.json)
+  - [https://mmif.clams.ai/1.1.0/schema/mmif.json](schema/mmif.json)
 1. The Vocabularies (the type hierarchies):
-  - [https://mmif.clams.ai/$VERSION/vocabulary](vocabulary)
+  - [https://mmif.clams.ai/1.1.0/vocabulary](vocabulary)
   - [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org)
 
 The JSON schema for MMIF defines the syntactic elements of MMIF which will be explained at length in ["structure" section](#the-structure-of-mmif-files). These specifications often refer to elements from the CLAMS and LAPPS Vocabularies which define concepts and their ontological relations, see ["vocabulary" section](#mmif-and-the-vocabularies) for notes on those vocabularies.
@@ -44,7 +44,7 @@ The top-level structure of a MMIF file is as follows:
 ```json
 {
   "metadata": {
-    "mmif": "http://mmif.clams.ai/$VERSION" },
+    "mmif": "http://mmif.clams.ai/1.1.0" },
   "documents": [ ],
   "views": [ ]
 }
@@ -64,14 +64,14 @@ Here is an example document list with a video and its transcript:
 {
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/vocabulary/VideoDocument/$VideoDocument_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/VideoDocument/v1",
       "properties": {
         "id": "m1",
         "mime": "video/mpeg",
         "location": "file:///var/archive/video-0012.mp4" }
     },
     {
-      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
       "properties": {
         "id": "m2",
         "mime": "text/plain",
@@ -89,14 +89,14 @@ The description also lists the properties that can be used for a type, and above
 {
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/vocabulary/VideoDocument/$VideoDocument_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/VideoDocument/v1",
       "properties": {
         "id": "m1",
         "mime": "video/mpeg",
         "location": "file:///var/archive/video-0012.mp4" }
     },
     {
-      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
       "properties": {
         "id": "m1",
         "text": {
@@ -150,7 +150,7 @@ This property contains information about the annotations in a view. Here is an e
   "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
   "timestamp": "2020-05-27T12:23:45",
   "contains": {
-    "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER": {
+    "http://mmif.clams.ai/vocabulary/TimeFrame/v2": {
       "timeUnit": "seconds",
       "document": "m1" 
     }
@@ -229,7 +229,7 @@ The value of the `annotations` property on a view is a list of annotation object
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
+  "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v2",
   "properties": {
     "id": "f1",
     "start": 0,
@@ -257,18 +257,18 @@ Here is another example of a view containing two bounding boxes created by the E
     "app": "http://apps.clams.io/east/1.0.4",
     "timestamp": "2020-05-27T12:23:45",
     "contains": {
-      "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER": {
+      "http://mmif.clams.ai/vocabulary/BoundingBox/v1": {
         "document": "image3"
       } 
     }
   },
   "annotations": [
-    { "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
+    { "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/v1",
       "properties": {
         "id": "bb0",
         "coordinates": [[10,20], [60,20], [10,50], [60,50]] }
     },
-    { "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
+    { "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/v1",
       "properties": {
         "id": "bb1",
         "coordinates": [[90,40], [110,40], [90,80], [110,80]] }
@@ -296,7 +296,7 @@ The result of this processing is a MMIF document with an image document and a vi
 {
   "documents": [
     {
-      "@type": "http://mmif.clams.ai/vocabulary/ImageDocument/$ImageDocument_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/ImageDocument/v1",
       "properties": {
         "id": "m1",
         "mime": "image/jpeg",
@@ -309,12 +309,12 @@ The result of this processing is a MMIF document with an image document and a vi
       "metadata": {
         "app": "http://mmif.clams.ai/apps/east/0.2.2",
         "contains": {
-          "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER": {
+          "http://mmif.clams.ai/vocabulary/BoundingBox/v1": {
             "document": "m1" } }
       },
       "annotations": [
         { 
-          "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
+          "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/v1",
           "properties": {
             "id": "bb1",
             "coordinates": [[10,20], [40,20], [10,30], [40,30]],
@@ -334,19 +334,19 @@ Tesseract will then add a view to this MMIF document that contains a text docume
   "metadata": {
     "app": "http://mmif.clams.ai/apps/tesseract/0.2.2",
     "contains": {
-      "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER" : {},
-      "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER": {} }
+      "http://mmif.clams.ai/vocabulary/TextDocument/v1" : {},
+      "http://mmif.clams.ai/vocabulary/Alignment/v1": {} }
   },
   "annotations": [
     { 
-      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
       "properties": {
         "id": "td1",
         "text": {
           "@value": "yelp" } }
     },
     {
-      "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
       "properties": {
         "source": "v1:bb1",
         "target": "td1" }
@@ -402,34 +402,34 @@ The image with the dog in the previous section just had a bounding box for the p
 {
   "id": "v2",
   "metadata": {
-    "app": "http://mmif.clams.ai/apps/tesseract/$VERSION",
+    "app": "http://mmif.clams.ai/apps/tesseract/1.1.0",
     "contains": {
-      "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
-      "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER": {} }
+      "http://mmif.clams.ai/vocabulary/TextDocument/v1": {},
+      "http://mmif.clams.ai/vocabulary/Alignment/v1": {} }
   },
   "annotations": [
     { 
-      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
       "properties": {
         "id": "td1",
         "text": {
           "@value": "yelp" } }
     },
     {
-      "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
       "properties": {
         "source": "v1:bb1",
         "target": "td1" }
     },
     { 
-      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
       "properties": {
         "id": "td2",
         "text": {
           "@value": "woof" } }
     },
     {
-      "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
       "properties": {
         "source": "v1:bb2",
         "target": "td2" }
@@ -448,11 +448,11 @@ Now if you run the semantic tagger you would get tags with the category set to "
   "metadata": {
     "app": "http://mmif.clams.ai/apps/semantic-typer/0.2.4",
     "contains": {
-      "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER": {} }
+      "http://mmif.clams.ai/vocabulary/SemanticTag/v1": {} }
   },
   "annotations": [
     { 
-      "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/v1",
       "properties": {
         "id": "st1",
         "category": "dog-sound",
@@ -461,7 +461,7 @@ Now if you run the semantic tagger you would get tags with the category set to "
         "end": 4 }
     },
     { 
-      "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER",
+      "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/v1",
       "properties": {
         "id": "st2",
         "category": "dog-sound",
@@ -486,7 +486,7 @@ The structure of MMIF files is defined in the [schema](schema/mmif.json)  and de
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
+  "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/v1",
   "properties": {
     "id": "bb1",
     "coordinates": [[0,0], [10,0], [0,10], [10,10]]
@@ -494,7 +494,7 @@ The structure of MMIF files is defined in the [schema](schema/mmif.json)  and de
 }
 ```
 
-The value of `@type` refers to the URL [http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER](vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that `id` is a required property inherited from *Annotation* and that `coordinates` is a required property of *BoundingBox*. Both are expressed in the `properties` dictionary above. The page also says that there is an optional property `timePoint`, but it is not used above.
+The value of `@type` refers to the URL [http://mmif.clams.ai/vocabulary/BoundingBox/v1](vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that `id` is a required property inherited from *Annotation* and that `coordinates` is a required property of *BoundingBox*. Both are expressed in the `properties` dictionary above. The page also says that there is an optional property `timePoint`, but it is not used above.
 
 You might also have noticed by now that these URL-formatted values to this key end with some version number (e.g. `/v1`), which is different from the version of this document. That is because each individual annotation type (and document type in `documents` list) has its own version independent of the MMIF version. The independent versioning of annotation types enables type checking mechanism in CLAMS pipelines. See [versioning notes](../versioning) for more details.
 
@@ -514,7 +514,7 @@ As aforementioned, the *Annotation* type and its children can put the source doc
     "app": "http://apps.clams.ai/some_time_segmentation_app/1.0.3",
     "timestamp": "2020-05-27T12:23:45",
     "contains": {
-        "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER": {
+        "http://mmif.clams.ai/vocabulary/TimeFrame/v2": {
           "document": "m12",
           "timeUnit": "milliseconds" } }
   }
