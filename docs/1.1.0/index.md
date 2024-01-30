@@ -155,7 +155,8 @@ This property contains information about the annotations in a view. Here is an e
       "document": "m1" 
     }
   },
-  "parameters": {}
+  "parameters": {"threshold": "0.5", "not-defined-parameter":  "some-value"},
+  "refinedParameters": {"threshold": 0.5}
 }
 ```
 
@@ -163,9 +164,9 @@ The `timestamp` key stores when the view was created by the application. This is
 
 The `app` key contains an identifier that specifies what application created the view. The identifier must be a URL form, and HTTP webpage pointed by the URL should contain all app metadata information relevant for the application: description, configuration, input/output specifications and a more complete description of what output is created. The app identifier always includes a version number for the app. The metadata should also contain a link to the public code repository for the app (and that repository will actually maintain all the information in the URL).
 
-The `parameters` is a dictionary of parameters and their values in *string*, if any, that were raw data handed to the app at the runtime when it was called. Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings. Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.
+The `parameters` is a dictionary of runtime parameters and their *string* values, if any. The primary purpose of this dictionary is to record the parameters "as-is" for reproducibility and accountability. Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings. Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.
 
-The `refinedParameters` is a dictionary of parameters and their values, after some automatic refinement of the runtime parameters. Automatic refinement can include:
+The `refinedParameters` is an dictionary of parameters and their values, after some automatic refinement of the runtime parameters. Automatic refinement can include:
 
 1. Converting data types according to the parameter specification.
 2. Adding default values for parameters that were not specified.

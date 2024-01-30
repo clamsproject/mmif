@@ -97,7 +97,7 @@
           "$ref": "#/definitions/strStrMap"
         },
         "refinedParameters": {
-          "$ref": "#/definitions/strStrMap"
+          "type": "object"
         }
       },
       "oneOf": [
