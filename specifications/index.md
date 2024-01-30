@@ -155,7 +155,8 @@ This property contains information about the annotations in a view. Here is an e
       "document": "m1" 
     }
   },
-  "parameters": {}
+  "parameters": {"threshold": "0.5", "not-defined-parameter":  "some-value"},
+  "refinedParameters": {"threshold": 0.5}
 }
 ```
 
@@ -163,29 +164,29 @@ The `timestamp` key stores when the view was created by the application. This is
 
 The `app` key contains an identifier that specifies what application created the view. The identifier must be a URL form, and HTTP webpage pointed by the URL should contain all app metadata information relevant for the application: description, configuration, input/output specifications and a more complete description of what output is created. The app identifier always includes a version number for the app. The metadata should also contain a link to the public code repository for the app (and that repository will actually maintain all the information in the URL).
 
-The `parameters` is a dictionary of parameters and their values in *string*, if any, that were raw data handed to the app at the runtime when it was called. Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings. Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.
+The `parameters` is a JSON object of runtime parameters and their *string* values, if any. The primary purpose of this object is to record the parameters "as-is" for reproducibility and accountability. Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings. Hence, the values in the `parameters` object are always strings or simple lists of strings.
 
-The `refinedParameters` is a dictionary of parameters and their values, after some automatic refinement of the runtime parameters. Automatic refinement can include:
+The `refinedParameters` is an object of parameters and their values, after some automatic refinement of the runtime parameters. Automatic refinement can include:
 
 1. Converting data types according to the parameter specification.
 2. Adding default values for parameters that were not specified.
 3. Removing undefined parameters.
 4. and possibly more. 
 
-The `contains` dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations, and it gives two metadata values for that annotation type:
+The `contains` object has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations, and it gives two metadata values for that annotation type:
 
 1. The `document` key gives the identifier of the document that the annotations of that type in this view are over. As we will see later, annotations anchor into documents using keys like `start` and `end` and this property specifies what document that is.
 2. The `timeUnit` key is set to "seconds" and this means that for each annotation the unit for the values in `start` and `end` are seconds. 
 
-Every annotation type defined in the CLAMS vocabulary has two feature structures - `metadata` and `properties`. See [this definition of *TimeFrame*](vocabulary/TimeFrame/) type in the vocabulary for an example. As we see here, `contains` dictionary in a view's metadata is used to assign values to metadata keys. We'll see in the following section that individual annotation objects are used to assign values to `properties` keys. 
+Every annotation type defined in the CLAMS vocabulary has two feature structures - `metadata` and `properties`. See [this definition of *TimeFrame*](vocabulary/TimeFrame/) type in the vocabulary for an example. As we see here, `contains` object in a view's metadata is used to assign values to metadata keys. We'll see in the following section that individual annotation objects are used to assign values to `properties` keys. 
 {: .box-note}
 
-Note that when a property is set to some value in the `contains` in the view metadata then all annotations of that type should adhere to that value, in this case the `document` and `timeUnit` are set to *"m1"* and *"seconds"* respectively. In other words, the `contains` dictionary not only functions as an overview of the annotation types in this view, but also as a place for common metadata shared among annotations of a type. This is useful especially for `document` property, as in a single view, an app is likely to process only a limited number of source documents and resulting annotation objects will be anchored on those documents. It is technically possible for *TimeFrame* type to add `document` properties to individual annotation objects and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later. 
+Note that when a property is set to some value in the `contains` in the view metadata then all annotations of that type should adhere to that value, in this case the `document` and `timeUnit` are set to *"m1"* and *"seconds"* respectively. In other words, the `contains` object not only functions as an overview of the annotation types in this view, but also as a place for common metadata shared among annotations of a type. This is useful especially for `document` property, as in a single view, an app is likely to process only a limited number of source documents and resulting annotation objects will be anchored on those documents. It is technically possible for *TimeFrame* type to add `document` properties to individual annotation objects and overrule the metadata property, but this is not to be done without really good reasons. We get back to this later. 
 
 For annotation types that are used to measure time (such as *TimePoint*, *TimeFrame*, or *VideoObject*), the unit of the measurement (`timeUnit`) must be specified in the `contains`. However, for objects that measure image regions (such as [*BoundingBox*](vocabulary/BoundingBox).`coordinates`), the *unit* is always assumed to be *pixels*. That is, a coordinate is numbers of pixels from a point in an image to the origin along all axes, where the origin (*(0,0)*) is always the top-left point of the image. Similarly, for objects that measure text spans (such as [*Span*](vocabulary/Span).start/end), the *unit* of counting characters must always be code points. As mentioned above, MMIF must be serialized to a UTF-8 Unicode file. 
 {: .box-note}
 
-Next section has more details on the interaction between the vocabulary and the metadata for the annotation types in the `contains` dictionary.
+Next section has more details on the interaction between the vocabulary and the metadata for the annotation types in the `contains` object.
 
 When an app fails to process the input for any reason and produces an error, it can record the error in the `error` field, instead of in `contains`. When this happens, the annotation list of the view must remain empty. Here is an example of a view with an error.
 
@@ -238,14 +239,14 @@ The value of the `annotations` property on a view is a list of annotation object
 }
 ```
 
-The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [CLAMS vocabulary ](vocabulary) or [LAPPS vocabulary](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature `frameType` as well as the inherited features `id`, `start` and `end`. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers. 
+The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` object typically contains the features defined for the annotation category as defined in the vocabularies at [CLAMS vocabulary ](vocabulary) or [LAPPS vocabulary](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature `frameType` as well as the inherited features `id`, `start` and `end`. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers. 
 
 The `id` key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s1”), or the identifier with a view identifier prefix (for example “v1:s1”). If there is no prefix, the current view is assumed.
 
 We will discuss more details on annotation type vocabularies in the ["vocabulary" section](#mmif-and-the-vocabularies). 
 {: .box-note}
 
-The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside other annotations. For example, LAPPS *Constituent* annotations will not contain other *Constituent* annotations. However, in the `properties` dictionary annotations can refer to other annotations using the identifiers of the other annotations.
+The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside other annotations. For example, LAPPS *Constituent* annotations will not contain other *Constituent* annotations. However, in the `properties` object annotations can refer to other annotations using the identifiers of the other annotations.
 
 Here is another example of a view containing two bounding boxes created by the EAST text recognition app:
 
@@ -493,7 +494,7 @@ The structure of MMIF files is defined in the [schema](schema/mmif.json)  and de
 }
 ```
 
-The value of `@type` refers to the URL [http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER](vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that `id` is a required property inherited from *Annotation* and that `coordinates` is a required property of *BoundingBox*. Both are expressed in the `properties` dictionary above. The page also says that there is an optional property `timePoint`, but it is not used above.
+The value of `@type` refers to the URL [http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER](vocabulary/BoundingBox) which is a page in the published vocabulary. That page will spell out the definition of *BoundingBox* as well as list all properties defined for it, whether inherited or not. On the page we can see that `id` is a required property inherited from *Annotation* and that `coordinates` is a required property of *BoundingBox*. Both are expressed in the `properties` object above. The page also says that there is an optional property `timePoint`, but it is not used above.
 
 You might also have noticed by now that these URL-formatted values to this key end with some version number (e.g. `/v1`), which is different from the version of this document. That is because each individual annotation type (and document type in `documents` list) has its own version independent of the MMIF version. The independent versioning of annotation types enables type checking mechanism in CLAMS pipelines. See [versioning notes](../versioning) for more details.
 
@@ -502,9 +503,9 @@ As displayed in the vocabulary, annotation types are hierarchically structured w
 The [http://mmif.clams.ai/vocabulary/Thing](vocabulary/Thing) type is designed only as a placeholder and is not intended to be used to represent actual annotations. 
 {: .box-note}
 
-The vocabulary also defines `metadata` properties. For example, the optional property `timeUnit` can be used for a *TimeFrame* to specify what unit is used for the start and end time points in instances of *TimeFrame*. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the `contains` dictionary:
+The vocabulary also defines `metadata` properties. For example, the optional property `timeUnit` can be used for a *TimeFrame* to specify what unit is used for the start and end time points in instances of *TimeFrame*. This property is not expressed in the annotation but in the metadata of the view with the annotation type in the `contains` object:
 
-As aforementioned, the *Annotation* type and its children can put the source document identifier in the `contains` dictionary, using `document` metadata property. Namely, there are two ways to express the source document of annotations: at individual object level or at the view level. Unless there is a good reason to specify document information for each and every annotation objects, using the view-level representation is recommended to save space when the MMIF is serialized to a JSON file. 
+As aforementioned, the *Annotation* type and its children can put the source document identifier in the `contains` object, using `document` metadata property. Namely, there are two ways to express the source document of annotations: at individual object level or at the view level. Unless there is a good reason to specify document information for each and every annotation objects, using the view-level representation is recommended to save space when the MMIF is serialized to a JSON file. 
 {: .box-warning}
 
 ```json
@@ -534,7 +535,7 @@ Using a LAPPS type is actually an instance of the more general notion that the v
 }
 ```
 
-This assumes that [https://schema.org/Clip](https://schema.org/Clip) defines all the features used in the `properties` dictionary. One little disconnect here is that in MMIF we insist on each annotation having an identifier in the `id` property and as it happens [https://schema.org](https://schema.org) does not define an `id` attribute, although it does define `identifier`. 
+This assumes that [https://schema.org/Clip](https://schema.org/Clip) defines all the features used in the `properties` object. One little disconnect here is that in MMIF we insist on each annotation having an identifier in the `id` property and as it happens [https://schema.org](https://schema.org) does not define an `id` attribute, although it does define `identifier`. 
 
 The CLAMS Platform does not require that a URL like [https://schema.org/Clip](https://schema.org/Clip) actually exists, but if it doesn't users of an application that creates the *Clip* type will not know exactly what the application creates.
 
