@@ -95,9 +95,6 @@
         },
         "parameters": {
           "$ref": "#/definitions/strStrMap"
-        },
-        "refinedParameters": {
-          "$ref": "#/definitions/strStrMap"
         }
       },
       "oneOf": [
