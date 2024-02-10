@@ -2,7 +2,7 @@
   <head>
     <link href="../../css/lappsstyle.css" rel="stylesheet" type="text/css"/>
     <title>
-      TimePoint
+      TimeFrame
     </title>
   </head>
   <body>
@@ -10,7 +10,7 @@
       <div id="intro">
         <div id="pageHeader">
           <h1>
-            TimePoint (v1)
+            TimeFrame (v2)
           </h1>
           <h2>
             CLAMS Vocabulary
@@ -21,14 +21,6 @@
         <div id="sectionbar">
           <p>
             included in:
-            <a href="../../../0.5.0/vocabulary">
-              0.5.0
-            </a>
-            ,
-            <a href="../../../1.0.0/vocabulary">
-              1.0.0
-            </a>
-            ,
             <a href="../../../1.0.1/vocabulary">
               1.0.1
             </a>
@@ -53,8 +45,14 @@
           <span>
             >
           </span>
+          <a href="../../Interval/v1">
+            Interval
+          </a>
           <span>
-            TimePoint
+            >
+          </span>
+          <span>
+            TimeFrame
           </span>
         </p>
         <br/>
@@ -66,7 +64,7 @@
               </b>
             </td>
             <td>
-              A time point in an audio or video stream.
+              A temporal interval in an audio or video stream. This is similar to the term segment used in audio processing, but that term has a different meaning in the image and video community.
             </td>
           </tr>
           <tr>
@@ -76,38 +74,8 @@
               </b>
             </td>
             <td>
-              <a href="http://mmif.clams.ai/vocabulary/TimePoint/v1">
-                http://mmif.clams.ai/vocabulary/TimePoint/v1
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Also known as
-            </td>
-            <td>
-              <a href="https://mmif.clams.ai/0.4.0/vocabulary/TimePoint/">
-                https://mmif.clams.ai/0.4.0/vocabulary/TimePoint/
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Also known as
-            </td>
-            <td>
-              <a href="https://mmif.clams.ai/0.4.1/vocabulary/TimePoint/">
-                https://mmif.clams.ai/0.4.1/vocabulary/TimePoint/
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Also known as
-            </td>
-            <td>
-              <a href="https://mmif.clams.ai/0.4.2/vocabulary/TimePoint/">
-                https://mmif.clams.ai/0.4.2/vocabulary/TimePoint/
+              <a href="http://mmif.clams.ai/vocabulary/TimeFrame/v2">
+                http://mmif.clams.ai/vocabulary/TimeFrame/v2
               </a>
             </td>
           </tr>
@@ -186,16 +154,62 @@
           </tr>
           <tr>
             <td>
-              timePoint
+              frameType
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              The type of TimeFrame. Possible values include, but are not limited to, bars, tones, bars-and-tones, speech, noise, music, slate, chyron, lower-third, credits, and other.
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Interval
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              start
             </td>
             <td>
               Integer
             </td>
             <td>
-              The starting offset in the stream.
-              <span class="required">
-                [Required]
-              </span>
+              The starting offset in the primary data. This point is inclusive.  For time intervals, the unit is determined by the *timeUnit* metadata key. For text intervals, the unit is Unicode code point.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              end
+            </td>
+            <td>
+              Integer
+            </td>
+            <td>
+              The ending offset in the primary data. This point is exclusive.  For time intervals, the unit is determined by the *timeUnit* metadata key. For text intervals, the unit is Unicode code point.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              targets
+            </td>
+            <td>
+              List of IDs
+            </td>
+            <td>
+              IDs of a sequence of annotations covering the region of primary data referred to by this annotation. Used as an alternative to *start* and *end* to point to component annotations (for example a token sequence) rather than directly into primary data, or to link two or more annotations (for example in a coreference annotation).
             </td>
           </tr>
         </table>
