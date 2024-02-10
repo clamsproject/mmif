@@ -140,7 +140,7 @@ properties:
   frameType:
     type: String
     description: The type of TimeFrame. Possible values include, but are not 
-      limited to, bars, tonses, bars-and-tones, speech, noise, music, slate, 
+      limited to, bars, tones, bars-and-tones, speech, noise, music, slate, 
       chyron, lower-third, credits, and other. 
 
 ---

@@ -528,13 +528,43 @@ def build_vocab(src, index_dir, mmif_version, item_dir) -> Tree:
                 attype_versions_included[attypename][attypever].append(old_ver)
             
     old_types = {t['name']: t for t in last_clams_types}
+    tree = Tree(new_clams_types)
+    
+    def how_different(type1, type2):
+        """
+        return 0 if the types are the same, 
+        1 if the differences should be propagated to the children
+        2 if the types are different in description and parent-ship only (no propagation),
+        """
+        for inheritable in ('properties', 'metadata'):
+            if type1.get(inheritable, {}) != type2.get(inheritable, {}):
+                return 1
+        if type1['description'] != type2['description'] or type1['parent'] != type2['parent']:
+            return 2
+        return 0
+
+    updated = collections.defaultdict(lambda: False)
+    
+    def propagate_version_changes(node, parent_changed=False):
+        if parent_changed:
+            updated[node['name']] = True
+            for child in node['childNodes']:
+                propagate_version_changes(child, True)
+        else:
+            difference = how_different(node, old_types[node['name']])
+            if difference > 0:
+                updated[node['name']] = True
+            for child in node['childNodes']:
+                propagate_version_changes(child, difference == 1)
+    
+    root = tree.root
+    propagate_version_changes(root, False)
+
     for t in new_clams_types:
         v = latest_attype_vers[t['name']]
-        if t != old_types[t['name']]:
+        if updated[t['name']]:
             v += 1
         t['version'] = format_attype_version(v)
-
-    tree = Tree(new_clams_types)
 
     # the main `x.y.z/vocabulary/index.html` page with the vocab tree
     IndexPage(tree, index_dir, mmif_version).write()
