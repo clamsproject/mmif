@@ -322,8 +322,6 @@ class TypePage(Page):
             dtrs.append(HREF('/'.join(['..'] * len(uri_suffix) + uri_suffix), n['name']))
             dtrs.append(SPAN('>'))
         dtrs.append(SPAN(self.clams_type['name']))
-        latest = tag('p', text=f'from {cur_vocab_ver} (last updated)')
-        dtrs.append(latest)
         p = tag('p', {'class': 'head'}, dtrs=dtrs)
         self.main_content.append(p)
         self._add_space()
@@ -350,6 +348,9 @@ class TypePage(Page):
         elif self.clams_type['version'] == 'v2' and self.clams_type['name'] == 'Annotation':
             children.append(
                 get_identity_row(f'https://mmif.clams.ai/0.4.2/vocabulary/{self.clams_type["name"]}/'))
+        if 'similarTo' in self.clams_type:
+            for s in self.clams_type['similarTo']:
+                children.append(TABLE_ROW([tag('td', text='Similar to'), tag('td', dtrs=[HREF(s, s)])]))
         table = TABLE(dtrs=children)
         self.main_content.append(table)
 
@@ -398,8 +399,8 @@ class TypePage(Page):
     def _add_header(self) -> None:
         header = DIV({'id': 'pageHeader'},
                      dtrs=[
-                         H1(f'{VOCAB_TITLE}'), 
-                         H2(f'{self.clams_type["name"]} ({self.clams_type["version"]})'),
+                         H1(f'{self.clams_type["name"]} ({self.clams_type["version"]})'),
+                         H2(f'{VOCAB_TITLE}'), 
                          ])
         self.intro.append(header)
 
@@ -527,13 +528,43 @@ def build_vocab(src, index_dir, mmif_version, item_dir) -> Tree:
                 attype_versions_included[attypename][attypever].append(old_ver)
             
     old_types = {t['name']: t for t in last_clams_types}
+    tree = Tree(new_clams_types)
+    
+    def how_different(type1, type2):
+        """
+        return 0 if the types are the same, 
+        1 if the differences should be propagated to the children
+        2 if the types are different in description and parent-ship only (no propagation),
+        """
+        for inheritable in ('properties', 'metadata'):
+            if type1.get(inheritable, {}) != type2.get(inheritable, {}):
+                return 1
+        if type1['description'] != type2['description'] or type1['parent'] != type2['parent']:
+            return 2
+        return 0
+
+    updated = collections.defaultdict(lambda: False)
+    
+    def propagate_version_changes(node, parent_changed=False):
+        if parent_changed:
+            updated[node['name']] = True
+            for child in node['childNodes']:
+                propagate_version_changes(child, True)
+        else:
+            difference = how_different(node, old_types[node['name']])
+            if difference > 0:
+                updated[node['name']] = True
+            for child in node['childNodes']:
+                propagate_version_changes(child, difference == 1)
+    
+    root = tree.root
+    propagate_version_changes(root, False)
+
     for t in new_clams_types:
         v = latest_attype_vers[t['name']]
-        if t != old_types[t['name']]:
+        if updated[t['name']]:
             v += 1
         t['version'] = format_attype_version(v)
-
-    tree = Tree(new_clams_types)
 
     # the main `x.y.z/vocabulary/index.html` page with the vocab tree
     IndexPage(tree, index_dir, mmif_version).write()
