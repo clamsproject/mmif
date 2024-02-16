@@ -37,6 +37,28 @@ metadata:
       defined either at the metadata level, in which case it has scope over all
       annotations of the same type in a view, or at the instance level, in which
       it has scope over just the single annotation.
+  labelset:
+    type: List of Strings
+    description: >-
+      When an annotation object contains results of a classification task,
+      this metadata is used to specify the label values used in classification.
+      Individual annotations then must have a <code>label</code> property that
+      is one of the values in this list. Note that not all of labels specified
+      in the <code>labelset</code> must occur in the output annotations. For 
+      example, a <code>labelset</code> can contain a <i>catch-all</i> negative
+      label, but if the negative label can be not interesting enough to keep in 
+      the output annotation.
+      <br><br>
+      Note that annotations from a classifier app must have this metadata.
+  labelsetUri:
+    type: String
+    description: >-
+      A URI to an externally defined labelset. Since the <code>labelset</code>
+      metadata is a list of simple strings, this URI can be used to point to a
+      more detailed definition of the labelset. This can be a JSON-LD document
+      or a SKOS concept scheme, for example. 
+      <br><br>
+      Optional on top of the <code>labelset</code> metadata.
 
 properties:
   document:
@@ -44,38 +66,26 @@ properties:
     description: >-
       The identifier of the document that the annotation is over.
   label:
-    type:
-      - String
-      - Map from String to Number (singleton)
+    type: String
     description: >-
-      A label/tag given to this object by a classification task. The value can be
-      a simple string value of the label/tag or a map from the label value to its 
-      <i>score</i> number provided by the classification algorithm. The score can be 
-      probability, similarity, confidence, or any other real number that was used 
-      to determine the label/tag value. 
-  labelset: 
-    type: 
-      - String
-      - List of Strings
-      - Map from Strings to Numbers
-    description: >-
-      A finite set of label/tag values used in a classification task. When <code>label/tag</code> 
-      property is used, it is highly recommended to use this <code>labelset</code> property together.
-      Not all of labels specified in this property must be used in an annotation object. 
-      For example, a labelset can contain a <i>catch-all</i> negative label, but if the 
-      negative label/tag can be not interesting enough to keep in the output annotation. 
+      A label given to this object by a classifier. The value must be a simple 
+      string value of the label and must be one of the values in the 
+      <code>labelset</code> list defined in the annotation metadata.
       <br><br>
-      The value of this property can be a string of the URI to an externally defined 
-      label/tag set, or a simple list of all possible label/tag values, or a map from
-      label/tag values to their descriptions.
-  classifications: 
+      Note that annotations from a classifier app must have this property.
+  classifications:
     type: Map from String to Number
     description: >-
-      A map from label/tag values to their "score" numbers provided by the classification
-      algorithm. The score can be probability, similarity, confidence, or any other real 
-      number that was used to determine the label/tag value. If <code>labelset</code> property is used,
-      the keys of this property should match to the definition of the <code>labelset</code> property.
-
+      A map from label values to their "score" numbers provided by a classifier.
+      The score can be probability, similarity, confidence, or any other real 
+      number that was used to determine the label value. Unlike the 
+      <code>label</code> property or the <code>labelset</code> metadata, this 
+      property is not required to be a simple string value.
+      <br><br>
+      Optional on top of the <code>label</code> property. However when this 
+      property is used, the <code>label</code> property must be one of the keys
+      and the keys must match to the values of the <code>labelset</code>
+      metadata.
 
 ---
 
@@ -149,7 +159,7 @@ properties:
 name: Span
 parent: Interval
 
-similarTo: 
+similarTo:
   - http://vocab.lappsgrid.org/Region
 
 description: >-
@@ -171,11 +181,11 @@ description: >-
 properties:
   frameType:
     type: String
-    description: The type of TimeFrame. Possible values include, but are not 
-      limited to, bars, tones, bars-and-tones, speech, noise, music, slate, 
+    description: The type of TimeFrame. Possible values include, but are not
+      limited to, bars, tones, bars-and-tones, speech, noise, music, slate,
       chyron, lower-third, credits, and other.
       <br><br>
-      No longer encouraged to use, and instead <code>label</code> property
+      No longer encouraged to use, instead <code>label</code> property
       should replace this property.
 
 
@@ -241,7 +251,7 @@ description: >-
   A sequence of Polygons, where each Polygon is associated with a
   TimePoint. So a VideoObject is in effect a sequence of image objects at
   certain time points.
-  
+
 properties:
   polygons:
     type: List of IDs
