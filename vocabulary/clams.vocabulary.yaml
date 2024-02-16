@@ -43,6 +43,38 @@ properties:
     type: ID
     description: >-
       The identifier of the document that the annotation is over.
+  label:
+    type:
+      - String
+      - Map from String to Number (singleton)
+    description: >-
+      A label/tag given to this object by a classification task. The value can be
+      a simple string value of the label/tag or a map from the label value to its 
+      <i>score</i> number provided by the classification algorithm. The score can be 
+      probability, similarity, confidence, or any other real number that was used 
+      to determine the label/tag value. 
+  labelset: 
+    type: 
+      - String
+      - List of Strings
+      - Map from Strings to Numbers
+    description: >-
+      A finite set of label/tag values used in a classification task. When <code>label/tag</code> 
+      property is used, it is highly recommended to use this <code>labelset</code> property together.
+      Not all of labels specified in this property must be used in an annotation object. 
+      For example, a labelset can contain a <i>catch-all</i> negative label, but if the 
+      negative label/tag can be not interesting enough to keep in the output annotation. 
+      <br><br>
+      The value of this property can be a string of the URI to an externally defined 
+      label/tag set, or a simple list of all possible label/tag values, or a map from
+      label/tag values to their descriptions.
+  classifications: 
+    type: Map from String to Number
+    description: >-
+      A map from label/tag values to their "score" numbers provided by the classification
+      algorithm. The score can be probability, similarity, confidence, or any other real 
+      number that was used to determine the label/tag value. If <code>labelset</code> property is used,
+      the keys of this property should match to the definition of the <code>labelset</code> property.
 
 
 ---
@@ -141,7 +173,11 @@ properties:
     type: String
     description: The type of TimeFrame. Possible values include, but are not 
       limited to, bars, tones, bars-and-tones, speech, noise, music, slate, 
-      chyron, lower-third, credits, and other. 
+      chyron, lower-third, credits, and other.
+      <br><br>
+      No longer encouraged to use, and instead <code>label</code> property
+      should replace this property.
+
 
 ---
 
@@ -190,7 +226,11 @@ description: >-
 properties:
   boxType:
     type: String
-    description: The type of BoundingBox. Mostly used for text boxes where we use the value text.
+    description: >-
+      The type of BoundingBox. Mostly used for text boxes where we use the value text.
+      <br><br>
+      No longer encouraged to use, and instead <code>label</code> property 
+      should replace this property.
 
 ---
 
