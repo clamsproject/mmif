@@ -24,6 +24,7 @@ from os.path import join as pjoin
 from string import Template
 from typing import Union, List, Dict, Optional, Set
 from urllib import request
+from packaging.version import parse as ver_parse
 
 import yaml
 from bs4 import BeautifulSoup, Tag
@@ -504,7 +505,8 @@ def build_vocab(src, index_dir, mmif_version, item_dir) -> Tree:
 
     cwd = os.path.abspath(os.path.dirname(__file__))
     git_tags = subprocess.run('git tag'.split(), cwd=cwd, capture_output=True).stdout.decode('ascii').split('\n')
-    old_vers = sorted([tag for tag in git_tags if tag and re.match(r'\d+\.\d+\.\d+$', tag)])
+    old_vers = sorted([
+        tag for tag in git_tags if tag and re.match(r'\d+\.\d+\.\d+$', tag) and ver_parse(tag) < ver_parse(mmif_version)])
     last_ver = old_vers[-1]
     proc = subprocess.run(f'git show {last_ver}:{vocab_yaml_path}'.split(), cwd=cwd, capture_output=True)
     if proc.returncode != 0:
