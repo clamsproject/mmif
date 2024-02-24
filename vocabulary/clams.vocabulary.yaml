@@ -42,14 +42,17 @@ metadata:
     description: >-
       When an annotation object contains results of a classification task,
       this metadata is used to specify the label values used in classification.
-      Individual annotations then must have a <code>label</code> property that
-      is one of the values in this list. Note that not all of labels specified
+      Individual annotations then must have <code>label</code> property that
+      is one of the values in this list. 
+      <br><br>
+      [Note] Annotations from a classifier app must have this metadata or <code>
+      labelsetUri </code> metadata.
+      <br><br>
+      [Note] Not all of labels specified
       in the <code>labelset</code> must occur in the output annotations. For 
       example, a <code>labelset</code> can contain a <i>catch-all</i> negative
       label, but if the negative label can be not interesting enough to keep in 
       the output annotation.
-      <br><br>
-      Note that annotations from a classifier app must have this metadata.
   labelsetUri:
     type: String
     description: >-
@@ -58,7 +61,8 @@ metadata:
       more detailed definition of the labelset. This can be a JSON-LD document
       or a SKOS concept scheme, for example. 
       <br><br>
-      Optional on top of the <code>labelset</code> metadata.
+      [Note] Annotations from a classifier app must have this metadata or <code>
+      labelset </code> metadata.
 
 properties:
   document:
@@ -69,23 +73,21 @@ properties:
     type: String
     description: >-
       A label given to this object by a classifier. The value must be a simple 
-      string value of the label and must be one of the values in the 
-      <code>labelset</code> list defined in the annotation metadata.
+      string value of the label and must be one of the values defined in the
+      <code>labelset</code> or <code>labelsetUri</code> annotation metadata.
       <br><br>
-      Note that annotations from a classifier app must have this property.
+      [Note] Annotations from a classifier app must have this property.
   classifications:
     type: Map from String to Number
     description: >-
       A map from label values to their "score" numbers provided by a classifier.
       The score can be probability, similarity, confidence, or any other real 
-      number that was used to determine the label value. Unlike the 
-      <code>label</code> property or the <code>labelset</code> metadata, this 
-      property is not required to be a simple string value.
+      number that was used to determine the label value. 
       <br><br>
-      Optional on top of the <code>label</code> property. However when this 
+      [Optional] on top of the <code>label</code> property. However when this 
       property is used, the <code>label</code> property must be one of the keys
-      and the keys must match to the values of the <code>labelset</code>
-      metadata.
+      and the keys must match to the values defined in the <code>labelset</code>
+        or <code>labelsetUri</code> annotation metadata.
 
 ---
 
