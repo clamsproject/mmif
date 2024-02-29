@@ -59,14 +59,14 @@ And here is the annotations list:
     "properties": {
       "id": "bb1",
       "coordinates": [[10,20], [40,20], [10,30], [40,30]],
-      "boxType": "text" }
+      "label": "text" }
   },
   {
     "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
     "properties": {
       "id": "bb2",
       "coordinates": [[210,220], [240,220], [210,230], [240,230]],
-      "boxType": "text" }
+      "label": "text" }
   }
 ]
 ```

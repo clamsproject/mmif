@@ -41,7 +41,7 @@ if __name__ == '__main__':
                 [('id', box_id),
                  ('timePoint', time_offset),
                  ('coordinates', coordinates),
-                 ('boxType', 'text')])
+                 ('label', 'text')])
 
     count += 1
     box_id = 'bb%s' % count
@@ -50,4 +50,4 @@ if __name__ == '__main__':
         [('id', box_id),
          ('timePoint', 21000),
          ('coordinates', fido_box_coordinates),
-         ('boxType', 'text')])
+         ('label', 'text')])
