@@ -69,7 +69,7 @@
           "additionalProperties": false,
           "patternProperties": {
             "^https?:\/\/": {
-              "$ref": "#/definitions/strStrMap"
+              "type": "object"
             }
           }
         },
