@@ -122,7 +122,7 @@ Let's assume that EAST runs on frames sampled from the video at 1 second interva
     "id": "bb9",
     "timePoint": 4000,
     "coordinates": [[180, 110], [460, 110], [180, 170], [460, 170]],
-    "boxType": "text" }
+    "label": "text" }
 }
 ```
 

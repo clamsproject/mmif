@@ -24,6 +24,7 @@ from os.path import join as pjoin
 from string import Template
 from typing import Union, List, Dict, Optional, Set
 from urllib import request
+from packaging.version import parse as ver_parse
 
 import yaml
 from bs4 import BeautifulSoup, Tag
@@ -52,14 +53,14 @@ def get_soup() -> BeautifulSoup:
                          "<head></head>" +
                          "<body></body>" +
                          "</html>",
-                         features='lxml')
+                         features='html.parser')
 
 
 def tag(tagname: str, attrs: Optional[Dict] = None, text: Optional[str] = None, dtrs: Optional[List[Tag]] = None) -> Tag:
     """Return a soup Tag element."""
     attrs = {} if attrs is None else attrs
     dtrs = [] if dtrs is None else dtrs
-    newtag = BeautifulSoup('', features='lxml').new_tag(tagname, attrs=attrs)
+    newtag = BeautifulSoup('', features='html.parser').new_tag(tagname, attrs=attrs)
     if text is not None:
         newtag.append(text)
     for dtr in dtrs:
@@ -257,7 +258,7 @@ class IndexPage(Page):
           <a href='ontologies/clams.vocabulary.rdf'>RDF</a>,
           <a href='ontologies/clams.vocabulary.owl'>OWL</a>,
           <a href='ontologies/clams.vocabulary.jsonld'>JSONLD</a> and
-          <a href='ontologies/clams.vocabulary.ttl'>TTL</a>.</p>""", features="lxml")
+          <a href='ontologies/clams.vocabulary.ttl'>TTL</a>.</p>""", features="html.parser")
         for element in onto_soup.body:
             self.main_content.append(element)
 
@@ -504,7 +505,8 @@ def build_vocab(src, index_dir, mmif_version, item_dir) -> Tree:
 
     cwd = os.path.abspath(os.path.dirname(__file__))
     git_tags = subprocess.run('git tag'.split(), cwd=cwd, capture_output=True).stdout.decode('ascii').split('\n')
-    old_vers = sorted([tag for tag in git_tags if tag and re.match(r'\d+\.\d+\.\d+$', tag)])
+    old_vers = sorted([
+        tag for tag in git_tags if tag and re.match(r'\d+\.\d+\.\d+$', tag) and ver_parse(tag) < ver_parse(mmif_version)])
     last_ver = old_vers[-1]
     proc = subprocess.run(f'git show {last_ver}:{vocab_yaml_path}'.split(), cwd=cwd, capture_output=True)
     if proc.returncode != 0:

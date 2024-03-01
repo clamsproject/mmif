@@ -226,12 +226,12 @@ The value of the `annotations` property on a view is a list of annotation object
     "id": "f1",
     "start": 0,
     "end": 5,
-    "frameType": "bars-and-tones"
+    "label": "bars-and-tones"
   }
 }
 ```
 
-The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [CLAMS vocabulary ](vocabulary) or [LAPPS vocabulary](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature `frameType` as well as the inherited features `id`, `start` and `end`. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers. 
+The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [CLAMS vocabulary ](vocabulary) or [LAPPS vocabulary](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature `label` as well as the inherited features `id`, `start` and `end`. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers, but can be more complex. 
 
 The `id` key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s1”), or the identifier with a view identifier prefix (for example “v1:s1”). If there is no prefix, the current view is assumed.
 
@@ -282,7 +282,7 @@ Let's use an example of an image of a barking dog where a region of the image ha
 
 <img alt="yelp" src="pi78oGjdT-annotated.jpg" style="border: 1px;" height="200"/>
 
-The result of this processing is a MMIF document with an image document and a view that contains a *BoundingBox* annotation where the bounding box has the `boxType` property set to "text":
+The result of this processing is a MMIF document with an image document and a view that contains a *BoundingBox* annotation where the bounding box has the `label` property set to "text":
 
 ```json
 {
@@ -310,7 +310,7 @@ The result of this processing is a MMIF document with an image document and a vi
           "properties": {
             "id": "bb1",
             "coordinates": [[10,20], [40,20], [10,30], [40,30]],
-            "boxType": "text" }
+            "label": "text" }
         }
       ]
     }
