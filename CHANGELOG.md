@@ -6,6 +6,9 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 
 This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
+## Version 1.0.2 - 2024-02-28
+- Added general properties (`label`, `labelset`, and `classification`) for recording classification results (https://github.com/clamsproject/mmif/issues/218).
+
 ## Version 1.0.1 - 2024-02-07
 - vocabulary types now have `similarTo` field to link similar type definitions as URI (https://github.com/clamsproject/mmif/issues/203).
 - updated `TimeFrame` definition to ease `frameType` value restrictions (https://github.com/clamsproject/mmif/issues/207).
