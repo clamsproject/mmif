@@ -53,14 +53,14 @@ def get_soup() -> BeautifulSoup:
                          "<head></head>" +
                          "<body></body>" +
                          "</html>",
-                         features='lxml')
+                         features='html.parser')
 
 
 def tag(tagname: str, attrs: Optional[Dict] = None, text: Optional[str] = None, dtrs: Optional[List[Tag]] = None) -> Tag:
     """Return a soup Tag element."""
     attrs = {} if attrs is None else attrs
     dtrs = [] if dtrs is None else dtrs
-    newtag = BeautifulSoup('', features='lxml').new_tag(tagname, attrs=attrs)
+    newtag = BeautifulSoup('', features='html.parser').new_tag(tagname, attrs=attrs)
     if text is not None:
         newtag.append(text)
     for dtr in dtrs:
@@ -258,7 +258,7 @@ class IndexPage(Page):
           <a href='ontologies/clams.vocabulary.rdf'>RDF</a>,
           <a href='ontologies/clams.vocabulary.owl'>OWL</a>,
           <a href='ontologies/clams.vocabulary.jsonld'>JSONLD</a> and
-          <a href='ontologies/clams.vocabulary.ttl'>TTL</a>.</p>""", features="lxml")
+          <a href='ontologies/clams.vocabulary.ttl'>TTL</a>.</p>""", features="html.parser")
         for element in onto_soup.body:
             self.main_content.append(element)
 
