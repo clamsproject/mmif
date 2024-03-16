@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/1.0.3"
+  },
+  "documents": [
+    {
+      "@type": "http://mmif.clams.ai/vocabulary/VideoDocument/v1",
+      "properties": {
+        "id": "m1",
+        "mime": "video/mp4",
+        "location": "file:///var/archive/video-0012.mp4"
+      }
+    },
+    {
+      "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
+      "properties": {
+        "id": "m2",
+        "mime": "text/plain",
+        "location": "file:///var/archive/video-0012-transcript.txt"
+      }
+    }
+  ],
+  "views": [
+    {
+      "id": "v1",
+      "metadata": {
+        "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
+        "timestamp": "2020-05-27T12:23:45",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/TimeFrame/v4": {
+            "document": "m1",
+            "timeUnit": "seconds"
+          }
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v4",
+          "properties": {
+            "id": "s1",
+            "start": 0,
+            "end": 5,
+            "frameType": "bars-and-tones"
+          }
+        }
+      ]
+    },
+    {
+      "id": "v2",
+      "metadata": {
+        "app": "http://apps.clams.ai/slates/1.0.3",
+        "timestamp": "2020-05-27T12:23:45",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/TimeFrame/v4": {
+            "document": "m1",
+            "timeUnit": "seconds"
+          }
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v4",
+          "properties": {
+            "id": "s1",
+            "start": 25,
+            "end": 38,
+            "frameType": "slate"
+          }
+        }
+      ]
+    },
+    {
+      "id": "v3",
+      "metadata": {
+        "app": "http://apps.clams.ai/spacy/1.3.0",
+        "timestamp": "2020-05-27T12:25:15",
+        "contains": {
+          "http://vocab.lappsgrid.org/Token": {
+            "document": "m2"
+          }
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://vocab.lappsgrid.org/Token",
+          "properties": {
+            "id": "s1",
+            "start": 0,
+            "end": 3,
+            "word": "The"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"Thing": "v1", "Annotation": "v4", "Region": "v3", "TimePoint": "v3", "Interval": "v3", "Span": "v3", "TimeFrame": "v4", "Chapter": "v4", "Polygon": "v3", "BoundingBox": "v3", "VideoObject": "v3", "Relation": "v3", "Document": "v1", "VideoDocument": "v1", "AudioDocument": "v1", "ImageDocument": "v1", "TextDocument": "v1", "Alignment": "v1"}

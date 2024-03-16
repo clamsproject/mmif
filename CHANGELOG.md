@@ -6,6 +6,9 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 
 This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
+## Version 1.0.3 - 2024-03-16
+- Fixed typo in `classification` property name (was `classifications` plural).
+
 ## Version 1.0.2 - 2024-02-28
 - Added general properties (`label`, `labelset`, and `classification`) for recording classification results (https://github.com/clamsproject/mmif/issues/218).
 
