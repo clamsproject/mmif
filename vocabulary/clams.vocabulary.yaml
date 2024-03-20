@@ -77,6 +77,11 @@ properties:
       <code>labelset</code> or <code>labelsetUri</code> annotation metadata.
       <br><br>
       [Note] Annotations from a classifier app must have this property.
+  classifications:
+    type: Map from String to Number
+    description: >-
+      Alias for the <code>classification</code> metadata. Here for historical
+      reasons.
   classification:
     type: Map from String to Number
     description: >-
