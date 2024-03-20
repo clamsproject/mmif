@@ -156,7 +156,7 @@ This property contains information about the annotations in a view. Here is an e
     }
   },
   "parameters": {"threshold": "0.5", "not-defined-parameter":  "some-value"},
-  "appConfiguredAs": {"threshold": 0.5}
+  "appConfiguration": {"threshold": 0.5}
 }
 ```
 
@@ -167,7 +167,8 @@ The `app` key contains an identifier that specifies what application created the
 The `parameters` is a dictionary of runtime parameters and their *string* values, if any.  The primary purpose of this dictionary is to record the parameters "as-is" for reproducibility and accountability.  Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings.  Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.
 
 
-The `appConfiguredAs` is a dictionary of parameters and their values, after some automatic refinement of the runtime parameters, that were actually used by the app. For the time being, automatic refinement includes:
+The `appConfiguration` is a dictionary of parameters and their values, after some automatic refinement of the runtime 
+parameters, that were actually used by the app. For the time being, automatic refinement includes:
 
 1. Converting data types according to the parameter specification.
 2. Adding default values for parameters that the user didn't specify.

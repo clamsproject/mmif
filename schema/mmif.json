@@ -96,7 +96,7 @@
         "parameters": {
           "$ref": "#/definitions/strStrMap"
         },
-        "appConfiguredAs": {
+        "appConfiguration": {
           "type": "object"
         }
       },
