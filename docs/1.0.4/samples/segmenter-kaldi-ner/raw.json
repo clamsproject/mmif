@@ -1,0 +1,247 @@
+{
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/1.0.4"
+  },
+  "documents": [
+    {
+      "@type": "http://mmif.clams.ai/vocabulary/AudioDocument/v1",
+      "properties": {
+        "id": "m1",
+        "mime": "audio/mpeg",
+        "location": "file:///var/archive/audio-002.mp3"
+      }
+    }
+  ],
+  "views": [
+    {
+      "id": "v1",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/audio-segmenter/0.2.1",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/TimeFrame/v5": {
+            "timeUnit": "milliseconds",
+            "document": "m1"
+          }
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v5",
+          "properties": {
+            "id": "tf1",
+            "frameType": "speech",
+            "start": 17,
+            "end": 132
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v5",
+          "properties": {
+            "frameType": "non-speech",
+            "id": "tf2",
+            "start": 132,
+            "end": 194
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v5",
+          "properties": {
+            "id": "tf3",
+            "frameType": "speech",
+            "start": 194,
+            "end": 342
+          }
+        }
+      ]
+    },
+    {
+      "id": "v2",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/TextDocument/v1": {},
+          "http://vocab.lappsgrid.org/Token": {},
+          "http://mmif.clams.ai/vocabulary/TimeFrame/v5": {
+            "timeUnit": "milliseconds",
+            "document": "m1"
+          },
+          "http://mmif.clams.ai/vocabulary/Alignment/v1": {}
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
+          "properties": {
+            "id": "td1",
+            "text": {
+              "@value": "Fido barks"
+            }
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "a1",
+            "source": "v1:tf1",
+            "target": "td1"
+          }
+        },
+        {
+          "@type": "http://vocab.lappsgrid.org/Token",
+          "properties": {
+            "id": "t1",
+            "document": "v2:td1",
+            "start": 0,
+            "end": 4,
+            "text": "Fido"
+          }
+        },
+        {
+          "@type": "http://vocab.lappsgrid.org/Token",
+          "properties": {
+            "id": "t2",
+            "document": "v2:td1",
+            "start": 5,
+            "end": 10,
+            "text": "barks"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v5",
+          "properties": {
+            "id": "tf1",
+            "start": 17,
+            "end": 64
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v5",
+          "properties": {
+            "id": "tf2",
+            "start": 65,
+            "end": 132
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "a2",
+            "source": "tf1",
+            "target": "t1"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "a3",
+            "source": "tf2",
+            "target": "t2"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
+          "properties": {
+            "id": "td2",
+            "textSource": "v1:tf3",
+            "text": {
+              "@value": "Fluffy sleeps"
+            }
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "a4",
+            "source": "v1:tf3",
+            "target": "td2"
+          }
+        },
+        {
+          "@type": "http://vocab.lappsgrid.org/Token",
+          "properties": {
+            "id": "t3",
+            "document": "v2:td2",
+            "start": 0,
+            "end": 6,
+            "text": "Fluffy"
+          }
+        },
+        {
+          "@type": "http://vocab.lappsgrid.org/Token",
+          "properties": {
+            "id": "t4",
+            "document": "v2:td2",
+            "start": 7,
+            "end": 13,
+            "text": "sleeps"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v5",
+          "properties": {
+            "id": "tf3",
+            "start": 194,
+            "end": 240
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v5",
+          "properties": {
+            "id": "tf4",
+            "start": 241,
+            "end": 342
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "a5",
+            "source": "tf3",
+            "target": "t3"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "a5",
+            "source": "tf4",
+            "target": "t4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "v3",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/stanford-ner/0.2.1",
+        "contains": {
+          "http://vocab.lappsgrid.org/NamedEntity": {}
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://vocab.lappsgrid.org/NamedEntity",
+          "properties": {
+            "id": "ne1",
+            "document": "v2:td1",
+            "start": 0,
+            "end": 4,
+            "category": "Person",
+            "word": "Fido"
+          }
+        },
+        {
+          "@type": "http://vocab.lappsgrid.org/NamedEntity",
+          "properties": {
+            "id": "ne2",
+            "document": "v2:td2",
+            "start": 0,
+            "end": 6,
+            "category": "Person",
+            "word": "Fluffy"
+          }
+        }
+      ]
+    }
+  ]
+}
