@@ -10,6 +10,14 @@ parent: null
 description: >-
   Abstract top type.
 
+metadata:
+  description:
+    type: String
+    description: >-
+      A human-readable description of the object. This is intended to be used
+      for documentation purposes for particular use cases of this annotation 
+      type and is not expected to be used by software.
+
 properties:
   id:
     type: ID
