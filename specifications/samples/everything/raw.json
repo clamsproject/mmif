@@ -127,7 +127,7 @@
             "id": "t1",
             "start": 0,
             "end": 5,
-            "text": "Hello" }
+            "word": "Hello" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -149,7 +149,7 @@
             "id": "t2",
             "start": 5,
             "end": 6,
-            "text": "," }
+            "word": "," }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -171,7 +171,7 @@
             "id": "t3",
             "start": 7,
             "end": 11,
-            "text": "this" }
+            "word": "this" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -193,7 +193,7 @@
             "id": "t4",
             "start": 12,
             "end": 14,
-            "text": "is" }
+            "word": "is" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -215,7 +215,7 @@
             "id": "t5",
             "start": 15,
             "end": 18,
-            "text": "Jim" }
+            "word": "Jim" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -237,7 +237,7 @@
             "id": "t6",
             "start": 19,
             "end": 25,
-            "text": "Lehrer" }
+            "word": "Lehrer" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -259,7 +259,7 @@
             "id": "t7",
             "start": 26,
             "end": 30,
-            "text": "with" }
+            "word": "with" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -281,7 +281,7 @@
             "id": "t8",
             "start": 31,
             "end": 34,
-            "text": "the" }
+            "word": "the" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -303,7 +303,7 @@
             "id": "t9",
             "start": 35,
             "end": 43,
-            "text": "NewsHour" }
+            "word": "NewsHour" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -325,7 +325,7 @@
             "id": "t10",
             "start": 44,
             "end": 46,
-            "text": "on" }
+            "word": "on" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -347,7 +347,7 @@
             "id": "t11",
             "start": 47,
             "end": 50,
-            "text": "PBS" }
+            "word": "PBS" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -369,7 +369,7 @@
             "id": "t12",
             "start": 50,
             "end": 51,
-            "text": "." }
+            "word": "." }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -391,7 +391,7 @@
             "id": "t13",
             "start": 52,
             "end": 54,
-            "text": "In" }
+            "word": "In" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -413,7 +413,7 @@
             "id": "t14",
             "start": 55,
             "end": 58,
-            "text": "the" }
+            "word": "the" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -435,7 +435,7 @@
             "id": "t15",
             "start": 59,
             "end": 67,
-            "text": "nineteen" }
+            "word": "nineteen" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -457,7 +457,7 @@
             "id": "t16",
             "start": 68,
             "end": 76,
-            "text": "eighties" }
+            "word": "eighties" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -479,7 +479,7 @@
             "id": "t17",
             "start": 76,
             "end": 77,
-            "text": "," }
+            "word": "," }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -501,7 +501,7 @@
             "id": "t18",
             "start": 78,
             "end": 85,
-            "text": "barking" }
+            "word": "barking" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -523,7 +523,7 @@
             "id": "t19",
             "start": 86,
             "end": 90,
-            "text": "dogs" }
+            "word": "dogs" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -545,7 +545,7 @@
             "id": "t20",
             "start": 91,
             "end": 95,
-            "text": "have" }
+            "word": "have" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -567,7 +567,7 @@
             "id": "t21",
             "start": 96,
             "end": 108,
-            "text": "increasingly" }
+            "word": "increasingly" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -589,7 +589,7 @@
             "id": "t22",
             "start": 109,
             "end": 115,
-            "text": "become" }
+            "word": "become" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -611,7 +611,7 @@
             "id": "t23",
             "start": 116,
             "end": 117,
-            "text": "a" }
+            "word": "a" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -633,7 +633,7 @@
             "id": "t24",
             "start": 118,
             "end": 125,
-            "text": "problem" }
+            "word": "problem" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -655,7 +655,7 @@
             "id": "t25",
             "start": 126,
             "end": 128,
-            "text": "in" }
+            "word": "in" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -677,7 +677,7 @@
             "id": "t26",
             "start": 129,
             "end": 134,
-            "text": "urban" }
+            "word": "urban" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -699,7 +699,7 @@
             "id": "t27",
             "start": 135,
             "end": 140,
-            "text": "areas" }
+            "word": "areas" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -721,7 +721,7 @@
             "id": "t28",
             "start": 140,
             "end": 141,
-            "text": "." }
+            "word": "." }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
@@ -1311,7 +1311,7 @@
             "start": 0,
             "end": 10,
             "category": "Date",
-            "text": "1982-05-12" }
+            "word": "1982-05-12" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1321,7 +1321,7 @@
             "start": 0,
             "end": 10,
             "category": "Person",
-            "text": "Jim Lehrer" }
+            "word": "Jim Lehrer" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1331,7 +1331,7 @@
             "start": 0,
             "end": 9,
             "category": "Person",
-            "text": "Sara Just" }
+            "word": "Sara Just" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1341,7 +1341,7 @@
             "start": 0,
             "end": 10,
             "category": "Date",
-            "text": "1982-05-12" }
+            "word": "1982-05-12" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1351,7 +1351,7 @@
             "start": 0,
             "end": 10,
             "category": "Person",
-            "text": "Jim Lehrer" }
+            "word": "Jim Lehrer" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1361,7 +1361,7 @@
             "start": 0,
             "end": 9,
             "category": "Person",
-            "text": "Sara Just" }
+            "word": "Sara Just" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1371,7 +1371,7 @@
             "start": 0,
             "end": 10,
             "category": "Date",
-            "text": "1982-05-12" }
+            "word": "1982-05-12" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1381,7 +1381,7 @@
             "start": 0,
             "end": 10,
             "category": "Person",
-            "text": "Jim Lehrer" }
+            "word": "Jim Lehrer" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1391,7 +1391,7 @@
             "start": 0,
             "end": 9,
             "category": "Person",
-            "text": "Sara Just" }
+            "word": "Sara Just" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1401,7 +1401,7 @@
             "start": 7,
             "end": 15,
             "category": "Location",
-            "text": "New York" }
+            "word": "New York" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1411,7 +1411,7 @@
             "start": 15,
             "end": 25,
             "category": "Person",
-            "text": "Jim Lehrer" }
+            "word": "Jim Lehrer" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
@@ -1421,7 +1421,7 @@
             "start": 47,
             "end": 50,
             "category": "Organization",
-            "text": "PBS" }
+            "word": "PBS" }
         }
       ]
     },
@@ -1444,7 +1444,7 @@
             "start": 0,
             "end": 10,
             "tagName": "Date",
-            "text": "1982-05-12" }
+            "word": "1982-05-12" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1454,7 +1454,7 @@
             "start": 0,
             "end": 9,
             "tagName": "Title",
-            "text": "Loud Dogs" }
+            "word": "Loud Dogs" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1464,7 +1464,7 @@
             "start": 0,
             "end": 10,
             "tagName": "Host",
-            "text": "Jim Lehrer" }
+            "word": "Jim Lehrer" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1474,7 +1474,7 @@
             "start": 0,
             "end": 9,
             "tagName": "Producer",
-            "text": "Sara Just" }
+            "word": "Sara Just" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1484,7 +1484,7 @@
             "start": 0,
             "end": 10,
             "tagName": "Date",
-            "text": "1982-05-12" }
+            "word": "1982-05-12" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1494,7 +1494,7 @@
             "start": 0,
             "end": 9,
             "tagName": "Title",
-            "text": "Loud Dogs" }
+            "word": "Loud Dogs" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1504,7 +1504,7 @@
             "start": 0,
             "end": 10,
             "tagName": "Host",
-            "text": "Jim Lehrer" }
+            "word": "Jim Lehrer" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1514,7 +1514,7 @@
             "start": 0,
             "end": 9,
             "tagName": "Producer",
-            "text": "Sara Just" }
+            "word": "Sara Just" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1524,7 +1524,7 @@
             "start": 0,
             "end": 10,
             "tagName": "Date",
-            "text": "1982-05-12" }
+            "word": "1982-05-12" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1534,7 +1534,7 @@
             "start": 0,
             "end": 9,
             "tagName": "Title",
-            "text": "Loud Dogs" }
+            "word": "Loud Dogs" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1544,7 +1544,7 @@
             "start": 0,
             "end": 10,
             "tagName": "Host",
-            "text": "Jim Lehrer" }
+            "word": "Jim Lehrer" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/SemanticTag",
@@ -1554,7 +1554,7 @@
             "start": 0,
             "end": 9,
             "tagName": "Producer",
-            "text": "Sara Just" }
+            "word": "Sara Just" }
         }
       ]
     }
