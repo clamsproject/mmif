@@ -6,6 +6,9 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 
 This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
+## Version 1.0.5 - 2023-06-25
+- Fixed typo in a sample MMIF file
+
 ## Version 1.0.4 - 2023-03-16
 - Added optional field `mmif.view.metadata.appConfiguration` to store configuration map actually used by the app (_refined_ from user input and defaults).
 
