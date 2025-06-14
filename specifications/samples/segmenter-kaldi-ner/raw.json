@@ -83,7 +83,7 @@
           "properties": {
             "id": "a1",
             "source": "v1:tf1",
-            "target": "td1"
+            "target": "v2:td1"
           }
         },
         {
@@ -126,16 +126,16 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a2",
-            "source": "tf1",
-            "target": "t1"
+            "source": "v2:tf1",
+            "target": "v2:t1"
           }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a3",
-            "source": "tf2",
-            "target": "t2"
+            "source": "v2:tf2",
+            "target": "v2:t2"
           }
         },
         {
@@ -153,7 +153,7 @@
           "properties": {
             "id": "a4",
             "source": "v1:tf3",
-            "target": "td2"
+            "target": "v2:td2"
           }
         },
         {
@@ -196,16 +196,16 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a5",
-            "source": "tf3",
-            "target": "t3"
+            "source": "v2:tf3",
+            "target": "v2:t3"
           }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a5",
-            "source": "tf4",
-            "target": "t4"
+            "source": "v2:tf4",
+            "target": "v2:t4"
           }
         }
       ]

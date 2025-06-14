@@ -85,7 +85,8 @@ The `@type` key has a special meaning in JSON-LD and it is used to define the ty
 
 The description also lists the properties that can be used for a type, and above we have the `id`, `mime` and `location` properties, used for the document identifier, the document's MIME type and the location of the document, which is a URL. Should the document be a local file then the `file://` scheme must be used. Alternatively, and for text only, the document could be inline, in which case the element is represented as in the `text` property in LIF, using a JSON [value object](http://www.w3.org/TR/json-ld/#dfn-value-object) containing a `@value` key and optionally a `@language` key:
 
-``` json
+
+```json
 {
   "documents": [
     {
@@ -128,18 +129,16 @@ This is where all the annotations and associated metadata live. Views contain st
 }
 ```
 
-Each view has a unique identifier. Annotation elements in the view have identifiers unique to the view and these elements can be uniquely referred to from outside the view by using the view identifier and the annotation element identifier, separated by a colon. For example, if the view above has an annotation with identifier "a8" then it can be referred to from outside the view by using "v1:a8".
 
 Here are a few general principles relevant to views:
 
+1. Each view in a MMIF has a unique identifier.
 1. There is no limit to the number of views.
-2. Apps may create as many new views as they want.
-3. Apps may not change or add information to existing views, that is, views are read-only, which has many advantages at the cost of some redundancy. Since views are read-only, apps may not overwrite or delete information in existing views. This holds for the view’s metadata as well as the annotations.
-4. Annotations in views have identifiers that are unique to the view. Views have identifiers that uniquely define them relative to other views.
+1. Apps may create as many new views as they want.
+1. Apps may not change or add information to existing views, that is, views are generally considered read-only, which has many advantages at the cost of some redundancy. Since views are read-only, apps may not overwrite or delete information in existing views. This holds for the view’s metadata as well as the annotations.
+1. Annotations in views have identifiers that are unique to the view. Views have identifiers that uniquely define them relative to other views.
 
 We now describe the metadata and the annotations.
-
-
 
 #### The *view's metadata* property
 
@@ -242,16 +241,21 @@ The value of the `annotations` property on a view is a list of annotation object
 }
 ```
 
-The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary typically contains the features defined for the annotation category as defined in the vocabularies at [CLAMS vocabulary ](vocabulary) or [LAPPS vocabulary](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the feature `label` as well as the inherited features `id`, `start` and `end`. Values should be as specified in the vocabulary, values typically are strings, identifiers and integers, or lists of strings, identifiers and integers, but can be more complex. 
-
-The `id` key should have a value that is unique relative to all annotation elements in the view. Other annotations can refer to this identifier either with just the identifier (for example “s1”), or the identifier with a view identifier prefix (for example “v1:s1”). If there is no prefix, the current view is assumed.
+The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary typically contains the properties defined for the annotation category as defined in the vocabularies at [CLAMS vocabulary ](vocabulary) or [LAPPS vocabulary](http://vocab.lappsgrid.org/). For example, for the *TimeFrame* annotation type the vocabulary includes the property `label` as well as the inherited properties `id`, `start` and `end`. Value types for the properties should be as specified in the vocabulary, and typically are strings, identifiers (referring to over annotations) and integers, or lists of strings, identifiers and integers, but can be more complex. 
 
 We will discuss more details on annotation type vocabularies in the ["vocabulary" section](#mmif-and-the-vocabularies). 
 {: .box-note}
 
-The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside other annotations. For example, LAPPS *Constituent* annotations will not contain other *Constituent* annotations. However, in the `properties` dictionary annotations can refer to other annotations using the identifiers of the other annotations.
+Regardless of the type, all annotations must have `id` property. The `id` should have a string value ("short" form) that is unique relative to all annotation elements in the view, and these annotations can be uniquely referred to by using their _parent_ view identifier and the annotation identifier, separated by a colon (the "long" form ID). For example, if the time frame annotation above is in the `"v1"` view's anntoations list, then it should be referred to by other annotations using `"v1:f1"`.
 
-Here is another example of a view containing two bounding boxes created by the EAST text recognition app:
+The string value of `id` property is always the "short" form ID (not prefixed with the _parent_ view identifier). However, it is always recommended to use the long form ID when referring to an annotation object, even within the same view, to eliminate possible ambiguity. That said, views in the top-level `views` field and documents in the top-level `documents` field do not have the long form ID.
+{: .box-note}
+
+Note that the colon character (`:`) is reserved for delimiting view and annotation identifiers, hence can't be used as a part of ID strings
+{: .box-warning}
+
+The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside other annotations. However, the values of individual property can have arbitrarily complex data structures, as long as the structure and the type is well-documented in the underlying type definitions. 
+Here is another example of a view containing two bounding boxes created by a text localization app:
 
 ```json
 {
@@ -282,12 +286,9 @@ Here is another example of a view containing two bounding boxes created by the E
 
 Note how the `coordinates` property is a list of lists where each embedded list is a pair of an x-coordinate and a y-coordinate. 
 
-
-
-
 ### Views with documents
 
-We have seen that an initial set of media is added to the MMIF `documents` list and that applications then create views from those documents. But some applications are special in that they create text from audiovisual data and the annotations they create are similar to the documents in the `documents` list in that they could be the starting point for a text processing chain. For example, Tesseract can take a bounding box in an image and generate text from it and a Named Entity Recognition (NER) component can take the text and extract entities, just like it would from a transcript or other text document in the `documents` list.
+We have seen that an initial set of media is added to the MMIF `documents` list and that applications then create views from those documents. But some applications are special in that they create text from audiovisual data and the annotations they create are similar to the documents in the `documents` list in that they could be the starting point for a text processing chain. For example, a text recognition app (OCR) can take a bounding box in an image and generate text from it and a Named Entity Recognition (NER) component can take the text and extract entities, just like it would from a transcript or other text document in the `documents` list.
 
 Let's use an example of an image of a barking dog where a region of the image has been recognized by the EAST application as an image box containing text (image taken from [http://clipart-library.com/dog-barking-clipart.html](http://clipart-library.com/dog-barking-clipart.html)): 
 
@@ -329,7 +330,7 @@ The result of this processing is a MMIF document with an image document and a vi
 }
 ```
 
-Tesseract will then add a view to this MMIF document that contains a text document as well as an *Alignment* type that specifies that the text document is aligned with the bounding box from view "v1".
+The OCR app will then add a view to this MMIF document that contains a text document as well as an *Alignment* type that specifies that the text document is aligned with the bounding box from view "v1".
 
 ```json
 {
@@ -352,18 +353,15 @@ Tesseract will then add a view to this MMIF document that contains a text docume
       "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
       "properties": {
         "source": "v1:bb1",
-        "target": "td1" }
+        "target": "v1:td1" }
     }
   ]
 }
 ```
 
-The text document annotation is the same kind of objects as the text document objects in the toplevel `documents` property, it has the same type and uses the same properties. Notice also that the history of the text document, namely that it was derived from a particular bounding box in a particular image, can be traced via the alignment of the text document with the bounding box.
+The text document annotation is the same kind of objects as the text document objects in the toplevel `documents` property, it has the same type and uses the same properties. Notice also that the history of the text document, namely that it was derived from a particular bounding box in a particular image, can be traced via the alignment of the text document with the bounding box. Also notice that when a document in a view is referred, the reference takes the "long" form ID. 
 
-An alternative for using an alignment would be to use a `textSource` property on the document or perhaps to reuse the `location` property. That would require less space, but would introduce another ways to align annotations.
-{: .box-note}
-
-Now this text document can be input to language processing. An NER component will not do anything interesting with this text so let's say we have a semantic typing component that has *"dog-sound"* as one of its categories. That hypothetical semantic typing component would add a new view to the list. That semantic typing component would add a new view to the list:
+Now this text document can be input to language processing. A named entity recognition (NER) component will not do anything interesting with this text so let's say we have a semantic typing component that has *"dog-sound"* as one of its categories. That hypothetical semantic typing component would add a new view to the list. That semantic typing component would add a new view to the list:
 
 ```json
 {
@@ -422,7 +420,7 @@ The image with the dog in the previous section just had a bounding box for the p
       "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
       "properties": {
         "source": "v1:bb1",
-        "target": "td1" }
+        "target": "v2:td1" }
     },
     { 
       "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -435,7 +433,7 @@ The image with the dog in the previous section just had a bounding box for the p
       "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
       "properties": {
         "source": "v1:bb2",
-        "target": "td2" }
+        "target": "v2:td2" }
     }
   ]
 }
@@ -478,7 +476,7 @@ Now if you run the semantic tagger you would get tags with the category set to "
 
 Notice how the document to which the *SemanticTag* annotations point is not expressed by the metadata `document` property but by individual `document` properties on each semantic tag. This is unavoidable when we have multiple text documents that can be input to language processing.
 
-The above glances over the problem that we need some way for Tesseract to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for an application.
+The above glances over the problem that we need some way for the OCR app to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for an application.
 {: .box-note}
 
 
@@ -549,12 +547,12 @@ The CLAMS Platform does not require that a URL like [https://schema.org/Clip](ht
 To finish off this document we provide some examples of complete MMIF documents:
 
 
-| example                                                   | description                                                  |
-| --------------------------------------------------------- | ------------------------------------------------------------ |
-| [bars-tones-slates](samples/bars-tones-slates)         | A couple of time frames and some minimal text processing on a transcript. |
-| [east-tesseract-typing](samples/east-tesseract-typing) | EAST text box recognition followed by Tesseract OCR and semantic typing. |
-| [segmenter-kaldi-ner](samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER. |
-| [everything](samples/everything)     | A big MMIF example with various multimodal AI apps for video/audio as well as text.  |
+| example                                                | description                                                                         |
+|--------------------------------------------------------|-------------------------------------------------------------------------------------|
+| [bars-tones-slates](samples/bars-tones-slates)         | A couple of time frames and some minimal text processing on a transcript.           |
+| [east-tesseract-typing](samples/east-tesseract-typing) | EAST text box recognition followed by Tesseract OCR and semantic typing.            |
+| [segmenter-kaldi-ner](samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER.                    |
+| [everything](samples/everything)                       | A big MMIF example with various multimodal AI apps for video/audio as well as text. |
 
 Each example has some comments and a link to a raw JSON file.
 

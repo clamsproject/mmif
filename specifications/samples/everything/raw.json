@@ -119,7 +119,7 @@
           "properties": {
             "id": "a1",
             "source": "v3:tf1",
-            "target": "td1" }
+            "target": "v4:td1" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -140,8 +140,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a2",
-            "source": "tf1",
-            "target": "t1" }
+            "source": "v4:tf1",
+            "target": "v4:t1" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -162,8 +162,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a3",
-            "source": "tf2",
-            "target": "t2" }
+            "source": "v4:tf2",
+            "target": "v4:t2" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -184,8 +184,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a4",
-            "source": "tf3",
-            "target": "t3" }
+            "source": "v4:tf3",
+            "target": "v4:t3" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -206,8 +206,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a5",
-            "source": "tf4",
-            "target": "t4" }
+            "source": "v4:tf4",
+            "target": "v4:t4" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -228,8 +228,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a6",
-            "source": "tf5",
-            "target": "t5" }
+            "source": "v4:tf5",
+            "target": "v4:t5" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -250,8 +250,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a7",
-            "source": "tf6",
-            "target": "t6" }
+            "source": "v4:tf6",
+            "target": "v4:t6" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -272,8 +272,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a8",
-            "source": "tf7",
-            "target": "t7" }
+            "source": "v4:tf7",
+            "target": "v4:t7" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -294,8 +294,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a9",
-            "source": "tf8",
-            "target": "t8" }
+            "source": "v4:tf8",
+            "target": "v4:t8" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -316,8 +316,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a10",
-            "source": "tf9",
-            "target": "t9" }
+            "source": "v4:tf9",
+            "target": "v4:t9" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -338,8 +338,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a11",
-            "source": "tf10",
-            "target": "t10" }
+            "source": "v4:tf10",
+            "target": "v4:t10" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -360,8 +360,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a12",
-            "source": "tf11",
-            "target": "t11" }
+            "source": "v4:tf11",
+            "target": "v4:t11" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -382,8 +382,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a13",
-            "source": "tf12",
-            "target": "t12" }
+            "source": "v4:tf12",
+            "target": "v4:t12" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -404,8 +404,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a14",
-            "source": "tf13",
-            "target": "t13" }
+            "source": "v4:tf13",
+            "target": "v4:t13" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -426,8 +426,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a15",
-            "source": "tf14",
-            "target": "t14" }
+            "source": "v4:tf14",
+            "target": "v4:t14" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -448,8 +448,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a16",
-            "source": "tf15",
-            "target": "t15" }
+            "source": "v4:tf15",
+            "target": "v4:t15" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -470,8 +470,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a17",
-            "source": "tf16",
-            "target": "t16" }
+            "source": "v4:tf16",
+            "target": "v4:t16" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -492,8 +492,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a18",
-            "source": "tf17",
-            "target": "t17" }
+            "source": "v4:tf17",
+            "target": "v4:t17" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -514,8 +514,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a19",
-            "source": "tf18",
-            "target": "t18" }
+            "source": "v4:tf18",
+            "target": "v4:t18" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -536,8 +536,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a20",
-            "source": "tf19",
-            "target": "t19" }
+            "source": "v4:tf19",
+            "target": "v4:t19" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -558,8 +558,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a21",
-            "source": "tf20",
-            "target": "t20" }
+            "source": "v4:tf20",
+            "target": "v4:t20" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -580,8 +580,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a22",
-            "source": "tf21",
-            "target": "t21" }
+            "source": "v4:tf21",
+            "target": "v4:t21" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -602,8 +602,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a23",
-            "source": "tf22",
-            "target": "t22" }
+            "source": "v4:tf22",
+            "target": "v4:t22" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -624,8 +624,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a24",
-            "source": "tf23",
-            "target": "t23" }
+            "source": "v4:tf23",
+            "target": "v4:t23" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -646,8 +646,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a25",
-            "source": "tf24",
-            "target": "t24" }
+            "source": "v4:tf24",
+            "target": "v4:t24" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -668,8 +668,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a26",
-            "source": "tf25",
-            "target": "t25" }
+            "source": "v4:tf25",
+            "target": "v4:t25" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -690,8 +690,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a27",
-            "source": "tf26",
-            "target": "t26" }
+            "source": "v4:tf26",
+            "target": "v4:t26" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -712,8 +712,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a28",
-            "source": "tf27",
-            "target": "t27" }
+            "source": "v4:tf27",
+            "target": "v4:t27" }
         },
         {
           "@type": "http://vocab.lappsgrid.org/Token",
@@ -734,8 +734,8 @@
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
             "id": "a29",
-            "source": "tf28",
-            "target": "t28" }
+            "source": "v4:tf28",
+            "target": "v4:t28" }
         }
       ]
     },
@@ -977,7 +977,7 @@
           "properties": {
             "id": "a1",
             "source": "v5:bb1",
-            "target": "td1" }
+            "target": "v6:td1" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -990,7 +990,7 @@
           "properties": {
             "id": "a2",
             "source": "v5:bb2",
-            "target": "td2" }
+            "target": "v6:td2" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1003,7 +1003,7 @@
           "properties": {
             "id": "a3",
             "source": "v5:bb3",
-            "target": "td3" }
+            "target": "v6:td3" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1016,7 +1016,7 @@
           "properties": {
             "id": "a4",
             "source": "v5:bb4",
-            "target": "td4" }
+            "target": "v6:td4" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1029,7 +1029,7 @@
           "properties": {
             "id": "a5",
             "source": "v5:bb5",
-            "target": "td5" }
+            "target": "v6:td5" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1042,7 +1042,7 @@
           "properties": {
             "id": "a6",
             "source": "v5:bb6",
-            "target": "td6" }
+            "target": "v6:td6" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1055,7 +1055,7 @@
           "properties": {
             "id": "a7",
             "source": "v5:bb7",
-            "target": "td7" }
+            "target": "v6:td7" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1068,7 +1068,7 @@
           "properties": {
             "id": "a8",
             "source": "v5:bb8",
-            "target": "td8" }
+            "target": "v6:td8" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1081,7 +1081,7 @@
           "properties": {
             "id": "a9",
             "source": "v5:bb9",
-            "target": "td9" }
+            "target": "v6:td9" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1094,7 +1094,7 @@
           "properties": {
             "id": "a10",
             "source": "v5:bb10",
-            "target": "td10" }
+            "target": "v6:td10" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1107,7 +1107,7 @@
           "properties": {
             "id": "a11",
             "source": "v5:bb11",
-            "target": "td11" }
+            "target": "v6:td11" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1120,7 +1120,7 @@
           "properties": {
             "id": "a12",
             "source": "v5:bb12",
-            "target": "td12" }
+            "target": "v6:td12" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1133,7 +1133,7 @@
           "properties": {
             "id": "a13",
             "source": "v5:bb13",
-            "target": "td13" }
+            "target": "v6:td13" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1146,7 +1146,7 @@
           "properties": {
             "id": "a14",
             "source": "v5:bb14",
-            "target": "td14" }
+            "target": "v6:td14" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1159,7 +1159,7 @@
           "properties": {
             "id": "a15",
             "source": "v5:bb15",
-            "target": "td15" }
+            "target": "v6:td15" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1172,7 +1172,7 @@
           "properties": {
             "id": "a16",
             "source": "v5:bb16",
-            "target": "td16" }
+            "target": "v6:td16" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1185,7 +1185,7 @@
           "properties": {
             "id": "a17",
             "source": "v5:bb17",
-            "target": "td17" }
+            "target": "v6:td17" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1198,7 +1198,7 @@
           "properties": {
             "id": "a18",
             "source": "v5:bb18",
-            "target": "td18" }
+            "target": "v6:td18" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1211,7 +1211,7 @@
           "properties": {
             "id": "a19",
             "source": "v5:bb19",
-            "target": "td19" }
+            "target": "v6:td19" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1224,7 +1224,7 @@
           "properties": {
             "id": "a20",
             "source": "v5:bb20",
-            "target": "td20" }
+            "target": "v6:td20" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1237,7 +1237,7 @@
           "properties": {
             "id": "a21",
             "source": "v5:bb21",
-            "target": "td21" }
+            "target": "v6:td21" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1250,7 +1250,7 @@
           "properties": {
             "id": "a22",
             "source": "v5:bb22",
-            "target": "td22" }
+            "target": "v6:td22" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1263,7 +1263,7 @@
           "properties": {
             "id": "a23",
             "source": "v5:bb23",
-            "target": "td23" }
+            "target": "v6:td23" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1276,7 +1276,7 @@
           "properties": {
             "id": "a24",
             "source": "v5:bb24",
-            "target": "td24" }
+            "target": "v6:td24" }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
@@ -1289,7 +1289,7 @@
           "properties": {
             "id": "a25",
             "source": "v5:bb25",
-            "target": "td25" }
+            "target": "v6:td25" }
         }
       ]
     },
