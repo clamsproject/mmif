@@ -188,6 +188,10 @@ description: >-
   pointing directly into primary data (by using start and end offsets) or
   by linking to one or more other Annotations with the targets property.
 
+properties: 
+  text:
+    type: String
+    description: The surface string in the primary data covered by this span.
 ---
 
 name: Token
@@ -214,9 +218,6 @@ properties:
     description: >-
       Orthographic properties of the token such as LowerCase, UpperCase, 
       UpperInitial, etc. Ideally a URI referencing a pre-defined descriptor.
-  word:
-    type: String
-    description: The surface string in the primary data covered by this Token.
 
 ---
 
