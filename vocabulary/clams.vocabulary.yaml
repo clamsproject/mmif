@@ -176,6 +176,154 @@ description: >-
 
 ---
 
+name: Token
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/Token
+
+description: >-
+  A string of one or more characters that serves as an indivisible unit 
+  for the purposes of morpho-syntactic labeling (part of speech tagging).
+
+properties:
+  pos:
+    type: String or URI
+    description: Part-of-speech tag associated with the token.
+  lemma:
+    type: String or URI
+    description: >-
+      The root (base) form associated with the token. URI may point to a 
+      lexicon entry.
+  tokenType:
+    type: String or URI
+    description: >-
+      Sub-type such as word, punctuation, abbreviation, number, symbol, etc. 
+      Ideally a URI referencing a pre-defined descriptor.
+  orth:
+    type: String or URI
+    description: >-
+      Orthographic properties of the token such as LowerCase, UpperCase, 
+      UpperInitial, etc. Ideally a URI referencing a pre-defined descriptor.
+  word:
+    type: String
+    description: The surface string in the primary data covered by this Token.
+
+---
+
+name: Sentence
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/Sentence
+
+description: >
+  A sequence of words capable of standing alone to make an assertion, ask a
+  question, or give a command, usually consisting of a subject and a predicate
+  containing a finite verb.
+
+properties:
+  sentenceType:
+    type: String or URI
+    description: >-
+      Values such as declarative, interrogative, exclamatory, question,
+      fragment. Ideally a URI referencing a pre-defined descriptor.
+
+---
+
+name: Paragraph
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/Paragraph
+
+description: >-
+  A division of a piece of writing, usually dealing with a single theme and 
+  indicated by a new line, indentation, and/or numbering.
+
+---
+
+name: NamedEntity
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/NamedEntity
+
+description: >-
+  A phrase that clearly identifies an individual from others that have similar 
+  attributes, such as the name of a person, organization, location, artifact, 
+  etc. as well as temporal expressions.
+
+metadata:
+  namedEntityCategorySet:
+    type: String or URI
+    description: The set of values that can be used for the category property.
+
+properties:
+  category:
+    type: String or URI
+    required: true
+    description: >-
+      The type of named entity. Typically one of DATE, PERSON, ORGANIZATION,
+      or LOCATION.
+  type:
+    type: String or URI
+    description: >-
+      A type attribute for the entity. For example the type of location or
+      organization.
+  gender:
+    type: String or URI
+    description: >-
+      A value such as male, female, unknown. Ideally a URI referencing a
+      pre-defined descriptor.
+
+---
+
+name: NounChunk
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/NounChunk
+
+description: >-
+  The initial portion of a non-recursive noun phrase up to the head, including 
+  determiners but not including postmodifying prepositional phrases or clauses.
+
+---
+
+name: VerbChunk
+parent: Span
+
+similarTo: 
+  - http://vocab.lappsgrid.org/VerbChunk
+  
+description: >-
+  Non-recursive verb groups, which include modals, auxiliary verbs, and medial
+  adverbs, and end at the head verb or predicate adjective.
+
+properties:
+  vcType:
+    type: String or URI
+    description: >-
+      Values such as finite, non-finite, participle, modal, special (e.g., 'is
+      going to investigate').
+  tense:
+    type: String or URI
+    description: >-
+      Provides tense information for the verb. Example values include BeVBG,
+      BeVBN, FutCon, HaveVBN, Pas, PasCon, PasPer, PasPerCon, Per, Pre, PreCon,
+      PrePer, PrePerCon, SimFut, SimPas, SimPre, none
+  voice:
+    type: String or URI
+    description: >-
+      Indicates if the verb group is active or passive. Possible values include
+      ACTIVE, PASSIVE, or NONE
+  neg:
+    type: String or URI
+    description: Indicates whether or not the verb is negated. Values include YES, NO.
+
+---
+
 name: TimeFrame
 parent: Interval
 

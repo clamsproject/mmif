@@ -341,11 +341,15 @@ class TypePage(Page):
         def get_identity_row(identity_url):
             return TABLE_ROW([tag('td', text='Also known as'), tag('td', dtrs=[HREF(identity_url, identity_url)])])
         if self.clams_type['version'] == 'v1':
-            patches = [0, 1]
-            if self.clams_type['name'] != 'Annotation':
-                patches.append(2)
-            for patch in patches:
-                children.append(get_identity_row(f'https://mmif.clams.ai/0.4.{patch}/vocabulary/{self.clams_type["name"]}/'))
+            # old lapps vocabs
+            if self.clams_type['name'] in 'Token Sentence Paragraph Markable NamedEntity NounChunk VerbChunk'.split():
+                children.append(get_identity_row(f'http://vocab.lappsgrid.org/{self.clams_type["name"]}'))
+            else:
+                patches = [0, 1]
+                if self.clams_type['name'] != 'Annotation':
+                    patches.append(2)
+                for patch in patches:
+                    children.append(get_identity_row(f'https://mmif.clams.ai/0.4.{patch}/vocabulary/{self.clams_type["name"]}/'))
         elif self.clams_type['version'] == 'v2' and self.clams_type['name'] == 'Annotation':
             children.append(
                 get_identity_row(f'https://mmif.clams.ai/0.4.2/vocabulary/{self.clams_type["name"]}/'))
