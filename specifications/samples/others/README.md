@@ -1,0 +1,1 @@
+This directory contains legacy MMIF sample files preserved for historical reference. These files are outdated and do not conform to the current format specification.

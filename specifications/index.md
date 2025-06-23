@@ -246,12 +246,9 @@ The two required keys are `@type` and `properties`. As mentioned before, the `@t
 We will discuss more details on annotation type vocabularies in the ["vocabulary" section](#mmif-and-the-vocabularies). 
 {: .box-note}
 
-Regardless of the type, all annotations must have `id` property. The `id` should have a string value ("short" form) that is unique relative to all annotation elements in the view, and these annotations can be uniquely referred to by using their _parent_ view identifier and the annotation identifier, separated by a colon (the "long" form ID). For example, if the time frame annotation above is in the `"v1"` view's anntoations list, then it should be referred to by other annotations using `"v1:f1"`.
+Regardless of the type, all annotations must have the `id` property. The `id` should have a string value that is unique relative to all annotation elements in the MMIF, and these annotations can be uniquely referred to by using these identifier. By convention, we use annotation identifiers prefixed with their parent_ view identifiers, separated by a colon (`:`). For example, if the time frame annotation above is in the `"v1"` view's annotations list, then it should be assigned with identifier `"v1:f1"`, and later can be referred to by other annotations using `"v1:f1"`. This is the reference implementation in the `mmif-python` Python SDK, and its purpose is to eliminate possible ambiguity. That said, views in the top-level `views` field and documents in the top-level `documents` field do not have the _parent_ view to prefix, hence their identifier format is much simpler.
 
-The string value of `id` property is always the "short" form ID (not prefixed with the _parent_ view identifier). However, it is always recommended to use the long form ID when referring to an annotation object, even within the same view, to eliminate possible ambiguity. That said, views in the top-level `views` field and documents in the top-level `documents` field do not have the long form ID.
-{: .box-note}
-
-Note that the colon character (`:`) is reserved for delimiting view and annotation identifiers, hence can't be used as a part of ID strings
+Note that the colon character (`:`) is reserved, by convention, as the delimiter in prefixed annotation identifiers, hence can't be used as a part of ID strings
 {: .box-warning}
 
 The annotations list is shallow, that is, all annotations in a view are in that list and annotations are not embedded inside other annotations. However, the values of individual property can have arbitrarily complex data structures, as long as the structure and the type is well-documented in the underlying type definitions. 
@@ -272,12 +269,12 @@ Here is another example of a view containing two bounding boxes created by a tex
   "annotations": [
     { "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
       "properties": {
-        "id": "bb0",
+        "id": "v1:bb0",
         "coordinates": [[10,20], [60,20], [10,50], [60,50]] }
     },
     { "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
       "properties": {
-        "id": "bb1",
+        "id": "v1:bb1",
         "coordinates": [[90,40], [110,40], [90,80], [110,80]] }
     }
   ]
@@ -320,7 +317,7 @@ The result of this processing is a MMIF document with an image document and a vi
         { 
           "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
           "properties": {
-            "id": "bb1",
+            "id": "v1:bb1",
             "coordinates": [[10,20], [40,20], [10,30], [40,30]],
             "label": "text" }
         }
@@ -345,7 +342,7 @@ The OCR app will then add a view to this MMIF document that contains a text docu
     { 
       "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
       "properties": {
-        "id": "td1",
+        "id": "v2:td1",
         "text": {
           "@value": "yelp" } }
     },
@@ -353,13 +350,13 @@ The OCR app will then add a view to this MMIF document that contains a text docu
       "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
       "properties": {
         "source": "v1:bb1",
-        "target": "v1:td1" }
+        "target": "v2:td1" }
     }
   ]
 }
 ```
 
-The text document annotation is the same kind of objects as the text document objects in the toplevel `documents` property, it has the same type and uses the same properties. Notice also that the history of the text document, namely that it was derived from a particular bounding box in a particular image, can be traced via the alignment of the text document with the bounding box. Also notice that when a document in a view is referred, the reference takes the "long" form ID. 
+The text document annotation is the same kind of object as the text document objects in the toplevel `documents` property, it has the same type and uses the same properties. Notice also that the history of the text document, namely that it was derived from a particular bounding box in a particular image, can be traced via the alignment of the text document with the bounding box. Also notice that when a document in a view is referred to, the reference takes the "long" form ID. 
 
 Now this text document can be input to language processing. A named entity recognition (NER) component will not do anything interesting with this text so let's say we have a semantic typing component that has *"dog-sound"* as one of its categories. That hypothetical semantic typing component would add a new view to the list. That semantic typing component would add a new view to the list:
 
@@ -376,7 +373,7 @@ Now this text document can be input to language processing. A named entity recog
     { 
       "@type": "http://vocab.lappsgrid.org/SemanticTag",
       "properties": {
-        "id": "st1",
+        "id": "v3:st1",
         "category": "dog-sound",
         "start": 0,
         "end": 4 }
@@ -412,7 +409,7 @@ The image with the dog in the previous section just had a bounding box for the p
     { 
       "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
       "properties": {
-        "id": "td1",
+        "id": "v2:td1",
         "text": {
           "@value": "yelp" } }
     },
@@ -425,7 +422,7 @@ The image with the dog in the previous section just had a bounding box for the p
     { 
       "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
       "properties": {
-        "id": "td2",
+        "id": "v2:td2",
         "text": {
           "@value": "woof" } }
     },
@@ -455,7 +452,7 @@ Now if you run the semantic tagger you would get tags with the category set to "
     { 
       "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER",
       "properties": {
-        "id": "st1",
+        "id": "v3:st1",
         "category": "dog-sound",
         "document": "V2:td1",
         "start": 0,
@@ -464,7 +461,7 @@ Now if you run the semantic tagger you would get tags with the category set to "
     { 
       "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER",
       "properties": {
-        "id": "st2",
+        "id": "v3:st2",
         "category": "dog-sound",
         "document": "V2:td2",
         "start": 0,
@@ -489,7 +486,7 @@ The structure of MMIF files is defined in the [schema](schema/mmif.json)  and de
 {
   "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
   "properties": {
-    "id": "bb1",
+    "id": "v0:bb1",
     "coordinates": [[0,0], [10,0], [0,10], [10,10]]
   }
 }

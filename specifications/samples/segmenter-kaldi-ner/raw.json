@@ -28,7 +28,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
-            "id": "tf1",
+            "id": "v1:tf1",
             "frameType": "speech",
             "start": 17,
             "end": 132
@@ -38,7 +38,7 @@
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
             "frameType": "non-speech",
-            "id": "tf2",
+            "id": "v1:tf2",
             "start": 132,
             "end": 194
           }
@@ -46,7 +46,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
-            "id": "tf3",
+            "id": "v1:tf3",
             "frameType": "speech",
             "start": 194,
             "end": 342
@@ -72,7 +72,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
           "properties": {
-            "id": "td1",
+            "id": "v2:td1",
             "text": {
               "@value": "Fido barks"
             }
@@ -81,7 +81,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
-            "id": "a1",
+            "id": "v2:a1",
             "source": "v1:tf1",
             "target": "v2:td1"
           }
@@ -89,7 +89,7 @@
         {
           "@type": "http://vocab.lappsgrid.org/Token",
           "properties": {
-            "id": "t1",
+            "id": "v2:t1",
             "document": "v2:td1",
             "start": 0,
             "end": 4,
@@ -99,7 +99,7 @@
         {
           "@type": "http://vocab.lappsgrid.org/Token",
           "properties": {
-            "id": "t2",
+            "id": "v2:t2",
             "document": "v2:td1",
             "start": 5,
             "end": 10,
@@ -109,7 +109,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
-            "id": "tf1",
+            "id": "v2:tf1",
             "start": 17,
             "end": 64
           }
@@ -117,7 +117,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
-            "id": "tf2",
+            "id": "v2:tf2",
             "start": 65,
             "end": 132
           }
@@ -125,7 +125,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
-            "id": "a2",
+            "id": "v2:a2",
             "source": "v2:tf1",
             "target": "v2:t1"
           }
@@ -133,7 +133,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
-            "id": "a3",
+            "id": "v2:a3",
             "source": "v2:tf2",
             "target": "v2:t2"
           }
@@ -141,7 +141,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
           "properties": {
-            "id": "td2",
+            "id": "v2:td2",
             "textSource": "v1:tf3",
             "text": {
               "@value": "Fluffy sleeps"
@@ -151,7 +151,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
-            "id": "a4",
+            "id": "v2:a4",
             "source": "v1:tf3",
             "target": "v2:td2"
           }
@@ -159,7 +159,7 @@
         {
           "@type": "http://vocab.lappsgrid.org/Token",
           "properties": {
-            "id": "t3",
+            "id": "v2:t3",
             "document": "v2:td2",
             "start": 0,
             "end": 6,
@@ -169,7 +169,7 @@
         {
           "@type": "http://vocab.lappsgrid.org/Token",
           "properties": {
-            "id": "t4",
+            "id": "v2:t4",
             "document": "v2:td2",
             "start": 7,
             "end": 13,
@@ -179,7 +179,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
-            "id": "tf3",
+            "id": "v2:tf3",
             "start": 194,
             "end": 240
           }
@@ -187,7 +187,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
-            "id": "tf4",
+            "id": "v2:tf4",
             "start": 241,
             "end": 342
           }
@@ -195,7 +195,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
-            "id": "a5",
+            "id": "v2:a5",
             "source": "v2:tf3",
             "target": "v2:t3"
           }
@@ -203,7 +203,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
-            "id": "a5",
+            "id": "v2:a5",
             "source": "v2:tf4",
             "target": "v2:t4"
           }
@@ -222,7 +222,7 @@
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
           "properties": {
-            "id": "ne1",
+            "id": "v3:ne1",
             "document": "v2:td1",
             "start": 0,
             "end": 4,
@@ -233,7 +233,7 @@
         {
           "@type": "http://vocab.lappsgrid.org/NamedEntity",
           "properties": {
-            "id": "ne2",
+            "id": "v3:ne2",
             "document": "v2:td2",
             "start": 0,
             "end": 6,

@@ -37,7 +37,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
-            "id": "s1",
+            "id": "v1:s1",
             "start": 0,
             "end": 5,
             "frameType": "bars-and-tones"
@@ -61,7 +61,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
           "properties": {
-            "id": "s1",
+            "id": "v2:s1",
             "start": 25,
             "end": 38,
             "frameType": "slate"
@@ -84,7 +84,7 @@
         {
           "@type": "http://vocab.lappsgrid.org/Token",
           "properties": {
-            "id": "s1",
+            "id": "v3:s1",
             "start": 0,
             "end": 3,
             "word": "The"
