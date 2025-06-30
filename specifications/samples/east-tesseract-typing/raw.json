@@ -28,7 +28,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
           "properties": {
-            "id": "bb1",
+            "id": "v1:bb1",
             "coordinates": [ [10, 20], [40, 20], [10, 30], [40, 30] ],
             "label": "text"
           }
@@ -36,7 +36,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
           "properties": {
-            "id": "bb2",
+            "id": "v1:bb2",
             "coordinates": [ [210, 220], [240, 220], [210, 230], [240, 230] ],
             "label": "text"
           }
@@ -56,7 +56,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
           "properties": {
-            "id": "td1",
+            "id": "v2:td1",
             "text": {
               "@value": "Arf"
             }
@@ -65,15 +65,15 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
-            "id": "a1",
+            "id": "v2:a1",
             "source": "v1:bb1",
-            "target": "td1"
+            "target": "v2:td1"
           }
         },
         {
           "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
           "properties": {
-            "id": "td2",
+            "id": "v2:td2",
             "text": {
               "@value": "yelp"
             }
@@ -82,9 +82,9 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
           "properties": {
-            "id": "a2",
+            "id": "v2:a2",
             "source": "v1:bb2",
-            "target": "td2"
+            "target": "v2:td2"
           }
         }
       ]
@@ -101,7 +101,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER",
           "properties": {
-            "id": "st1",
+            "id": "v3:st1",
             "category": "dog-sound",
             "document": "V2:td1",
             "start": 0,
@@ -111,7 +111,7 @@
         {
           "@type": "http://mmif.clams.ai/vocabulary/SemanticTag/$SemanticTag_VER",
           "properties": {
-            "id": "st2",
+            "id": "v3:st2",
             "category": "dog-sound",
             "document": "V2:td2",
             "start": 0,
