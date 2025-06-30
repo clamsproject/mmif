@@ -100,7 +100,7 @@
         "contains": {
           "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
           "http://vocab.lappsgrid.org/Token": {
-            "document": "td1"
+            "document": "v4:td1"
           },
           "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER": {
             "timeUnit": "milliseconds",

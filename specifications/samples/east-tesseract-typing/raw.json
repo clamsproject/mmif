@@ -67,7 +67,7 @@
           "properties": {
             "id": "v2:a1",
             "source": "v1:bb1",
-            "target": "td1"
+            "target": "v2:td1"
           }
         },
         {
@@ -84,7 +84,7 @@
           "properties": {
             "id": "v2:a2",
             "source": "v1:bb2",
-            "target": "td2"
+            "target": "v2:td2"
           }
         }
       ]
