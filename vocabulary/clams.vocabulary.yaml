@@ -77,13 +77,13 @@ properties:
       defined in the <code>labelset</code> or <code>labelsetUri</code> 
       annotation metadata. 
       <br><br>
-      For example, for <code>Sentence</code> subtype, this could
+      For example, for the <code>Sentence</code> subtype, this could
       be used to indicate the type of sentence, such as "declarative", 
       "interrogative", "exclamatory", etc. For <code>NamedEntity</code> 
       subtype, this could be used to indicate the type of named entity, 
       such as "PER", "ORG", "LOC", "MISC" (following the CoNLL-2003 labels). 
       <br><br>
-      For non-linguistic annotations, for example as <code>TimeFrame<code>, 
+      For non-linguistic annotations, for example for <code>TimeFrame<code>, 
       this could be used to indicate the type of the time frame, such as
       "speech", "music", "noise", "bars-and-tones", etc, for acoustic 
       classification. Or "slate", "lower-third", "credits" for visual 
