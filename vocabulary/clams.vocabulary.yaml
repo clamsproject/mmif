@@ -72,11 +72,25 @@ properties:
   label:
     type: String
     description: >-
-      A label given to this object by a classifier. The value must be a simple 
-      string value of the label and must be one of the values defined in the
-      <code>labelset</code> or <code>labelsetUri</code> annotation metadata.
+      A label given to this object by classification. The value must be a
+      simple string value of the label and must be one of the values 
+      defined in the <code>labelset</code> or <code>labelsetUri</code> 
+      annotation metadata. 
       <br><br>
-      [Note] Annotations from a classifier app must have this property.
+      For example, for the <code>Sentence</code> subtype, this could
+      be used to indicate the type of sentence, such as "declarative", 
+      "interrogative", "exclamatory", etc. For <code>NamedEntity</code> 
+      subtype, this could be used to indicate the type of named entity, 
+      such as "PER", "ORG", "LOC", "MISC" (following the CoNLL-2003 labels). 
+      <br><br>
+      For non-linguistic annotations, for example for <code>TimeFrame<code>, 
+      this could be used to indicate the type of the time frame, such as
+      "speech", "music", "noise", "bars-and-tones", etc, for acoustic 
+      classification. Or "slate", "lower-third", "credits" for visual 
+      classification of video frames.
+      <br><br>
+      [Note] Annotations from a type of classifier model must have this 
+      property.
   classifications:
     type: Map from String to Number
     description: >-
@@ -174,6 +188,115 @@ description: >-
   pointing directly into primary data (by using start and end offsets) or
   by linking to one or more other Annotations with the targets property.
 
+properties: 
+  text:
+    type: String
+    description: The surface string in the primary data covered by this span.
+---
+
+name: Token
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/Token
+
+description: >-
+  A string of one or more characters that serves as an indivisible unit 
+  for the purposes of morpho-syntactic labeling (part of speech tagging).
+
+properties:
+  pos:
+    type: String or URI
+    description: Part-of-speech tag associated with the token.
+  lemma:
+    type: String or URI
+    description: >-
+      The root (base) form associated with the token. URI may point to a 
+      lexicon entry.
+  orth:
+    type: String or URI
+    description: >-
+      Orthographic properties of the token such as LowerCase, UpperCase, 
+      UpperInitial, etc. Ideally a URI referencing a pre-defined descriptor.
+
+---
+
+name: Sentence
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/Sentence
+
+description: >
+  A sequence of words capable of standing alone to make an assertion, ask a
+  question, or give a command, usually consisting of a subject and a predicate
+  containing a finite verb.
+
+---
+
+name: Paragraph
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/Paragraph
+
+description: >-
+  A division of a piece of writing, usually dealing with a single theme and 
+  indicated by a new line, indentation, and/or numbering.
+
+---
+
+name: NamedEntity
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/NamedEntity
+
+description: >-
+  A phrase that clearly identifies an individual from others that have similar 
+  attributes, such as the name of a person, organization, location, artifact, 
+  etc. as well as temporal expressions.
+
+---
+
+name: NounChunk
+parent: Span
+
+similarTo:
+  - http://vocab.lappsgrid.org/NounChunk
+
+description: >-
+  The initial portion of a non-recursive noun phrase up to the head, including 
+  determiners but not including postmodifying prepositional phrases or clauses.
+
+---
+
+name: VerbChunk
+parent: Span
+
+similarTo: 
+  - http://vocab.lappsgrid.org/VerbChunk
+  
+description: >-
+  Non-recursive verb groups, which include modals, auxiliary verbs, and medial
+  adverbs, and end at the head verb or predicate adjective.
+
+properties:
+  tense:
+    type: String or URI
+    description: >-
+      Provides tense information for the verb. Example values include BeVBG,
+      BeVBN, FutCon, HaveVBN, Pas, PasCon, PasPer, PasPerCon, Per, Pre, PreCon,
+      PrePer, PrePerCon, SimFut, SimPas, SimPre, none
+  voice:
+    type: String or URI
+    description: >-
+      Indicates if the verb group is active or passive. Possible values include
+      ACTIVE, PASSIVE, or NONE
+  neg:
+    type: String or URI
+    description: Indicates whether or not the verb is negated. Values include YES, NO.
+
 ---
 
 name: TimeFrame
@@ -194,7 +317,6 @@ properties:
       <br><br>
       No longer encouraged to use, instead <code>label</code> property
       should replace this property.
-
 
 ---
 
