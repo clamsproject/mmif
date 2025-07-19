@@ -124,7 +124,9 @@ metadata:
     description: >-
       Specifies which unit of time the measurement is based. 
       Can be *seconds* or *milliseconds*, or in case of annotations on 
-      a VideoDocument, *frames*. 
+      a VideoDocument, *frames*. If not specified, *milliseconds* (in whole numbers) is assumed.
+      <br><br>
+      [Note] This metadata is only relevant for time-based annotations.
 
 ---
 
