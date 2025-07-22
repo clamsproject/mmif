@@ -6,6 +6,13 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 
 This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
+## Version 1.1.0 - 2025-07-22
+
+- Migrated `Span`-based types from the LAPPS vocabulary, significantly expanding the MMIF vocabulary.
+- Made the `timeUnit` property for all time-based annotation types optional, defaulting to `milliseconds`.
+- Clarified that annotation IDs must be unique across the entire MMIF file.
+- Updated example documents to reflect these changes.
+
 ## Version 1.0.5 - 2023-06-25
 - Fixed typo in a sample MMIF file
 

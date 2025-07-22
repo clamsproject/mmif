@@ -341,11 +341,15 @@ class TypePage(Page):
         def get_identity_row(identity_url):
             return TABLE_ROW([tag('td', text='Also known as'), tag('td', dtrs=[HREF(identity_url, identity_url)])])
         if self.clams_type['version'] == 'v1':
-            patches = [0, 1]
-            if self.clams_type['name'] != 'Annotation':
-                patches.append(2)
-            for patch in patches:
-                children.append(get_identity_row(f'https://mmif.clams.ai/0.4.{patch}/vocabulary/{self.clams_type["name"]}/'))
+            # old lapps vocabs
+            if self.clams_type['name'] in 'Token Sentence Paragraph Markable NamedEntity NounChunk VerbChunk'.split():
+                children.append(get_identity_row(f'http://vocab.lappsgrid.org/{self.clams_type["name"]}'))
+            else:
+                patches = [0, 1]
+                if self.clams_type['name'] != 'Annotation':
+                    patches.append(2)
+                for patch in patches:
+                    children.append(get_identity_row(f'https://mmif.clams.ai/0.4.{patch}/vocabulary/{self.clams_type["name"]}/'))
         elif self.clams_type['version'] == 'v2' and self.clams_type['name'] == 'Annotation':
             children.append(
                 get_identity_row(f'https://mmif.clams.ai/0.4.2/vocabulary/{self.clams_type["name"]}/'))
@@ -359,23 +363,25 @@ class TypePage(Page):
         self.main_content.append(H1('Metadata'))
         if self.metadata:
             self._add_properties_aux(self.metadata)
-        self._add_properties_from_chain('metadata')
+        print('found meta:', self.metadata)
+        self._add_properties_from_chain('metadata', shadowed_names=self.metadata.keys() if self.metadata else {})
 
     def _add_properties(self) -> None:
         self.main_content.append(H1('Properties'))
         if self.properties:
             self._add_properties_aux(self.properties)
-        self._add_properties_from_chain('properties')
+        print('found prop:', self.properties)
+        self._add_properties_from_chain('properties', shadowed_names=self.properties.keys() if self.properties else {})
 
-    def _add_properties_from_chain(self, proptype) -> None:
+    def _add_properties_from_chain(self, proptype, shadowed_names={}) -> None:
         for n in self._chain_to_top():
             properties = n.get(proptype, None)
             if properties is not None:
                 h2 = H2("%s from %s" % (proptype.capitalize(), n['name']))
                 self.main_content.append(h2)
-                self._add_properties_aux(properties)
+                self._add_properties_aux(properties, shadowed_names)
 
-    def _add_properties_aux(self, properties) -> None:
+    def _add_properties_aux(self, properties, shadowed_names={}) -> None:
         if properties:
             th1 = tag('th', {'class': 'fixed'}, text='Property')
             th2 = tag('th', {'class': 'fixed'}, text='Type')
@@ -391,7 +397,7 @@ class TypePage(Page):
                 if prop_required:
                     req = tag('span', {'class': 'required'}, text='[Required]')
                     description_cell.append(req)
-                row = TABLE_ROW([tag('td', {}, prop),
+                row = TABLE_ROW([tag('td', {}, prop if prop not in shadowed_names else f'<s>{prop}</s> (shadowed)'),
                                  tag('td', {}, prop_type),
                                  description_cell])
                 table.append(row)
@@ -485,7 +491,7 @@ def build_spec(src, dst, mmif_version, attypes_versions):
     for name, version in attypes_versions.items():
         version_dict[f"{name}_VER"] = version 
     version_dict['VERSION'] = mmif_version
-    copy(src, dst, exclude_fnames={'next.md', 'notes', 'samples/others'}, templating=version_dict)
+    copy(src, dst, exclude_fnames={'next.md', 'notes', 'samples/others', 'samples/everything/scripts'}, templating=version_dict)
 
 
 def build_schema(src, dst, version):
@@ -548,7 +554,13 @@ def build_vocab(src, index_dir, mmif_version, item_dir) -> Tree:
     updated = collections.defaultdict(lambda: False)
     
     def propagate_version_changes(node, parent_changed=False):
-        if parent_changed:
+        if node['name'] not in old_types:
+            # a newly added type, don't propagate to its children
+            updated[node['name']] = False
+            for child in node['childNodes']:
+                propagate_version_changes(child, False)
+
+        elif parent_changed:
             updated[node['name']] = True
             for child in node['childNodes']:
                 propagate_version_changes(child, True)

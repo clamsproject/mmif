@@ -4,6 +4,9 @@ title: MMIF Context Files
 subtitle: version $VERSION
 ---
 
+MMIF no longer relies on JSON-LD `@context` and context files in this directory. The contents of this directory (documentation and context files) are kept here for historical reasons.
+
+---
 JSON-LD context definitions can be used to help expand terms in the MMIF document to full URIs. Rather than using inline context definitions we use context files.
 
 There are two kinds of terms that we want to expand:

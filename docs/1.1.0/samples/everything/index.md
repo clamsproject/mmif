@@ -1,7 +1,7 @@
 ---
 layout: page
 title: MMIF Specification
-subtitle: Version $VERSION
+subtitle: Version 1.1.0
 ---
 
 # Example: Everything and the kitchen sink
@@ -33,7 +33,7 @@ The first three steps are straightforward and all result in views with time fram
 
 ```json
 {
-	"@type": "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER",
+	"@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v6",
 	"properties": {
 		"id": "tf2",
 		"frameType": "speech",
@@ -60,13 +60,13 @@ In the metadata it spells out that the offsets of all tokens are taken to be off
 {
   "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
   "contains": {
-    "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
-    "http://mmif.clams.ai/vocabulary/Token/$Token_VER": {
+    "http://mmif.clams.ai/vocabulary/TextDocument/v1": {},
+    "http://mmif.clams.ai/vocabulary/Token/v1": {
       "document": "td1" },
-    "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER": {
+    "http://mmif.clams.ai/vocabulary/TimeFrame/v6": {
       "timeUnit": "milliseconds",
       "document": "m1" },
-    "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER": {}
+    "http://mmif.clams.ai/vocabulary/Alignment/v1": {}
   }
 }
 ```
@@ -75,7 +75,7 @@ Note that a text document can refer to its text by either using the *text* prope
 
 ```json
 {
-	"@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
+	"@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
 	"properties": {
 		"id": "td1",
 		"mime": "text/plain",
@@ -91,7 +91,7 @@ This text is aligned with the second time frame from the segmenter.
 
 ```json
 {
-	"@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
+	"@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
 	"properties": {
 		"id": "a1",
 		"source": "v3:tf2",
@@ -109,7 +109,7 @@ EAST adds bounding boxes anchored to the video document with id=m1:
 {
   "app": "http://mmif.clams.ai/apps/east/0.2.1",
   "contains": {
-    "http://mmif.clams.ai/$VERSION/BoundingBox": { "document": "m1" }
+    "http://mmif.clams.ai/1.1.0/BoundingBox": { "document": "m1" }
 }
 ```
 
@@ -117,7 +117,7 @@ Let's assume that EAST runs on frames sampled from the video at 1 second interva
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER",
+  "@type": "http://mmif.clams.ai/vocabulary/BoundingBox/v5",
   "properties": {
     "id": "bb9",
     "timePoint": 4000,
@@ -139,10 +139,10 @@ Thus, the metadata of the new view would be:
 {
   "app": "http://mmif.clams.ai/apps/tesseract/0.4.4",
   "contains": {
-    "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
-    "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER": {
-      "sourceType": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER", 
-      "targetType": "http://mmif.clams.ai/vocabulary/BoundingBox/$BoundingBox_VER"
+    "http://mmif.clams.ai/vocabulary/TextDocument/v1": {},
+    "http://mmif.clams.ai/vocabulary/Alignment/v1": {
+      "sourceType": "http://mmif.clams.ai/vocabulary/TextDocument/v1", 
+      "targetType": "http://mmif.clams.ai/vocabulary/BoundingBox/v5"
     }
   }
 }
@@ -155,7 +155,7 @@ Now the recognition results are recorded as text documents, here's one:
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER",
+  "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
   "properties": {
     "id": "td1",
     "text": { "@value": "DATE" } }
@@ -166,7 +166,7 @@ And here is the corresponding alignment from the bounding box to the text docume
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/vocabulary/Alignment/$Alignment_VER",
+  "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
   "properties": {
     "id": "a1",
     "source": "v5:bb1",
@@ -182,7 +182,7 @@ After Kaldi and Tesseract have added text documents we now have all text extract
 
 ```json
 {
-  "@type": "http://mmif.clams.ai/vocabulary/NamedEntity/$NamedEntity_VER",
+  "@type": "http://mmif.clams.ai/vocabulary/NamedEntity/v1",
   "properties": {
     "id": "ne1",
     "document": "v6:td2",
