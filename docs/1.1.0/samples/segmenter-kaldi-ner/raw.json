@@ -1,0 +1,247 @@
+{
+  "metadata": {
+    "mmif": "http://mmif.clams.ai/1.1.0"
+  },
+  "documents": [
+    {
+      "@type": "http://mmif.clams.ai/vocabulary/AudioDocument/v1",
+      "properties": {
+        "id": "m1",
+        "mime": "audio/mpeg",
+        "location": "file:///var/archive/audio-002.mp3"
+      }
+    }
+  ],
+  "views": [
+    {
+      "id": "v1",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/audio-segmenter/0.2.1",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/TimeFrame/v6": {
+            "timeUnit": "milliseconds",
+            "document": "m1"
+          }
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v6",
+          "properties": {
+            "id": "v1:tf1",
+            "frameType": "speech",
+            "start": 17,
+            "end": 132
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v6",
+          "properties": {
+            "frameType": "non-speech",
+            "id": "v1:tf2",
+            "start": 132,
+            "end": 194
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v6",
+          "properties": {
+            "id": "v1:tf3",
+            "frameType": "speech",
+            "start": 194,
+            "end": 342
+          }
+        }
+      ]
+    },
+    {
+      "id": "v2",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/TextDocument/v1": {},
+          "http://mmif.clams.ai/vocabulary/Token/v1": {},
+          "http://mmif.clams.ai/vocabulary/TimeFrame/v6": {
+            "timeUnit": "milliseconds",
+            "document": "m1"
+          },
+          "http://mmif.clams.ai/vocabulary/Alignment/v1": {}
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
+          "properties": {
+            "id": "v2:td1",
+            "text": {
+              "@value": "Fido barks"
+            }
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "v2:a1",
+            "source": "v1:tf1",
+            "target": "v2:td1"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Token/v1",
+          "properties": {
+            "id": "v2:t1",
+            "document": "v2:td1",
+            "start": 0,
+            "end": 4,
+            "text": "Fido"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Token/v1",
+          "properties": {
+            "id": "v2:t2",
+            "document": "v2:td1",
+            "start": 5,
+            "end": 10,
+            "text": "barks"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v6",
+          "properties": {
+            "id": "v2:tf1",
+            "start": 17,
+            "end": 64
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v6",
+          "properties": {
+            "id": "v2:tf2",
+            "start": 65,
+            "end": 132
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "v2:a2",
+            "source": "v2:tf1",
+            "target": "v2:t1"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "v2:a3",
+            "source": "v2:tf2",
+            "target": "v2:t2"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TextDocument/v1",
+          "properties": {
+            "id": "v2:td2",
+            "textSource": "v1:tf3",
+            "text": {
+              "@value": "Fluffy sleeps"
+            }
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "v2:a4",
+            "source": "v1:tf3",
+            "target": "v2:td2"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Token/v1",
+          "properties": {
+            "id": "v2:t3",
+            "document": "v2:td2",
+            "start": 0,
+            "end": 6,
+            "text": "Fluffy"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Token/v1",
+          "properties": {
+            "id": "v2:t4",
+            "document": "v2:td2",
+            "start": 7,
+            "end": 13,
+            "text": "sleeps"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v6",
+          "properties": {
+            "id": "v2:tf3",
+            "start": 194,
+            "end": 240
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/TimeFrame/v6",
+          "properties": {
+            "id": "v2:tf4",
+            "start": 241,
+            "end": 342
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "v2:a5",
+            "source": "v2:tf3",
+            "target": "v2:t3"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/Alignment/v1",
+          "properties": {
+            "id": "v2:a5",
+            "source": "v2:tf4",
+            "target": "v2:t4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "v3",
+      "metadata": {
+        "app": "http://mmif.clams.ai/apps/stanford-ner/0.2.1",
+        "contains": {
+          "http://mmif.clams.ai/vocabulary/NamedEntity/v1": {}
+        }
+      },
+      "annotations": [
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/NamedEntity/v1",
+          "properties": {
+            "id": "v3:ne1",
+            "document": "v2:td1",
+            "start": 0,
+            "end": 4,
+            "category": "Person",
+            "text": "Fido"
+          }
+        },
+        {
+          "@type": "http://mmif.clams.ai/vocabulary/NamedEntity/v1",
+          "properties": {
+            "id": "v3:ne2",
+            "document": "v2:td2",
+            "start": 0,
+            "end": 6,
+            "category": "Person",
+            "text": "Fluffy"
+          }
+        }
+      ]
+    }
+  ]
+}

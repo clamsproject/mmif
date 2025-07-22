@@ -21,6 +21,7 @@ navbar-links:
   CLAMS: "https://clams.ai"
   # a new version will be added here by build.py
   VERSIONS:
+    - 1.1.0: '1.1.0'
     - 1.0.5: '1.0.5'
     - 1.0.4: '1.0.4'
     - 1.0.3: '1.0.3'
