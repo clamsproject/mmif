@@ -1,0 +1,301 @@
+<html>
+  <head>
+    <link href="../../css/lappsstyle.css" rel="stylesheet" type="text/css"/>
+    <title>
+      Constituent
+    </title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="intro">
+        <div id="pageHeader">
+          <h1>
+            Constituent (v1)
+          </h1>
+          <h2>
+            CLAMS Vocabulary
+          </h2>
+        </div>
+      </div>
+      <div id="mainContent">
+        <div id="sectionbar">
+          <p>
+            included in:
+            <a href="../../../1.1.0/vocabulary">
+              1.1.0
+            </a>
+          </p>
+        </div>
+        <p class="head">
+          <a href="../../Thing/v1">
+            Thing
+          </a>
+          <span>
+            >
+          </span>
+          <a href="../../Annotation/v6">
+            Annotation
+          </a>
+          <span>
+            >
+          </span>
+          <a href="../../Relation/v5">
+            Relation
+          </a>
+          <span>
+            >
+          </span>
+          <span>
+            Constituent
+          </span>
+        </p>
+        <br/>
+        <table>
+          <tr>
+            <td class="fixed">
+              <b>
+                Definition
+              </b>
+            </td>
+            <td>
+              A constituent of a <link>PhraseStructure</link> (parse tree).
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>
+                URI
+              </b>
+            </td>
+            <td>
+              <a href="http://mmif.clams.ai/vocabulary/Constituent/v1">
+                http://mmif.clams.ai/vocabulary/Constituent/v1
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Also known as
+            </td>
+            <td>
+              <a href="https://mmif.clams.ai/0.4.0/vocabulary/Constituent/">
+                https://mmif.clams.ai/0.4.0/vocabulary/Constituent/
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Also known as
+            </td>
+            <td>
+              <a href="https://mmif.clams.ai/0.4.1/vocabulary/Constituent/">
+                https://mmif.clams.ai/0.4.1/vocabulary/Constituent/
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Also known as
+            </td>
+            <td>
+              <a href="https://mmif.clams.ai/0.4.2/vocabulary/Constituent/">
+                https://mmif.clams.ai/0.4.2/vocabulary/Constituent/
+              </a>
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Metadata
+        </h1>
+        <h2>
+          Metadata from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              document
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the document that the annotation is over. This has to be defined either at the metadata level, in which case it has scope over all annotations of the same type in a view, or at the instance level, in which it has scope over just the single annotation.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              labelset
+            </td>
+            <td>
+              List of Strings
+            </td>
+            <td>
+              When an annotation object contains results of a classification task, this metadata is used to specify the label values used in classification. Individual annotations then must have <code>label</code> property that is one of the values in this list.  <br><br> [Note] Annotations from a classifier app must have this metadata or <code> labelsetUri </code> metadata. <br><br> [Note] Not all of labels specified in the <code>labelset</code> must occur in the output annotations. For  example, a <code>labelset</code> can contain a <i>catch-all</i> negative label, but if the negative label can be not interesting enough to keep in  the output annotation.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              labelsetUri
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              A URI to an externally defined labelset. Since the <code>labelset</code> metadata is a list of simple strings, this URI can be used to point to a more detailed definition of the labelset. This can be a JSON-LD document or a SKOS concept scheme, for example.  <br><br> [Note] Annotations from a classifier app must have this metadata or <code> labelset </code> metadata.
+            </td>
+          </tr>
+        </table>
+        <h1>
+          Properties
+        </h1>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              parent
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The parent (if any) of this constituent.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              children
+            </td>
+            <td>
+              List of IDs
+            </td>
+            <td>
+              The children (if any) of this constituent. The children are typically  other Constituent annotations or <link>Token</link>s.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Annotation
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              document
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              The identifier of the document that the annotation is over.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              label
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              A label given to this object by classification. The value must be a simple string value of the label and must be one of the values  defined in the <code>labelset</code> or <code>labelsetUri</code>  annotation metadata.  <br><br> For example, for the <code>Sentence</code> subtype, this could be used to indicate the type of sentence, such as "declarative",  "interrogative", "exclamatory", etc. For <code>NamedEntity</code>  subtype, this could be used to indicate the type of named entity,  such as "PER", "ORG", "LOC", "MISC" (following the CoNLL-2003 labels).  <br><br> For non-linguistic annotations, for example for <code>TimeFrame<code>,  this could be used to indicate the type of the time frame, such as "speech", "music", "noise", "bars-and-tones", etc, for acoustic  classification. Or "slate", "lower-third", "credits" for visual  classification of video frames. <br><br> [Note] Annotations from a type of classifier model must have this  property.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              classifications
+            </td>
+            <td>
+              Map from String to Number
+            </td>
+            <td>
+              Alias for the <code>classification</code> metadata. Here for historical reasons.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              classification
+            </td>
+            <td>
+              Map from String to Number
+            </td>
+            <td>
+              A map from label values to their "score" numbers provided by a classifier. The score can be probability, similarity, confidence, or any other real  number that was used to determine the label value.  <br><br> [Optional] on top of the <code>label</code> property. However when this  property is used, the <code>label</code> property must be one of the keys and the keys must match to the values defined in the <code>labelset</code>
+  or <code>labelsetUri</code> annotation metadata.
+            </td>
+          </tr>
+        </table>
+        <h2>
+          Properties from Thing
+        </h2>
+        <table class="definition-table">
+          <tr>
+            <th class="fixed">
+              Property
+            </th>
+            <th class="fixed">
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              id
+            </td>
+            <td>
+              ID
+            </td>
+            <td>
+              A unique identifier for the annotation or document. Uniqueness is relative to the view the annotation is in or the list of documents at the top level of a MMIF file.
+              <span class="required">
+                [Required]
+              </span>
+            </td>
+          </tr>
+        </table>
+        <br/>
+      </div>
+    </div>
+    <div id="footer">
+      Page generated on 2025-07-22 at 17:42:25
+    </div>
+  </body>
+</html>
