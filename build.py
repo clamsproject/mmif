@@ -491,7 +491,7 @@ def build_spec(src, dst, mmif_version, attypes_versions):
     for name, version in attypes_versions.items():
         version_dict[f"{name}_VER"] = version 
     version_dict['VERSION'] = mmif_version
-    copy(src, dst, exclude_fnames={'next.md', 'notes', 'samples/others'}, templating=version_dict)
+    copy(src, dst, exclude_fnames={'next.md', 'notes', 'samples/others', 'samples/everything/scripts'}, templating=version_dict)
 
 
 def build_schema(src, dst, version):
