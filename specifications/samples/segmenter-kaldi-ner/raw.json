@@ -60,7 +60,7 @@
         "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
         "contains": {
           "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
-          "http://vocab.lappsgrid.org/Token": {},
+          "http://mmif.clams.ai/vocabulary/Token/$Token_VER": {},
           "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER": {
             "timeUnit": "milliseconds",
             "document": "m1"
@@ -87,7 +87,7 @@
           }
         },
         {
-          "@type": "http://vocab.lappsgrid.org/Token",
+          "@type": "http://mmif.clams.ai/vocabulary/Token/$Token_VER",
           "properties": {
             "id": "v2:t1",
             "document": "v2:td1",
@@ -97,7 +97,7 @@
           }
         },
         {
-          "@type": "http://vocab.lappsgrid.org/Token",
+          "@type": "http://mmif.clams.ai/vocabulary/Token/$Token_VER",
           "properties": {
             "id": "v2:t2",
             "document": "v2:td1",
@@ -157,7 +157,7 @@
           }
         },
         {
-          "@type": "http://vocab.lappsgrid.org/Token",
+          "@type": "http://mmif.clams.ai/vocabulary/Token/$Token_VER",
           "properties": {
             "id": "v2:t3",
             "document": "v2:td2",
@@ -167,7 +167,7 @@
           }
         },
         {
-          "@type": "http://vocab.lappsgrid.org/Token",
+          "@type": "http://mmif.clams.ai/vocabulary/Token/$Token_VER",
           "properties": {
             "id": "v2:t4",
             "document": "v2:td2",
@@ -215,30 +215,30 @@
       "metadata": {
         "app": "http://mmif.clams.ai/apps/stanford-ner/0.2.1",
         "contains": {
-          "http://vocab.lappsgrid.org/NamedEntity": {}
+          "http://mmif.clams.ai/vocabulary/NamedEntity/$NamedEntity_VER": {}
         }
       },
       "annotations": [
         {
-          "@type": "http://vocab.lappsgrid.org/NamedEntity",
+          "@type": "http://mmif.clams.ai/vocabulary/NamedEntity/$NamedEntity_VER",
           "properties": {
             "id": "v3:ne1",
             "document": "v2:td1",
             "start": 0,
             "end": 4,
             "category": "Person",
-            "word": "Fido"
+            "text": "Fido"
           }
         },
         {
-          "@type": "http://vocab.lappsgrid.org/NamedEntity",
+          "@type": "http://mmif.clams.ai/vocabulary/NamedEntity/$NamedEntity_VER",
           "properties": {
             "id": "v3:ne2",
             "document": "v2:td2",
             "start": 0,
             "end": 6,
             "category": "Person",
-            "word": "Fluffy"
+            "text": "Fluffy"
           }
         }
       ]

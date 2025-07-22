@@ -61,7 +61,7 @@ In the metadata it spells out that the offsets of all tokens are taken to be off
   "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
   "contains": {
     "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
-    "http://vocab.lappsgrid.org/Token": {
+    "http://mmif.clams.ai/vocabulary/Token/$Token_VER": {
       "document": "td1" },
     "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER": {
       "timeUnit": "milliseconds",
@@ -182,7 +182,7 @@ After Kaldi and Tesseract have added text documents we now have all text extract
 
 ```json
 {
-  "@type": "http://vocab.lappsgrid.org/NamedEntity",
+  "@type": "http://mmif.clams.ai/vocabulary/NamedEntity/$NamedEntity_VER",
   "properties": {
     "id": "ne1",
     "document": "v6:td2",

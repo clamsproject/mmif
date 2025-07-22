@@ -62,7 +62,7 @@ Metadata:
   "app": "http://mmif.clams.ai/apps/kaldi/0.2.1",
   "contains": {
     "http://mmif.clams.ai/vocabulary/TextDocument/$TextDocument_VER": {},
-    "http://vocab.lappsgrid.org/Token": {},
+    "http://mmif.clams.ai/vocabulary/Token/$Token_VER": {},
     "http://mmif.clams.ai/vocabulary/TimeFrame/$TimeFrame_VER": {
       "timeUnit": "milliseconds",
       "document": "m1" },
@@ -152,7 +152,7 @@ Metadata:
 {
   "app": "http://mmif.clams.ai/apps/stanford-ner/0.2.1",
   "contains": {
-    "http://vocab.lappsgrid.org/NamedEntity": {} }
+    "http://mmif.clams.ai/vocabulary/NamedEntity/$NamedEntity_VER": {} }
 }
 ```
 
@@ -160,14 +160,14 @@ One of the two named entity annotations:
 
 ```json
 {
-  "@type": "http://vocab.lappsgrid.org/NamedEntity",
+  "@type": "http://mmif.clams.ai/vocabulary/NamedEntity/$NamedEntity_VER",
   "properties": {
     "id": "ne1",
     "document": "v2:td1",
     "start": 0,
     "end": 4,
     "category": "Person",
-    "word": "Fido" }
+    "text": "Fido" }
 }
 ```
 
