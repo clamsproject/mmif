@@ -9,11 +9,10 @@ MMIF is an annotation format for audiovisual media and associated text like tran
 MMIF consists of two formal components in addition to this more informal specification:
 1. The JSON schema:
   - [https://mmif.clams.ai/$VERSION/schema/mmif.json](schema/mmif.json)
-1. The Vocabularies (the type hierarchies):
+1. The Vocabulary (the type hierarchy):
   - [https://clams.ai/vocabulary/](https://clams.ai/vocabulary/)
-  - [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org)
 
-The JSON schema for MMIF defines the syntactic elements of MMIF which will be explained at length in ["structure" section](#the-structure-of-mmif-files). These specifications often refer to elements from the CLAMS and LAPPS Vocabularies which define concepts and their ontological relations, see ["vocabulary" section](#mmif-and-the-vocabularies) for notes on those vocabularies.
+The JSON schema for MMIF defines the syntactic elements of MMIF which will be explained at length in ["structure" section](#the-structure-of-mmif-files). These specifications often refer to elements from the CLAMS Vocabulary which defines concepts and their ontological relations, see ["vocabulary" section](#mmif-and-the-vocabulary) for notes on the vocabulary.
 
 Along with the formal specifications and documentation we also provide a reference implementation of MMIF. It is developed in the Python programming language, and it will be distributed via GitHub (as source code) as well as via the [Python Package Index](https://pypi.org/) (as a Python library). The package will function as a software development kit (SDK), that helps users (mostly developers) to easily use various features of MMIF in developing their own applications.
 
@@ -175,7 +174,7 @@ parameters, that were actually used by the app. For the time being, automatic re
 
 But refinedment process can be more complex in the future. 
 
-The `contains` dictionary has keys that refer to annotation objects in the CLAMS or LAPPS vocabulary, or user-defined objects. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations, and it gives two metadata values for that annotation type:
+The `contains` dictionary has keys that refer to annotation types in the CLAMS Vocabulary or user-defined types. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations, and it gives two metadata values for that annotation type:
 
 1. The `document` key gives the identifier of the document that the annotations of that type in this view are over. As we will see later, annotations anchor into documents using keys like `start` and `end` and this property specifies what document that is.
 2. The `timeUnit` key is set to "seconds" and this means that for each annotation the unit for the values in `start` and `end` are seconds. 
@@ -239,9 +238,9 @@ The value of the `annotations` property on a view is a list of annotation object
 }
 ```
 
-The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary contains the properties defined for the annotation type in the [CLAMS Vocabulary](https://clams.ai/vocabulary/) or [LAPPS Vocabulary](http://vocab.lappsgrid.org/). Value types for properties are specified in the vocabulary and typically are strings, identifiers (referring to other annotations) and integers, or lists thereof, but can be more complex.
+The two required keys are `@type` and `properties`. As mentioned before, the `@type` key in JSON-LD is used to define the type of data structure. The `properties` dictionary contains the properties defined for the annotation type in the [CLAMS Vocabulary](https://clams.ai/vocabulary/). Value types for properties are specified in the vocabulary and typically are strings, identifiers (referring to other annotations) and integers, or lists thereof, but can be more complex.
 
-We will discuss more details on annotation type vocabularies in the ["vocabulary" section](#mmif-and-the-vocabularies). 
+We will discuss more details on annotation type vocabularies in the ["vocabulary" section](#mmif-and-the-vocabulary). 
 {: .box-note}
 
 Regardless of the type, all annotations must have the `id` property. The `id` should have a string value that is unique relative to all annotation elements in the MMIF, and these annotations can be uniquely referred to by using these identifier. By convention, we use annotation identifiers prefixed with their parent_ view identifiers, separated by a colon (`:`). For example, if the time frame annotation above is in the `"v1"` view's annotations list, then it should be assigned with identifier `"v1:f1"`, and later can be referred to by other annotations using `"v1:f1"`. This is the reference implementation in the `mmif-python` Python SDK, and its purpose is to eliminate possible ambiguity. That said, views in the top-level `views` field and documents in the top-level `documents` field do not have the _parent_ view to prefix, hence their identifier format is much simpler.
@@ -471,12 +470,12 @@ Now if you run the semantic tagger you would get tags with the category set to "
 
 Notice how the document to which the *SemanticTag* annotations point is not expressed by the metadata `document` property but by individual `document` properties on each semantic tag. This is unavoidable when we have multiple text documents that can be input to language processing.
 
-The above glances over the problem that we need some way for the OCR app to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, we may need to solve what we never really solved for LAPPS which is what view should be used as input for an application.
+The above glances over the problem that we need some way for the OCR app to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, the question of which view should be used as input for an application remains an open design problem (see [clams-python#262](https://github.com/clamsproject/clams-python/issues/262)).
 {: .box-note}
 
 
 
-## MMIF and the Vocabularies
+## MMIF and the Vocabulary
 
 The structure of MMIF files is defined in the [schema](schema/mmif.json) and described in this document. But the semantics of what is expressed in the views are determined by the [CLAMS Vocabulary](https://clams.ai/vocabulary/), which is maintained and versioned independently of this specification. Each annotation in a view has two fields: `@type` and `properties`. The value of `@type` is typically an annotation type URI from the vocabulary. Here is a *BoundingBox* annotation as an example:
 
@@ -510,9 +509,7 @@ Some properties can be expressed at the view level rather than on individual ann
 }
 ```
 
-Annotations in a MMIF file often refer to the LAPPS Vocabulary at [http://vocab.lappsgrid.org](http://vocab.lappsgrid.org). In that case, the annotation type in `@type` will refer to a URL just as with CLAMS annotation types, the only difference is that the URL will be in the LAPPS Vocabulary. Properties and metadata properties of LAPPS annotation types are defined and used the same way as described above for CLAMS types.
-
-Using a LAPPS type is actually an instance of the more general notion that the value of `@type` can be any URL (actually, any IRI). You can use any annotation category defined elsewhere, for example, you can use categories defined by the creator of an application or categories from other vocabularies. Here is an example with a type from [https://schema.org](https://schema.org):
+The value of `@type` can be any IRI, not just a CLAMS Vocabulary type. You can use any annotation category defined elsewhere, for example, categories defined by the creator of an application or types from other vocabularies. Here is an example with a type from [https://schema.org](https://schema.org):
 
 ```json
 {
