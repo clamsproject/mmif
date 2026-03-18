@@ -539,7 +539,7 @@ To finish off this document we provide some examples of complete MMIF documents:
 | [segmenter-kaldi-ner](samples/segmenter-kaldi-ner)     | Audio segmentation followed by Kaldi speech recognition and NER.                    |
 | [everything](samples/everything)                       | A big MMIF example with various multimodal AI apps for video/audio as well as text. |
 
-Each example has some comments and a link to a raw JSON file.
+Each example has some comments and a link to a raw JSON file. Note that these examples may be outdated as they are no longer updated by the spec build process.
 
-As we move along integrating new applications, other examples will be added with other kinds of annotation types.
+Validated, up-to-date MMIF examples are maintained in the [`mmif-python`](https://github.com/clamsproject/mmif-python) repository as test fixtures.
 
