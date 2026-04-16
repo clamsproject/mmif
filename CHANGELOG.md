@@ -35,7 +35,7 @@ This file documents changes made to the MMIF specification. Version names used t
 
 ## Version 0.5.0 - 2023-04-21
 
-- Changed IRI format of CLAMS vocabulary items
+- Changed URI format of CLAMS vocabulary items
     * old format: `https://mmif.clams.ai/<VERSION>/vocabulary/<TYPE_NAME>`
     * new format: `https://mmif.clams.ai/vocabulary/<TYPE_NAME>/<VERSION>`
 - CLAMS vocabulary items are now versioned independently of the MMIF version. See comments time-stamped between Feb 2023 - Apr 2023 in these threads for discussion behind this big change: 
