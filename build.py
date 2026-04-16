@@ -19,7 +19,7 @@ import urllib.error
 import warnings
 from os.path import join as pjoin
 from string import Template
-from typing import Union, Dict, Optional, Set
+from typing import Dict, Set
 from urllib import request
 
 INCLUDE_CONTEXT = False
@@ -33,7 +33,7 @@ def copy(src_dir: str, dst_dir: str, include_fnames: Set = {}, exclude_fnames: S
                 continue
             elif not include_fnames or f in include_fnames:
                 os.makedirs(pjoin(dst_dir, r), exist_ok=True)
-                if templating and (f.endswith('.json') or f.endswith('.md')):
+                if templating and f.endswith('.md'):
                     with open(pjoin(src_dir, r, f), 'r') as in_f, open(pjoin(dst_dir, r, f), 'w') as out_f:
                         tmpl_to_compile = Template(in_f.read())
                         compiled = tmpl_to_compile.safe_substitute(templating)
@@ -50,8 +50,8 @@ def check_version_exists(version: str):
         if version in tags:
             raise RuntimeError(f"{version} already exists, can't overwrite an exising version.")
     except urllib.error.URLError:
-        warnings.warn(f"Cannot connect to the remote repository.\n"
-                      f"Now using local git tags to check version conflict.",
+        warnings.warn("Cannot connect to the remote repository.\n"
+                  "Now using local git tags to check version conflict.",
                       category=RuntimeWarning)
         proc = subprocess.run('git tag'.split(), cwd=os.path.abspath(os.path.dirname(__file__)), capture_output=True)
         if version in proc.stdout.decode('ascii').split('\n'):
