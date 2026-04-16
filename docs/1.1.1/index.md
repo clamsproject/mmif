@@ -1,14 +1,14 @@
 ---
 layout: page
 title: MMIF Specification
-subtitle: Version $VERSION
+subtitle: Version 1.1.1
 ---
 
 MMIF is an annotation format for audiovisual media and associated text like transcripts and closed captions. It is a JSON-LD format used to transport data between CLAMS apps and is inspired by and partially based on LIF, the [LAPPS Interchange Format](https://wiki.lappsgrid.org/interchange/). MMIF is pronounced *mif* or *em-mif*, or, if you like to hum, *mmmmmif*.
 
 MMIF consists of two formal components in addition to this more informal specification:
 1. The JSON schema:
-  - [https://mmif.clams.ai/$VERSION/schema/mmif.json](schema/mmif.json)
+  - [https://mmif.clams.ai/1.1.1/schema/mmif.json](schema/mmif.json)
 1. The Vocabulary (the type hierarchy):
   - [https://clams.ai/vocabulary/](https://clams.ai/vocabulary/)
 
@@ -43,7 +43,7 @@ The top-level structure of a MMIF file is as follows:
 ```json
 {
   "metadata": {
-    "mmif": "http://mmif.clams.ai/$VERSION" },
+    "mmif": "http://mmif.clams.ai/1.1.1" },
   "documents": [ ],
   "views": [ ]
 }
@@ -397,7 +397,7 @@ The image with the dog in the previous section just had a bounding box for the p
 {
   "id": "v2",
   "metadata": {
-    "app": "http://mmif.clams.ai/apps/tesseract/$VERSION",
+    "app": "http://mmif.clams.ai/apps/tesseract/1.1.1",
     "contains": {
       "http://clams.ai/vocabulary/type/TextDocument/v?": {},
       "http://clams.ai/vocabulary/type/Alignment/v?": {} }
