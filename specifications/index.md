@@ -509,7 +509,7 @@ Some properties can be expressed at the view level rather than on individual ann
 }
 ```
 
-The value of `@type` can be any IRI, not just a CLAMS Vocabulary type. You can use any annotation category defined elsewhere, for example, categories defined by the creator of an application or types from other vocabularies. Here is an example with a type from [https://schema.org](https://schema.org):
+The value of `@type` can be any URI, not just a CLAMS Vocabulary type. You can use any annotation category defined elsewhere, for example, categories defined by the creator of an application or types from other vocabularies. Here is an example with a type from [https://schema.org](https://schema.org):
 
 ```json
 {
