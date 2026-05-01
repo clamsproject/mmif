@@ -154,7 +154,14 @@ This property contains information about the annotations in a view. Here is an e
     }
   },
   "parameters": {"threshold": "0.5", "not-defined-parameter":  "some-value"},
-  "appConfiguration": {"threshold": 0.5}
+  "appConfiguration": {"threshold": 0.5},
+  "appProfiling": {
+    "runningTime": "0:00:05.466913",
+    "hardware": {
+      "cpu": "x86_64, 8 cores",
+      "cuda": ["NVIDIA GeForce RTX 3060, 12.00 GiB total, 8.63 GiB available, 3.37 GiB peak used"]
+    }
+  }
 }
 ```
 
@@ -173,6 +180,22 @@ parameters, that were actually used by the app. For the time being, automatic re
 3. Removing undefined parameters.
 
 But refinedment process can be more complex in the future. 
+
+The optional `appProfiling` is a dictionary of runtime measurements collected by the app while producing this view. The only sub-field formally defined by this specification is `runningTime`, a string holding the wall-clock duration of the app's processing call; the spec does not mandate an encoding. All other sub-fields of `appProfiling`, such as the `hardware` block in the example above, are at the app's discretion and may evolve independently of the spec; consumers must tolerate unknown sub-fields and treat them as advisory. As with `parameters` and `appConfiguration`, the contents are recorded for reproducibility and accountability and are not part of the annotation payload.
+
+**Reference implementation:** the reference `clams-python` SDK emits `runningTime` in Python's native `str(datetime.timedelta)` form `[D day[s], ]H:MM:SS[.ffffff]` (e.g. `"0:00:05.466913"`, `"1 day, 2:03:04"`). The rest of the reference implementation stack (e.g. `mmif-python`'s workflow helper) expects this form when consuming `runningTime`.
+{: .box-note}
+
+Other encodings that may appear from non-reference producers:
+
+| Convention | Format | Example |
+|---|---|---|
+| ISO 8601 *time-of-day* | `HH:MM:SS` with optional decimal seconds (≤ 24 hours) | `"01:23:45.678"` |
+| ISO 8601 *duration* (period) | `P[n]DT[n]H[n]M[n]S` with optional decimal seconds | `"PT5.466913S"`, `"P1DT2H3M4S"` |
+| Python `str(timedelta)` | `[D day[s], ]H:MM:SS[.ffffff]` | `"0:00:05.466913"`, `"1 day, 2:03:04"` |
+
+ISO 8601 leaves fractional-second precision implementation-defined; the six-digit microsecond shown in the Python row is specific to Python.
+{: .box-note}
 
 The `contains` dictionary has keys that refer to annotation types in the CLAMS Vocabulary or user-defined types. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations, and it gives two metadata values for that annotation type:
 
