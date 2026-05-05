@@ -114,7 +114,7 @@ The value associated with `@value` is a string and the value associated with `@l
 
 ### The *views* property
 
-This is where all the annotations and associated metadata live. Views contain structured information about documents but are separate from those documents. The value of `views` is a JSON-LD array of view objects where each view specifies what documents the annotation is over, what information it contains and what app created that information. To that end, each view has four properties:  `id`, `metadata` and `annotations`.
+This is where all the annotations and associated metadata live. Views contain structured information about documents but are separate from those documents. The value of `views` is a JSON-LD array of view objects where each view specifies what documents the annotation is over, what information it contains and what app created that information. To that end, each view has three top-level keys: `id`, `metadata` and `annotations`.
 
 ```json
 {
@@ -127,15 +127,14 @@ This is where all the annotations and associated metadata live. Views contain st
   ]
 }
 ```
+The view's `id` (here `"v1"`) is a string that uniquely identifies the view within the MMIF. The colon character (`:`) is reserved as the delimiter used in annotation identifiers (see below) so it must not appear inside any individual `id` value. The annotation ID convention is detailed further in the [annotations section](#the-views-annotations-property).
 
 
 Here are a few general principles relevant to views:
 
-1. Each view in a MMIF has a unique identifier.
 1. There is no limit to the number of views.
 1. Apps may create as many new views as they want.
 1. Apps may not change or add information to existing views, that is, views are generally considered read-only, which has many advantages at the cost of some redundancy. Since views are read-only, apps may not overwrite or delete information in existing views. This holds for the view’s metadata as well as the annotations.
-1. Annotations in views have identifiers that are unique to the view. Views have identifiers that uniquely define them relative to other views.
 
 We now describe the metadata and the annotations.
 
@@ -162,7 +161,7 @@ The `timestamp` key stores when the view was created by the application. This is
 
 The `app` key contains an identifier that specifies what application created the view. The identifier must be a URL form, and HTTP webpage pointed by the URL should contain all app metadata information relevant for the application: description, configuration, input/output specifications and a more complete description of what output is created. The app identifier always includes a version number for the app. The metadata should also contain a link to the public code repository for the app (and that repository will actually maintain all the information in the URL).
 
-The `parameters` is a dictionary of runtime parameters and their *string* values, if any.  The primary purpose of this dictionary is to record the parameters "as-is" for reproducibility and accountability.  Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings.  Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.
+The `parameters` key contains a dictionary of runtime parameters and their *string* values, if any.  The primary purpose of this dictionary is to record the parameters "as-is" for reproducibility and accountability.  Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings.  Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.  How exactly each runtime parameter ends up in this dictionary is up to the app implementation, but the recommended behavior (and the convention assumed in the examples in this document) is to record every parameter received at runtime verbatim, including keys that the app does not recognize as part of its declared parameter specification.  In the example above, `not-defined-parameter` illustrates such a case: it is not a parameter the app knows about, but it was passed in the request and is recorded here as the reference behavior.  Under this convention, unrecognized keys are dropped during refinement and will not appear in `appConfiguration` (see below).
 
 
 The `appConfiguration` is a dictionary of parameters and their values, after some automatic refinement of the runtime 
