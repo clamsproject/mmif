@@ -106,6 +106,15 @@
         },
         "appConfiguration": {
           "type": "object"
+        },
+        "appProfiling": {
+          "type": "object",
+          "properties": {
+            "runningTime": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         }
       },
       "oneOf": [
