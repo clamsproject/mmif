@@ -146,6 +146,7 @@ This property contains information about the annotations in a view. Here is an e
 {
   "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
   "timestamp": "2020-05-27T12:23:45",
+  "appTags": ["TemporalSegmentation", "BarsDetection"],
   "contains": {
     "http://clams.ai/vocabulary/type/TimeFrame/v?": {
       "timeUnit": "seconds",
@@ -168,7 +169,9 @@ The `timestamp` key stores when the view was created by the application. This is
 
 The `app` key contains an identifier that specifies what application created the view. The identifier must be a URL form, and HTTP webpage pointed by the URL should contain all app metadata information relevant for the application: description, configuration, input/output specifications and a more complete description of what output is created. The app identifier always includes a version number for the app. The metadata should also contain a link to the public code repository for the app (and that repository will actually maintain all the information in the URL).
 
-The `parameters` key contains a dictionary of runtime parameters and their *string* values, if any.  The primary purpose of this dictionary is to record the parameters "as-is" for reproducibility and accountability.  Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings.  Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.  How exactly each runtime parameter ends up in this dictionary is up to the app implementation, but the recommended behavior (and the convention assumed in the examples in this document) is to record every parameter received at runtime verbatim, including keys that the app does not recognize as part of its declared parameter specification.  In the example above, `not-defined-parameter` illustrates such a case: it is not a parameter the app knows about, but it was passed in the request and is recorded here as the reference behavior.  Under this convention, unrecognized keys are dropped during refinement and will not appear in `appConfiguration` (see below).
+The optional `appTags` key carries a list of short string labels that classify what kind of work the view represents. The values are advisory and are intended as a first-pass filter for downstream consumers (e.g. choosing a visualization tab, selecting views for evaluation, finding a substitutable upstream view); they are not a substitute for inspecting the view's `contains` dictionary and the annotations themselves. The labels shown in the example above (`"TemporalSegmentation"`, `"BarsDetection"`) are illustrative only — actual tag values come from the producing app's own metadata. A controlled vocabulary of well-known tags is under discussion (see [clams-python#262](https://github.com/clamsproject/clams-python/issues/262)) but is not yet established; for now this field accepts any string values.
+
+The `parameters` key contains a dictionary of runtime parameters and their *string* values, if any.  The primary purpose of this dictionary is to record the parameters "as-is" for reproducibility and accountability.  Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings.  Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.
 
 
 The `appConfiguration` is a dictionary of parameters and their values, after some automatic refinement of the runtime 
@@ -492,7 +495,7 @@ Now if you run the semantic tagger you would get tags with the category set to "
 
 Notice how the document to which the *SemanticTag* annotations point is not expressed by the metadata `document` property but by individual `document` properties on each semantic tag. This is unavoidable when we have multiple text documents that can be input to language processing.
 
-The above glances over the problem that we need some way for the OCR app to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, the question of which view should be used as input for an application remains an open design problem (see [clams-python#262](https://github.com/clamsproject/clams-python/issues/262)).
+The above glances over the problem that we need some way for the OCR app to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, the question of which view should be used as input for an application remains an open design problem (see [clams-python#262](https://github.com/clamsproject/clams-python/issues/262)). The optional `appTags` view-metadata field can serve as a first-pass filter for selecting candidate views, but consumers must still verify the chosen view's annotation types and properties.
 {: .box-note}
 
 
