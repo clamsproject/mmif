@@ -114,7 +114,7 @@ The value associated with `@value` is a string and the value associated with `@l
 
 ### The *views* property
 
-This is where all the annotations and associated metadata live. Views contain structured information about documents but are separate from those documents. The value of `views` is a JSON-LD array of view objects where each view specifies what documents the annotation is over, what information it contains and what app created that information. To that end, each view has four properties:  `id`, `metadata` and `annotations`.
+This is where all the annotations and associated metadata live. Views contain structured information about documents but are separate from those documents. The value of `views` is a JSON-LD array of view objects where each view specifies what documents the annotation is over, what information it contains and what app created that information. To that end, each view has three top-level keys: `id`, `metadata` and `annotations`.
 
 ```json
 {
@@ -127,15 +127,14 @@ This is where all the annotations and associated metadata live. Views contain st
   ]
 }
 ```
+The view's `id` (here `"v1"`) is a string that uniquely identifies the view within the MMIF. The colon character (`:`) is reserved as the delimiter used in annotation identifiers (see below) so it must not appear inside any individual `id` value. The annotation ID convention is detailed further in the [annotations section](#the-views-annotations-property).
 
 
 Here are a few general principles relevant to views:
 
-1. Each view in a MMIF has a unique identifier.
 1. There is no limit to the number of views.
 1. Apps may create as many new views as they want.
 1. Apps may not change or add information to existing views, that is, views are generally considered read-only, which has many advantages at the cost of some redundancy. Since views are read-only, apps may not overwrite or delete information in existing views. This holds for the view’s metadata as well as the annotations.
-1. Annotations in views have identifiers that are unique to the view. Views have identifiers that uniquely define them relative to other views.
 
 We now describe the metadata and the annotations.
 
@@ -147,6 +146,7 @@ This property contains information about the annotations in a view. Here is an e
 {
   "app": "http://apps.clams.ai/bars-and-tones/1.0.5",
   "timestamp": "2020-05-27T12:23:45",
+  "appTags": ["TemporalSegmentation", "BarsDetection"],
   "contains": {
     "http://clams.ai/vocabulary/type/TimeFrame/v?": {
       "timeUnit": "seconds",
@@ -154,7 +154,14 @@ This property contains information about the annotations in a view. Here is an e
     }
   },
   "parameters": {"threshold": "0.5", "not-defined-parameter":  "some-value"},
-  "appConfiguration": {"threshold": 0.5}
+  "appConfiguration": {"threshold": 0.5},
+  "appProfiling": {
+    "runningTime": "0:00:05.466913",
+    "hardware": {
+      "cpu": "x86_64, 8 cores",
+      "cuda": ["NVIDIA GeForce RTX 3060, 12.00 GiB total, 8.63 GiB available, 3.37 GiB peak used"]
+    }
+  }
 }
 ```
 
@@ -162,7 +169,9 @@ The `timestamp` key stores when the view was created by the application. This is
 
 The `app` key contains an identifier that specifies what application created the view. The identifier must be a URL form, and HTTP webpage pointed by the URL should contain all app metadata information relevant for the application: description, configuration, input/output specifications and a more complete description of what output is created. The app identifier always includes a version number for the app. The metadata should also contain a link to the public code repository for the app (and that repository will actually maintain all the information in the URL).
 
-The `parameters` is a dictionary of runtime parameters and their *string* values, if any.  The primary purpose of this dictionary is to record the parameters "as-is" for reproducibility and accountability.  Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings.  Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.
+The optional `appTags` key carries a list of short string labels that classify what kind of work the view represents. The values are advisory and are intended as a first-pass filter for downstream consumers (e.g. choosing a visualization tab, selecting views for evaluation, finding a substitutable upstream view); they are not a substitute for inspecting the view's `contains` dictionary and the annotations themselves. The labels shown in the example above (`"TemporalSegmentation"`, `"BarsDetection"`) are illustrative only — actual tag values come from the producing app's own metadata. A controlled vocabulary of well-known tags is under discussion (see [clams-python#262](https://github.com/clamsproject/clams-python/issues/262)) but is not yet established; for now this field accepts any string values.
+
+The `parameters` key contains a dictionary of runtime parameters and their *string* values, if any.  The primary purpose of this dictionary is to record the parameters "as-is" for reproducibility and accountability.  Note that CLAMS apps are developed to run as HTTP servers, expecting parameters to be passed as URL query strings.  Hence, the values in the `parameters` dictionary are always strings or simple lists of strings.
 
 
 The `appConfiguration` is a dictionary of parameters and their values, after some automatic refinement of the runtime 
@@ -173,6 +182,22 @@ parameters, that were actually used by the app. For the time being, automatic re
 3. Removing undefined parameters.
 
 But refinedment process can be more complex in the future. 
+
+The optional `appProfiling` is a dictionary of runtime measurements collected by the app while producing this view. The only sub-field formally defined by this specification is `runningTime`, a string holding the wall-clock duration of the app's processing call; the spec does not mandate an encoding. All other sub-fields of `appProfiling`, such as the `hardware` block in the example above, are at the app's discretion and may evolve independently of the spec; consumers must tolerate unknown sub-fields and treat them as advisory. As with `parameters` and `appConfiguration`, the contents are recorded for reproducibility and accountability and are not part of the annotation payload.
+
+**Reference implementation:** the reference `clams-python` SDK emits `runningTime` in Python's native `str(datetime.timedelta)` form `[D day[s], ]H:MM:SS[.ffffff]` (e.g. `"0:00:05.466913"`, `"1 day, 2:03:04"`). The rest of the reference implementation stack (e.g. `mmif-python`'s workflow helper) expects this form when consuming `runningTime`.
+{: .box-note}
+
+Other encodings that may appear from non-reference producers:
+
+| Convention | Format | Example |
+|---|---|---|
+| ISO 8601 *time-of-day* | `HH:MM:SS` with optional decimal seconds (≤ 24 hours) | `"01:23:45.678"` |
+| ISO 8601 *duration* (period) | `P[n]DT[n]H[n]M[n]S` with optional decimal seconds | `"PT5.466913S"`, `"P1DT2H3M4S"` |
+| Python `str(timedelta)` | `[D day[s], ]H:MM:SS[.ffffff]` | `"0:00:05.466913"`, `"1 day, 2:03:04"` |
+
+ISO 8601 leaves fractional-second precision implementation-defined; the six-digit microsecond shown in the Python row is specific to Python.
+{: .box-note}
 
 The `contains` dictionary has keys that refer to annotation types in the CLAMS Vocabulary or user-defined types. Namely, they indicate the kind of annotations that live in the view. The value of each of those keys is a JSON object which contains metadata specified for the annotation type. The example above has one key that indicates that the view contains *TimeFrame* annotations, and it gives two metadata values for that annotation type:
 
@@ -470,7 +495,7 @@ Now if you run the semantic tagger you would get tags with the category set to "
 
 Notice how the document to which the *SemanticTag* annotations point is not expressed by the metadata `document` property but by individual `document` properties on each semantic tag. This is unavoidable when we have multiple text documents that can be input to language processing.
 
-The above glances over the problem that we need some way for the OCR app to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, the question of which view should be used as input for an application remains an open design problem (see [clams-python#262](https://github.com/clamsproject/clams-python/issues/262)).
+The above glances over the problem that we need some way for the OCR app to know what bounding boxes to take. We can do that by either introducing some kind of type or use the `app` property in the metadata or maybe by introducing a subtype for BoundingBox like TextBox. In general, the question of which view should be used as input for an application remains an open design problem (see [clams-python#262](https://github.com/clamsproject/clams-python/issues/262)). The optional `appTags` view-metadata field can serve as a first-pass filter for selecting candidate views, but consumers must still verify the chosen view's annotation types and properties.
 {: .box-note}
 
 

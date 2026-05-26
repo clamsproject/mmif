@@ -64,6 +64,14 @@
           "format": "uri",
           "minLength": 7
         },
+        "appTags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
         "contains": {
           "type": "object",
           "additionalProperties": false,
@@ -98,6 +106,15 @@
         },
         "appConfiguration": {
           "type": "object"
+        },
+        "appProfiling": {
+          "type": "object",
+          "properties": {
+            "runningTime": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         }
       },
       "oneOf": [
