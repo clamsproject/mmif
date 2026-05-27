@@ -6,6 +6,18 @@ The format is loosely based on [Keep a Changelog](http://keepachangelog.com/). L
 
 This file documents changes made to the MMIF specification. Version names used to start with `spec-` because the Python MMIF SDK was also maintained in this repository. Starting with version 0.2.2 the repository was split and the prefix was discarded.
 
+## Version 1.2.0 - 2026-05-26
+
+- Added optional field `mmif.view.metadata.appTags` to classify the kind of work a view represents with short string labels (advisory; no controlled vocabulary is mandated yet).
+- Added optional field `mmif.view.metadata.appProfiling` to record runtime measurements collected while producing a view. Only `runningTime` is formally defined by the spec; other sub-fields (e.g. CPU/GPU info, memory footprint) are at the producing app's discretion.
+- Clarified `parameters` dict semantics, corrected the view-properties count, and reworded the metadata-properties section around annotation IDs.
+
+## Version 1.1.1 - 2026-04-16
+
+- Moved the CLAMS Vocabulary out of this repository into the standalone `clams-vocabulary` Python package.
+- Froze sample MMIF files at the 1.1.0 vocabulary URI; the contents of `samples/` will no longer be updated as vocabulary types evolve.
+- Updated wording around the Annotation `metadata` property.
+
 ## Version 1.1.0 - 2025-07-22
 
 - Migrated `Span`-based types from the LAPPS vocabulary, significantly expanding the MMIF vocabulary.
